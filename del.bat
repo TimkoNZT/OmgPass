@@ -1,7 +1,7 @@
 del *.dcu
 del *.exe
 del *.local
-del *.identcache
+;del *.identcache
 ;del win32\debug\*.dcu
 ;del win32\debug\*.exe
 :del win32\release\*.dcu

@@ -336,12 +336,12 @@ var
 	newTreeNode: TTreeNode;
 begin
 	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then Exit;
-    newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder', 1);
+    newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder');
     newFolderNode.Text:='Новая папка';
     newFolderNode.SetAttributeNS('type', '', 'folder');
     newFolderNode.SetAttributeNS('picture', '', 'folder');
     if (not treeNode.Expanded) then treeNode.Expand(False);
-	With TTreeView(treeNode.TreeView).Items.AddChildFirst(treeNode, 'Новая папка') do begin
+	With TTreeView(treeNode.TreeView).Items.AddChild(treeNode, 'Новая папка') do begin
 		Data:=Pointer(newFolderNode);
         ImageIndex:=0;
         SelectedIndex:=0;
