@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root signature="Omg!Pass file" version="1.0" type="root">
+	<Header type="header">
+		<Title>Тест-версия базы данных для Omg!pass</Title>
+		<Password>А нужен ли здесь пароль?</Password>
+		<Author>Nazarov Timur</Author>
+		<Owner>Pavlova Maria</Owner>
+		<Date>13.08.2014 - Дата создания или последнего сохранения?</Date>
+	</Header>
+	<Data type="data">
+		<Page type="page">Общее222
+			<DefFolder type="deffolder" picture="folder">Новая папка
+			</DefFolder>
+			<DefItem type="defitem" picture="item">
+				<Field name="Название" format="title">Запись</Field>
+				<Field name="Логин" format="text"></Field>
+				<Field name="Пароль" Format="pass"></Field>
+			</DefItem>
+			<Folder type="folder" picture="folder">Привет
+				<Item type="item" picture="item">
+					<Field name="Название" button="False" format="title" visible="True">Форум 4PDA.ру</Field>
+					<Field name="Логин" format="text" button="True" visible="True">mrgnstrn</Field>
+					<Field name="Пароль" format="pass" hide="True">4a4ij299</Field>
+					<Field name="Запасной пароль" format="pass" visible="True">5459649765464</Field>
+					<Field name="Сайт" format="web" visible="True">www.4pda.ru</Field>
+					<Field name="Дата" format="date" visible="True">15.08.2014</Field>
+					<Field name="Комментарий" format="comment" button="False" visible="True">Привет всем |как дела?|Много|Страничный|Тоесть|Мультилиновый|Комментарий|Хорошо, что этого никто не видит</Field>
+					<Field name="Описание" format="comment" visible="True">А тут пусто |как дела?</Field>
+					<Field name="Е-Майл" format="mail" visible="True">mrgnstrn@4pda.ru</Field>
+					<Field name="Прикрепленный файл" format="file" visible="True">source.txt</Field>
+				</Item>
+				<Folder type="folder" picture="folder">Форумы
+				<Title>Папка в папке</Title>
+					<Item type="item" picture="item">
+						<Field name="Название" format="title" visible="True">Альфабанк</Field>
+						<Field name="Логин" format="text" visible="True">mrgnstrn</Field>
+						<Field name="Пароль" format="pass" hide="True">4a4ij299</Field>
+						<Field name="Сайт" format="web" visible="True">www.4pda.ru</Field>
+						<Field name="Дата окончания пароля" format="date" visible="True">15.08.2014</Field>
+						<Field name="Комментарий" format="comment" visible="True">Привет всем |как дела?</Field>
+					</Item>
+					<Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+					<Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+				</Folder>
+			</Folder>
+		</Page>
+	</Data>
+</Root>
