@@ -88,7 +88,6 @@ begin
     //LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
 	With TFieldFrame.CreateParented(Panel.Handle) do begin
-    	Visible:=False;
 		Parent:=Panel;
         Align:=alTop;
         lblTitle.Caption:=GetAttribute(nField, 'name');
@@ -138,7 +137,6 @@ begin
         SetButtonImg(btnSmart, 4);
         btnSmart.OnClick:= clsSmartMethods.Create.EditField;
         end;
-    Visible:=True;
     end;
     //Log('--------------------GenerateField:End');
 end;
@@ -205,24 +203,6 @@ begin
 
     end;
     Log('--------------------IterateNodesToTree:End');
-end;
-
-procedure InsertFolder(treeNode: TTreeNode);
-var
-newFolderNode: IXMLNode;
-newTreeNode: TTreeNode;
-begin
-if GetNodeType(IXMLNode(treeNode.Data))=ntItem then Exit;
-newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder', 1);
-newFolderNode.Text:='Новая папка';
-newFolderNode.SetAttributeNS('type', '', 'folder');
-newFolderNode.SetAttributeNS('picture', '', 'folder');
-newTreeNode:=TTreeView(treeNode.TreeView).Items.AddChildFirst(treeNode, 'Новая папка');
-if not treeNode.Expanded then treeNode.Expand(False);
-newTreeNode.Data:=Pointer(newFolderNode);
-newTreeNode.Selected:=True;
-newTreeNode.EditText;
-
 end;
 
 procedure EditItem(treeNode: TTreeNode);
@@ -337,6 +317,26 @@ begin
     //i like spagetti
 end;
 
+procedure InsertFolder(treeNode: TTreeNode);
+var
+	newFolderNode: IXMLNode;
+	newTreeNode: TTreeNode;
+begin
+	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then Exit;
+    newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder', 1);
+    newFolderNode.Text:='Новая папка';
+    newFolderNode.SetAttributeNS('type', '', 'folder');
+    newFolderNode.SetAttributeNS('picture', '', 'folder');
+    if (not treeNode.Expanded) then treeNode.Expand(False);
+	With TTreeView(treeNode.TreeView).Items.AddChildFirst(treeNode, 'Новая папка') do begin
+		Data:=Pointer(newFolderNode);
+        ImageIndex:=0;
+        SelectedIndex:=0;
+		Selected:=True;
+		EditText;
+	end;
+end;
+
 procedure InsertItem(treeNode: TTreeNode);
 var
 	i: integer;
@@ -344,19 +344,21 @@ var
 	newItem: IXMLNode;
     destNode: IXMLNode;     //ntFolder;
 begin
-destNode:=IXMLNode(treeNode.Data);
-LogNodeInfo(destNode, 'InsertItem');
-if GetNodeType(destNode) = ntItem then Exit;
-defItem:=PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
-newItem:=destNode.OwnerDocument.CreateNode('Item');
+	destNode:=IXMLNode(treeNode.Data);
+	LogNodeInfo(destNode, 'InsertItem');
+	if GetNodeType(destNode) = ntItem then Exit;
+	defItem:=PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
+	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do
         newItem.ChildNodes.Add(defItem.ChildNodes[i].CloneNode(True));
-destNode.ChildNodes.Add(newItem);
-//frmMain.tabMainChange(nil);    //Можно было и так
+	destNode.ChildNodes.Add(newItem);
+	if (not treeNode.Expanded) then treeNode.Expand(False);
     with TTreeView(treeNode.TreeView).Items.AddChild(treeNode, GetNodeTitle(newItem)) do begin
         Data:= Pointer(newItem);
         ImageIndex:=1;
         SelectedIndex:=1;
+        Selected:=True;
+        EditText;
     end;
 
 end;

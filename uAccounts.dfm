@@ -136,6 +136,10 @@ object frmAccounts: TfrmAccounts
       ImageIndex = 1
       TabVisible = False
       OnShow = tabOpenShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object btnOpenBase: TSpeedButton
         Left = 278
         Top = 84
@@ -266,6 +270,10 @@ object frmAccounts: TfrmAccounts
     object TabSheet3: TTabSheet
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SpeedButton4: TSpeedButton
         Left = 336
         Top = 27

@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   VCLTee.TeCanvas, VCLTee.TeePenDlg, Vcl.StdCtrls, Vcl.CategoryButtons,
-  Vcl.ExtCtrls, Vcl.Buttons, Vcl.ComCtrls, Vcl.Mask, Unit1, Vcl.DBCtrls;
+  Vcl.ExtCtrls, Vcl.Buttons, Vcl.ComCtrls, Vcl.DBCtrls;
 
 type
   TfrmAccounts = class(TForm)

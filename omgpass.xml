@@ -30,7 +30,22 @@
 					<Field name="Прикрепленный файл" format="file" visible="True">source.txt</Field>
 				</Item>
 				<Folder type="folder" picture="folder">Форумы
-				<Title>Папка в папке</Title>
+				
+          <Folder type="folder" picture="folder">456789  <Folder type="folder" picture="folder">Новая папка</Folder>
+						<Item><Field name="Название" format="title">Запись</Field>
+							<Field name="Логин" format="text"></Field>
+							<Field name="Пароль" Format="pass"></Field>
+						</Item>
+						<Item><Field name="Название" format="title">Запись</Field>
+							<Field name="Логин" format="text"></Field>
+							<Field name="Пароль" Format="pass"></Field>
+						</Item>
+						<Item><Field name="Название" format="title">Запись</Field>
+							<Field name="Логин" format="text"></Field>
+							<Field name="Пароль" Format="pass"></Field>
+						</Item>
+					</Folder>
+					<Title>Папка в папке</Title>
 					<Item type="item" picture="item">
 						<Field name="Название" format="title" visible="True">Альфабанк</Field>
 						<Field name="Логин" format="text" visible="True">mrgnstrn</Field>
@@ -48,7 +63,10 @@
 						<Field name="Пароль" Format="pass"></Field>
 					</Item>
 				</Folder>
-			</Folder>
-		</Page>
+			</Folder>  <Item><Field name="Название" format="title">Запись</Field>
+				<Field name="Логин" format="text"></Field>
+				<Field name="Пароль" Format="pass"></Field>
+			</Item>
+    </Page>
 	</Data>
 </Root>
