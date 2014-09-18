@@ -10,7 +10,8 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  XMLutils, VersionUtils, Logic
+  XMLutils, VersionUtils, Logic, Data.Bind.EngExt, Vcl.Bind.DBEngExt,
+  System.Rtti, System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Components
   ;
 type
 TfrmMain = class(TForm)
@@ -72,6 +73,7 @@ TfrmMain = class(TForm)
     Timer1: TTimer;
     btnAddPage: TSpeedButton;
     btnDeletePage: TSpeedButton;
+    tmrRenameTab: TTimer;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -103,6 +105,11 @@ TfrmMain = class(TForm)
     procedure FormResize(Sender: TObject);
     procedure btnDeletePageClick(Sender: TObject);
     procedure tbtnInsertItemClick(Sender: TObject);
+    procedure tabMainMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure tmrRenameTabTimer(Sender: TObject);
+    procedure tabMainMouseLeave(Sender: TObject);
+    procedure tabMainChanging(Sender: TObject; var AllowChange: Boolean);
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -153,8 +160,8 @@ procedure TfrmMain.tmrBarTimer(Sender: TObject);
 {$WriteableConst ON}
     const i: Integer = 0;
 begin
-	sbMain.Panels[0].Text:=LogList[i];
-    if i<LogList.Count - 1 then inc(i);
+//	sbMain.Panels[0].Text:=LogList[i];
+//    if i<LogList.Count - 1 then inc(i);
 {$WriteableConst OFF}
 end;
 {$ENDREGION}
@@ -327,6 +334,35 @@ begin
 end;
 {$ENDREGION}
 
+{$REGION '#Переименование таба по щелчку с ожиданием'}
+procedure TfrmMain.tabMainMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+//Запуск таймера для переименования
+//Если в таймере выставлена единица, значит была смена табов
+//см. tabMainChange
+begin
+	if tmrRenameTab.Tag=1 then
+        tmrRenameTab.Tag:=0
+	else
+    	tmrRenameTab.Enabled:=True;
+end;
+procedure TfrmMain.tabMainMouseLeave(Sender: TObject);
+//Если мышь уведена, то переименования не будет
+begin
+	tmrRenameTab.Enabled:=False;
+end;
+procedure TfrmMain.tmrRenameTabTimer(Sender: TObject);
+//Таймер срабатывает через секунду, если не уводить с таба мышь
+//Выделяется и редактируется нода соотв. странице.
+begin
+with tvMain.Items[0] do begin
+	Selected:=True;
+	EditText;
+end;
+tmrRenameTab.Enabled:=False;
+end;
+{$ENDREGION}
+
 {$REGION '#Основы'}
 procedure TfrmMain.tvMainChange(Sender: TObject; Node: TTreeNode);
 begin
@@ -336,11 +372,19 @@ begin
     //ClearPanel(fpMain);
     GeneratePanel(IXMLNode(Node.Data), fpMain);
 end;
+
 procedure TfrmMain.tabMainChange(Sender: TObject);
 begin
+		tmrRenameTab.Tag:=1;
     	CleaningPanel(fpMain, True);
     	ParsePageToTree(tabMain.TabIndex, tvMain);
 end;
+
+procedure TfrmMain.tabMainChanging(Sender: TObject; var AllowChange: Boolean);
+begin
+
+end;
+
 {$ENDREGION}
 
 {$REGION '#Всякая хрень'}
