@@ -8,8 +8,7 @@
 		<Date>13.08.2014 - Дата создания или последнего сохранения?</Date>
 	</Header>
 	<Data type="data">
-		<Page type="page">Общее222
-			<DefFolder type="deffolder" picture="folder">Новая папка
+		<Page type="page">Общее<DefFolder type="deffolder" picture="folder">Новая папка
 			</DefFolder>
 			<DefItem type="defitem" picture="item">
 				<Field name="Название" format="title">Запись</Field>
@@ -63,10 +62,17 @@
 						<Field name="Пароль" Format="pass"></Field>
 					</Item>
 				</Folder>
-			</Folder>  <Item><Field name="Название" format="title">Запись</Field>
+			</Folder>
+			<Item><Field name="Название" format="title">Запись</Field>
 				<Field name="Логин" format="text"></Field>
 				<Field name="Пароль" Format="pass"></Field>
 			</Item>
-    </Page>
+		</Page>
+		<Page type="page">Лист_1893<DefItem type="defitem" picture="item">
+				<Field name="Название" format="title">Новая запись</Field>
+				<Field name="Логин" format="text"/>
+				<Field name="Пароль" format="pass"/>
+				<Field name="Комментарий" format="comment"/>
+			</DefItem></Page>
 	</Data>
 </Root>
