@@ -319,13 +319,8 @@ end;
 
 function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
 begin
-	if Node.HasAttribute(attrName) then begin
     	Node.Attributes[attrName]:=attrValue;
         result:=True;
-    end else begin
-        Node.Attributes[attrName]:=attrValue;
-    	result:=True;
-    end;
 end;
 
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');

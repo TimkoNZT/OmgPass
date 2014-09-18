@@ -237,7 +237,8 @@ begin
         frmEditItem.ShowModal;
         FreeAndNil(frmEditItem);
     end;
-    ntFolder,
+    ntFolder:
+    	Exit;
     ntPage:
     	treeNode.EditText;
     end;
@@ -363,6 +364,8 @@ begin
 	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do
         newItem.ChildNodes.Add(defItem.ChildNodes[i].CloneNode(True));
+    for i := 0 to defItem.AttributeNodes.Count - 1 do
+        newItem.AttributeNodes.Add(defItem.AttributeNodes[i].CloneNode(True));
 	destNode.ChildNodes.Add(newItem);
 	if (not treeNode.Expanded) then treeNode.Expand(False);
     with TTreeView(treeNode.TreeView).Items.AddChild(treeNode, GetNodeTitle(newItem)) do begin

@@ -8,30 +8,26 @@
 		<Date>13.08.2014 - Дата создания или последнего сохранения?</Date>
 	</Header>
 	<Data type="data">
-		<Page type="page" expand="True">Общее<Folder type="folder" picture="folder" expand="True">Денюшки<Folder type="folder" picture="folder" expand="False">Новая папка  <Item><Field name="Название" format="title">Запись</Field>
+		<Page type="page" expand="True">Общее<Folder type="folder" picture="folder" expand="True">Денюшки<Folder type="folder" picture="folder" expand="True">Новая папка      <Item type="item" picture="item"><Field name="Название" format="title">Запись</Field>
 						<Field name="Логин" format="text"></Field>
 						<Field name="Пароль" Format="pass"></Field>
 					</Item>
-					<Item><Field name="Название" format="title">Запись</Field>
+          <Item type="item" picture="item"><Field name="Название" format="title">Запись</Field>
 						<Field name="Логин" format="text"></Field>
 						<Field name="Пароль" Format="pass"></Field>
 					</Item>
-					<Item><Field name="Название" format="title">Запись</Field>
+          <Item type="item" picture="item"><Field name="Название" format="title">Запись</Field>
 						<Field name="Логин" format="text"></Field>
 						<Field name="Пароль" Format="pass"></Field>
 					</Item>
-					<Item><Field name="Название" format="title">Запись</Field>
-						<Field name="Логин" format="text"></Field>
-						<Field name="Пароль" Format="pass"></Field>
-					</Item>
-				</Folder>
+        </Folder>
 				<Folder type="folder" picture="folder">Новая папка</Folder>
 				<Folder type="folder" picture="folder">Новая папка</Folder>
 				<Folder type="folder" picture="folder">Новая папка</Folder>
 			</Folder>
-			<DefFolder type="deffolder" picture="folder">Новая папка
+			<DefFolder type="folder" picture="folder">Новая папка
 			</DefFolder>
-			<DefItem type="defitem" picture="item">
+			<DefItem type="item" picture="item">
 				<Field name="Название" format="title">Запись</Field>
 				<Field name="Логин" format="text"></Field>
 				<Field name="Пароль" Format="pass"></Field>
@@ -49,7 +45,7 @@
 					<Field name="Е-Майл" format="mail" visible="True">mrgnstrn@4pda.ru</Field>
 					<Field name="Прикрепленный файл" format="file" visible="True">source.txt</Field>
 				</Item>
-				<Folder type="folder" picture="folder" expand="False">Форумы
+				<Folder type="folder" picture="folder" expand="True">Форумы
 					<Item type="item" picture="item">
 						<Field name="Название" format="title" visible="True">Альфабанк</Field>
 						<Field name="Логин" format="text" visible="True">mrgnstrn</Field>
