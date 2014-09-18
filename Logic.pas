@@ -359,7 +359,11 @@ var
 begin
 	destNode:=IXMLNode(treeNode.Data);
 	LogNodeInfo(destNode, 'InsertItem');
-	if GetNodeType(destNode) = ntItem then Exit;
+	if GetNodeType(destNode) = ntItem then begin
+    	destNode:=destNode.ParentNode;
+        treeNode:=treeNode.Parent;
+    end;
+    Log(destNode.NodeName);
 	defItem:=PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
 	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do

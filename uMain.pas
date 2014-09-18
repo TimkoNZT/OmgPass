@@ -476,12 +476,8 @@ begin
         else log('Обновление завершилось ошибкой. Всё пропало.');
     end;
     xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-    //xmlMain.NodeIndentStr:=#10#13;
-    //xmlMain.
 	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
     //log(GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(NodeByPath(xmlMain, 'Root.Data.Page.Folder.Item')))));
-    //GeneratePanel(NodeByPath(xmlMain, 'Root\Data\Page\Folder\Item'), fpMain);
-
     ParsePagesToTabs(xmlMain, tabMain);
     tabMainChange(nil);
 
