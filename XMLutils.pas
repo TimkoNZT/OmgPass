@@ -34,6 +34,7 @@ function NodeByPath(x:IXMLDocument; const fNodePath: String): IXMLNode;
 function GetNodeType(Node: IXMLNode): eNodeType;
 function GetFieldFormat(Field: IXMLNode): eFieldFormat;
 function GetAttribute(Node: IXMLNode; attrName: String): String;
+function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
 function GetNodeTitle(Node:IXMLNode): String;
 function SetNodeTitle(Node:IXMLNode; Title: String): Boolean;
 
@@ -312,7 +313,19 @@ begin
 	//Log(Node.NodeName + ' всего атрибутов:' , Node.AttributeNodes.Count);
   	//Log(Node.NodeName + ' имеет атрибут ' + attrName + ':', Node.HasAttribute(attrName));
 	result:=VarToStr(Node.Attributes[attrName]);
-    //Log('GetAttribute('+ Node.NodeName + ',' + attrName + ') =', result);
+    Log('GetAttribute('+ Node.NodeName + ',' + attrName + ') =', result);
+    LogNodeInfo(Node, 'GetAttribute');
+end;
+
+function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
+begin
+	if Node.HasAttribute(attrName) then begin
+    	Node.Attributes[attrName]:=attrValue;
+        result:=True;
+    end else begin
+        Node.Attributes[attrName]:=attrValue;
+    	result:=True;
+    end;
 end;
 
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');

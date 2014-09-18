@@ -129,7 +129,6 @@ object frmMain: TfrmMain
     TabIndex = 0
     TabStop = False
     OnChange = tabMainChange
-    OnChanging = tabMainChanging
     OnMouseDown = tabMainMouseDown
     OnMouseLeave = tabMainMouseLeave
     DesignSize = (
@@ -189,9 +188,12 @@ object frmMain: TfrmMain
       StateImages = imlField
       TabOrder = 0
       OnChange = tvMainChange
+      OnCollapsed = tvMainCollapsed
+      OnCollapsing = tvMainCollapsing
       OnDblClick = tvMainDblClick
       OnEdited = tvMainEdited
       OnEditing = tvMainEditing
+      OnExpanded = tvMainExpanded
     end
     object fpMain: TScrollBox
       Left = 210
@@ -274,6 +276,7 @@ object frmMain: TfrmMain
         Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         ImageIndex = 1
         ShortCut = 45
+        OnClick = mnuInsertItemClick
       end
       object mnuInsertFolder: TMenuItem
         Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1087#1072#1087#1082#1091
@@ -10170,6 +10173,7 @@ object frmMain: TfrmMain
     object mnuPopupInsertItem: TMenuItem
       Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100'...'
       ImageIndex = 0
+      OnClick = mnuPopupInsertItemClick
     end
     object mnuPopupInsertFolder: TMenuItem
       Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1087#1072#1087#1082#1091'...'
@@ -10713,6 +10717,7 @@ object frmMain: TfrmMain
   end
   object tmrRenameTab: TTimer
     Enabled = False
+    Interval = 700
     OnTimer = tmrRenameTabTimer
     Left = 402
     Top = 206

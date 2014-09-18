@@ -9,8 +9,11 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
     XMLutils, uFieldFrame, uSmartMethods
   	;
 var
-	PageList: IXMLNodeList;      //Список страниц
-    intCurrentPage: Integer;     //Текущая страничка
+	PageList: IXMLNodeList;      	//Список страниц
+    intCurrentPage: Integer;    	//Текущая страничка
+    intProgramState: Integer;    	//Состояние программы
+    								//0 - нормальная работа
+                                    //1 - загрузка страницы
 
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
@@ -26,6 +29,8 @@ procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
 procedure AddPage();
 function CreateClearPage(): IXMLNode;
 procedure InsertItem(treeNode: TTreeNode);
+procedure SetNodeExpanded(treeNode: TTreeNode);
+function GetNodeExpanded(Node: IXMLNode): Boolean;
 
 implementation
 uses uMain, uEditItem;
@@ -148,6 +153,7 @@ begin
 	Log('--------------------ParsePagesToTabs:Start');
     xmlMain.Active:=False;
 	xmlMain.Active:=True;
+    intProgramState:=1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
 	PageList:= NodeByPath(x, 'Root/Data').ChildNodes;
@@ -161,6 +167,7 @@ begin
     else
        	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     //frmMain.btnAddPage.Left:=tabControl.TabRect(tabControl.Tabs.Count-1).Width + tabControl.TabRect(tabControl.Tabs.Count-1).Left + 3;
+    intProgramState:=0;
     Log('--------------------ParsePagesToTabs:End');
 end;
 
@@ -168,15 +175,17 @@ procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start');
+    intProgramState:=1;
 	Tree.Items.Clear;
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
     RootNode.Data:=Pointer(PageList[pageIndex]);
 	IterateNodesToTree(PageList[pageIndex], RootNode, Tree);
     log(RootNode.AbsoluteIndex);
     //RootNode.DropTarget:=True;
-    RootNode.Expand(True);
+    RootNode.Expand(False);
     RootNode.Selected:=True;
     intCurrentPage:= pageIndex;
+    intProgramState:=0;
     Log('--------------------ParsePageToTree:End');
 end;
 
@@ -191,16 +200,19 @@ begin
     if (GetNodeType(xn.ChildNodes[i]) = ntFolder) or
        (GetNodeType(xn.ChildNodes[i]) = ntItem) then begin
         ChildTreeNode := Tree.Items.AddChild(ParentNode, GetNodeTitle(xn.ChildNodes[i]));
-        IterateNodesToTree(xn.ChildNodes[i], ChildTreeNode, Tree);
-        if GetNodeType(xn.ChildNodes[i]) = ntItem then begin
-        	ChildTreeNode.ImageIndex:=1;
-            ChildTreeNode.SelectedIndex:=1;
-        end else begin
-        	ChildTreeNode.ImageIndex:= 0;
-            ChildTreeNode.SelectedIndex:= 0;
-        end;
         ChildTreeNode.Data:=Pointer(xn.ChildNodes[i]);
-
+        IterateNodesToTree(xn.ChildNodes[i], ChildTreeNode, Tree);
+        Case GetNodeType(xn.ChildNodes[i]) of
+            ntItem: begin
+                ChildTreeNode.ImageIndex:=1;
+                ChildTreeNode.SelectedIndex:=1;
+            end;
+            ntFolder: begin
+                ChildTreeNode.ImageIndex:= 0;
+                ChildTreeNode.SelectedIndex:= 0;
+                ChildTreeNode.Expanded:=GetNodeExpanded(xn.ChildNodes[i]);
+            end;
+        end;
     end;
     Log('--------------------IterateNodesToTree:End');
 end;
@@ -361,6 +373,25 @@ begin
         EditText;
     end;
 
+end;
+
+procedure SetNodeExpanded(treeNode: TTreeNode);
+begin
+	if intProgramState <> 0 then Exit;
+    if treeNode.IsFirstNode then Exit;
+	SetAttribute(IXMLNode(treeNode.Data), 'expand',
+                BoolToStr(treeNode.Expanded, True));
+end;
+
+function GetNodeExpanded(Node: IXMLNode): Boolean;
+var
+	tmp: String;
+begin
+	tmp:= GetAttribute(Node, 'expand');
+    if tmp='' then
+    	result:=False
+    else
+    	result:=StrToBool(tmp);
 end;
 
 end.

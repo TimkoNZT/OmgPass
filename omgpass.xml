@@ -8,14 +8,35 @@
 		<Date>13.08.2014 - Дата создания или последнего сохранения?</Date>
 	</Header>
 	<Data type="data">
-		<Page type="page">Общее<DefFolder type="deffolder" picture="folder">Новая папка
+		<Page type="page" expand="True">Общее<Folder type="folder" picture="folder" expand="True">Денюшки<Folder type="folder" picture="folder" expand="False">Новая папка  <Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+					<Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+					<Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+					<Item><Field name="Название" format="title">Запись</Field>
+						<Field name="Логин" format="text"></Field>
+						<Field name="Пароль" Format="pass"></Field>
+					</Item>
+				</Folder>
+				<Folder type="folder" picture="folder">Новая папка</Folder>
+				<Folder type="folder" picture="folder">Новая папка</Folder>
+				<Folder type="folder" picture="folder">Новая папка</Folder>
+			</Folder>
+			<DefFolder type="deffolder" picture="folder">Новая папка
 			</DefFolder>
 			<DefItem type="defitem" picture="item">
 				<Field name="Название" format="title">Запись</Field>
 				<Field name="Логин" format="text"></Field>
 				<Field name="Пароль" Format="pass"></Field>
 			</DefItem>
-			<Folder type="folder" picture="folder">Привет
+			<Folder type="folder" picture="folder" expand="False">Привет
 				<Item type="item" picture="item">
 					<Field name="Название" button="False" format="title" visible="True">Форум 4PDA.ру</Field>
 					<Field name="Логин" format="text" button="True" visible="True">mrgnstrn</Field>
@@ -28,23 +49,7 @@
 					<Field name="Е-Майл" format="mail" visible="True">mrgnstrn@4pda.ru</Field>
 					<Field name="Прикрепленный файл" format="file" visible="True">source.txt</Field>
 				</Item>
-				<Folder type="folder" picture="folder">Форумы
-				
-          <Folder type="folder" picture="folder">456789  <Folder type="folder" picture="folder">Новая папка</Folder>
-						<Item><Field name="Название" format="title">Запись</Field>
-							<Field name="Логин" format="text"></Field>
-							<Field name="Пароль" Format="pass"></Field>
-						</Item>
-						<Item><Field name="Название" format="title">Запись</Field>
-							<Field name="Логин" format="text"></Field>
-							<Field name="Пароль" Format="pass"></Field>
-						</Item>
-						<Item><Field name="Название" format="title">Запись</Field>
-							<Field name="Логин" format="text"></Field>
-							<Field name="Пароль" Format="pass"></Field>
-						</Item>
-					</Folder>
-					<Title>Папка в папке</Title>
+				<Folder type="folder" picture="folder" expand="False">Форумы
 					<Item type="item" picture="item">
 						<Field name="Название" format="title" visible="True">Альфабанк</Field>
 						<Field name="Логин" format="text" visible="True">mrgnstrn</Field>
@@ -63,16 +68,6 @@
 					</Item>
 				</Folder>
 			</Folder>
-			<Item><Field name="Название" format="title">Запись</Field>
-				<Field name="Логин" format="text"></Field>
-				<Field name="Пароль" Format="pass"></Field>
-			</Item>
 		</Page>
-		<Page type="page">Лист_1893<DefItem type="defitem" picture="item">
-				<Field name="Название" format="title">Новая запись</Field>
-				<Field name="Логин" format="text"/>
-				<Field name="Пароль" format="pass"/>
-				<Field name="Комментарий" format="comment"/>
-			</DefItem></Page>
 	</Data>
 </Root>

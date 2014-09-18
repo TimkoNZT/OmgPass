@@ -109,7 +109,13 @@ TfrmMain = class(TForm)
       Shift: TShiftState; X, Y: Integer);
     procedure tmrRenameTabTimer(Sender: TObject);
     procedure tabMainMouseLeave(Sender: TObject);
-    procedure tabMainChanging(Sender: TObject; var AllowChange: Boolean);
+    procedure mnuPopupInsertItemClick(Sender: TObject);
+    procedure mnuInsertItemClick(Sender: TObject);
+    procedure tvMainCollapsed(Sender: TObject; Node: TTreeNode);
+    procedure tvMainExpanded(Sender: TObject; Node: TTreeNode);
+    procedure tvMainCollapsing(Sender: TObject; Node: TTreeNode;
+      var AllowCollapse: Boolean);
+
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -245,7 +251,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION '#Вставка новой папки'}
+{$REGION '#Добавление новой страницы, папки или записи'}
 procedure TfrmMain.mnuPopupInsertFolderClick(Sender: TObject);
 var selNode: TTreeNode;
 begin
@@ -262,6 +268,27 @@ end;
 procedure TfrmMain.mnuInsertFolderClick(Sender: TObject);
 begin
 	InsertFolder(tvMain.Selected);
+end;
+procedure TfrmMain.mnuPopupInsertItemClick(Sender: TObject);
+var selNode: TTreeNode;
+begin
+	selNode:= tvMain.GetNodeAt(tvMain.ScreenToClient(menuTreePopup.PopupPoint).X,
+    						tvMain.ScreenToClient(menuTreePopup.PopupPoint).Y);
+    if selNode = nil then selNode:=tvMain.Selected;
+    selNode.Selected:=True;
+	InsertItem(selNode);
+end;
+procedure TfrmMain.mnuInsertItemClick(Sender: TObject);
+begin
+	InsertItem(tvMain.Selected);
+end;
+procedure TfrmMain.tbtnInsertItemClick(Sender: TObject);
+begin
+	InsertItem(tvMain.Selected);
+end;
+procedure TfrmMain.btnAddPageClick(Sender: TObject);
+begin
+    AddPage();
 end;
 {$ENDREGION}
 
@@ -323,17 +350,6 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION '#Добавление'}
-procedure TfrmMain.btnAddPageClick(Sender: TObject);
-begin
-    AddPage();
-end;
-procedure TfrmMain.tbtnInsertItemClick(Sender: TObject);
-begin
-	InsertItem(tvMain.Selected);
-end;
-{$ENDREGION}
-
 {$REGION '#Переименование таба по щелчку с ожиданием'}
 procedure TfrmMain.tabMainMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
@@ -372,19 +388,29 @@ begin
     //ClearPanel(fpMain);
     GeneratePanel(IXMLNode(Node.Data), fpMain);
 end;
-
 procedure TfrmMain.tabMainChange(Sender: TObject);
 begin
 		tmrRenameTab.Tag:=1;
     	CleaningPanel(fpMain, True);
     	ParsePageToTree(tabMain.TabIndex, tvMain);
 end;
+{$ENDREGION}
 
-procedure TfrmMain.tabMainChanging(Sender: TObject; var AllowChange: Boolean);
+{$REGION '#Запись состояния дерева'}
+procedure TfrmMain.tvMainCollapsed(Sender: TObject; Node: TTreeNode);
 begin
-
+SetNodeExpanded(Node);
 end;
-
+procedure TfrmMain.tvMainExpanded(Sender: TObject; Node: TTreeNode);
+begin
+SetNodeExpanded(Node);
+end;
+procedure TfrmMain.tvMainCollapsing(Sender: TObject; Node: TTreeNode;
+  var AllowCollapse: Boolean);
+//Запрет сворачивания первой записи
+begin
+if Node.IsFirstNode then AllowCollapse:= False;
+end;
 {$ENDREGION}
 
 {$REGION '#Всякая хрень'}
@@ -463,7 +489,7 @@ end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
-xmlMain.SaveToFile('temp.txt');
+//xmlMain.SaveToFile('temp.txt');
 end;
 
 end.
