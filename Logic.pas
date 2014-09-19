@@ -335,7 +335,9 @@ var
 	newFolderNode: IXMLNode;
 	newTreeNode: TTreeNode;
 begin
-	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then Exit;
+	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then begin
+        treeNode:=treeNode.Parent;
+    end;
     newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder');
     newFolderNode.Text:='Новая папка';
     newFolderNode.SetAttributeNS('type', '', 'folder');
