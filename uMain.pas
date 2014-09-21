@@ -58,8 +58,6 @@ TfrmMain = class(TForm)
     fpMain: TScrollBox;
     mnuBaseProperties: TMenuItem;
     sbMain: TStatusBar;
-    tmrBar: TTimer;
-    lbLog: TListBox;
     imlField: TImageList;
     imlTree: TImageList;
     imlTab: TImageList;
@@ -74,6 +72,7 @@ TfrmMain = class(TForm)
     btnAddPage: TSpeedButton;
     btnDeletePage: TSpeedButton;
     tmrRenameTab: TTimer;
+    tbtnLog: TToolButton;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -82,7 +81,6 @@ TfrmMain = class(TForm)
     procedure FormCreate(Sender: TObject);
     procedure fpMainMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure tmrBarTimer(Sender: TObject);
     procedure mnuBasePropertiesClick(Sender: TObject);
     procedure tabMainChange(Sender: TObject);
     procedure tvMainChange(Sender: TObject; Node: TTreeNode);
@@ -115,7 +113,8 @@ TfrmMain = class(TForm)
     procedure tvMainExpanded(Sender: TObject; Node: TTreeNode);
     procedure tvMainCollapsing(Sender: TObject; Node: TTreeNode;
       var AllowCollapse: Boolean);
-
+    procedure tbtnLogClick(Sender: TObject);
+    procedure OnMove(var Msg: TWMMove); message WM_MOVE;
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -126,49 +125,46 @@ public
 end;
 
 var
-	xmlMain: IXMLDocument;
     frmMain: TfrmMain;
-    LogList: TStringList;
     strCurrentBase: String;
-procedure Log(Val: Integer); overload;
-procedure Log(Text: String); overload;
-procedure Log(Flag: Boolean); overload;
-procedure Log(Text: String; Val: variant); overload;
+    bLogDocked: Boolean;
 
 implementation
 
 {$R *.dfm}
 
-uses uAccounts, uGenerator, uOptions, uProperties, uEditItem;
+uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog;
 {//////////////////////////////////////////////////////////////////////////////}
 
 {$REGION '#Логирование'}
-//Логирование
-procedure Log(Text: String);
+//Открытие формы Логирования.
+//Код логирования переехал в Logic
+procedure TfrmMain.tbtnLogClick(Sender: TObject);
 begin
-	LogList.Add(TimeToStr(Now) +': '+ Text);
-    frmMain.lbLog.Items.Insert(0, TimeToStr(Now) +': '+ Text);
+	if (not Assigned(frmLog)) then begin
+        frmLog:=  TfrmLog.Create(Self);
+        frmLog.Left:=frmMain.Left + frmMain.Width +3;
+        frmLog.Top:=frmMain.Top;
+        frmLog.Height:=frmMain.Height;
+        frmLog.lbLog.Items:=LogList;
+        frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+        frmLog.Show;
+        bLogDocked:=True;
+        tbtnLog.Down:=True;
+        frmLog.tmrLog.OnTimer(nil);
+	end else begin
+    	frmLog.Close;
+        tbtnLog.Down:=False;
+    end;
 end;
-procedure Log(Val: Integer);
+{$ENDREGION}
+
+{$REGION '#Прилипание формы лога к краю основной'}
+procedure TfrmMain.OnMove(var Msg: TWMMove);
 begin
-	Log(IntToStr(Val));
+    if Assigned(frmLog) and bLogDocked then begin
+      frmLog.tmrLog.OnTimer(nil);
 end;
-procedure Log(Flag: Boolean);
-begin
-    if Flag then Log('True') else Log('False');
-end;
-procedure Log(Text: String; Val: variant);
-begin
-	Log(Text + ' ' + VarToStr(Val));
-end;
-//Таймер для логирования в статусбар
-procedure TfrmMain.tmrBarTimer(Sender: TObject);
-{$WriteableConst ON}
-    const i: Integer = 0;
-begin
-//	sbMain.Panels[0].Text:=LogList[i];
-//    if i<LogList.Count - 1 then inc(i);
-{$WriteableConst OFF}
 end;
 {$ENDREGION}
 
@@ -383,8 +379,8 @@ end;
 procedure TfrmMain.tvMainChange(Sender: TObject; Node: TTreeNode);
 begin
     if Node.Data = nil then Exit;
-    log(Integer(Node.Data));
-    log(IXMLNode(Node.Data).NodeName);
+    //log(Integer(Node.Data));
+    //log(IXMLNode(Node.Data).NodeName);
     //ClearPanel(fpMain);
     GeneratePanel(IXMLNode(Node.Data), fpMain);
 end;
@@ -460,7 +456,6 @@ end;
 procedure TfrmMain.InitGlobal();
 begin
 	LogList:= TStringList.Create;
-    tmrBar.Enabled:=True;
 	Log('Инициализация...');
 	xmlMain:=TXMLDocument.Create(frmMain);
 	xmlMain.LoadFromFile('../../omgpass.xml');
@@ -480,6 +475,7 @@ begin
     //log(GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(NodeByPath(xmlMain, 'Root.Data.Page.Folder.Item')))));
     ParsePagesToTabs(xmlMain, tabMain);
     tabMainChange(nil);
+	if bShowLogAtStart then tbtnLogClick(nil);
 
 end;
 

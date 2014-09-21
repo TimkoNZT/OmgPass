@@ -67,7 +67,7 @@ procedure LogNodeInfo(Node: IXMLNode; Msg: String='');
     End;
 
 implementation
-uses uMain;
+uses Logic;
 
 {$REGION 'TTreeToXML'}
     { TTreeToXML }
@@ -313,8 +313,8 @@ begin
 	//Log(Node.NodeName + ' всего атрибутов:' , Node.AttributeNodes.Count);
   	//Log(Node.NodeName + ' имеет атрибут ' + attrName + ':', Node.HasAttribute(attrName));
 	result:=VarToStr(Node.Attributes[attrName]);
-    Log('GetAttribute('+ Node.NodeName + ',' + attrName + ') =', result);
-    LogNodeInfo(Node, 'GetAttribute');
+    //Log('GetAttribute('+ Node.NodeName + ',' + attrName + ') =', result);
+    //LogNodeInfo(Node, 'GetAttribute');
 end;
 
 function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;

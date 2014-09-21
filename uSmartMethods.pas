@@ -22,7 +22,7 @@ End;
 function GetEditFromTag(Sender: TObject): String;
 
 implementation
-uses uMain, uGenerator;
+uses uMain, uGenerator, Logic;
 
 procedure clsSmartMethods.CopyToClipboard(Sender: TObject);
 begin

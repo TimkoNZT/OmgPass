@@ -12,7 +12,10 @@ uses
   uProperties in 'uProperties.pas' {frmProperties},
   uFieldFrame in 'uFieldFrame.pas' {FieldFrame: TFrame},
   uSmartMethods in 'uSmartMethods.pas',
-  uEditItem in 'uEditItem.pas' {frmEditItem};
+  uEditItem in 'uEditItem.pas' {frmEditItem},
+  Vcl.Themes,
+  Vcl.Styles,
+  uLog in 'uLog.pas' {frmLog};
 
 {$R *.res}
 

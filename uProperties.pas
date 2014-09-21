@@ -27,7 +27,7 @@ var
 implementation
 
 {$R *.dfm}
-uses uMain;
+uses Logic;
 //Закрыть свойства
 procedure TfrmProperties.btnCancelClick(Sender: TObject);
 begin

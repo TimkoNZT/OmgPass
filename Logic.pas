@@ -8,13 +8,21 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
 	{MyUnits}
     XMLutils, uFieldFrame, uSmartMethods
   	;
+const
+	bShowLogAtStart: Boolean = True;
 var
+	xmlMain: IXMLDocument;          //Основной наш документ
+    LogList: TStringList;           //Переменная для логирования
 	PageList: IXMLNodeList;      	//Список страниц
     intCurrentPage: Integer;    	//Текущая страничка
     intProgramState: Integer;    	//Состояние программы
     								//0 - нормальная работа
                                     //1 - загрузка страницы
-
+	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
+procedure Log(Val: Integer); overload;
+procedure Log(Text: String); overload;
+procedure Log(Flag: Boolean); overload;
+procedure Log(Text: String; Val: variant); overload;
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
@@ -33,7 +41,31 @@ procedure SetNodeExpanded(treeNode: TTreeNode);
 function GetNodeExpanded(Node: IXMLNode): Boolean;
 
 implementation
-uses uMain, uEditItem;
+uses uMain, uLog, uEditItem;
+
+procedure Log(Text: String);
+begin
+	LogList.Add(TimeToStr(Now) +': '+ Text);
+    if Assigned(frmLog) then begin
+	    frmLog.lbLog.Items.Add(TimeToStr(Now) +': '+ Text);
+    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+    end;
+end;
+
+procedure Log(Val: Integer);
+begin
+	Log(IntToStr(Val));
+end;
+
+procedure Log(Flag: Boolean);
+begin
+    if Flag then Log('True') else Log('False');
+end;
+
+procedure Log(Text: String; Val: variant);
+begin
+	Log(Text + ' ' + VarToStr(Val));
+end;
 
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 //Очистка панельки
@@ -64,6 +96,7 @@ var i: Integer;
 begin
 //Проверяем корректность входящей ноды
 	Log('Start: GeneratePanel(' + nItem.NodeName + ', ' + Panel.Name +')');
+    Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
     //Чистим панельку
     CleaningPanel(Panel);
@@ -89,8 +122,8 @@ function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = F
 var
 	fieldFormat: eFieldFormat;
 begin
-	//Log('--------------------GenerateField:Start');
-    //LogNodeInfo(nField, 'GenerateField');
+	Log('--------------------GenerateField:Start');
+    LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
 	With TFieldFrame.CreateParented(Panel.Handle) do begin
 		Parent:=Panel;
@@ -143,7 +176,7 @@ begin
         btnSmart.OnClick:= clsSmartMethods.Create.EditField;
         end;
     end;
-    //Log('--------------------GenerateField:End');
+    Log('--------------------GenerateField:End');
 end;
 
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
@@ -219,16 +252,20 @@ end;
 
 procedure EditItem(treeNode: TTreeNode);
 var
-	TrgNode: IXMLNode;
+	trgNode: IXMLNode;
+    tmpNode: IXMLNode;
 begin
 	if treeNode.Data = nil then Exit;
+    //Если узел в режиме редактирования то просто применяем изменения
     if TTreeView(treeNode.TreeView).IsEditing then begin
     		TTreeView(treeNode.TreeView).Selected.EndEdit(False);
             Log('EditItem: EndEdit');
             Exit;
     end;
-    TrgNode:= IXMLNode(treeNode.Data);
-    LogNodeInfo(TrgNode, 'EditItem');
+    trgNode:= IXMLNode(treeNode.Data);
+    tmpNode:= trgNode.CloneNode(True);
+    LogNodeInfo(TrgNode, 'EditItem:Target');
+    LogNodeInfo(tmpNode, 'EditItem:Temp');
 	case GetNodeType(TrgNode) of
     ntItem: begin
         if (not Assigned(frmEditItem)) then frmEditItem:= TfrmEditItem.Create(frmMain);
