@@ -4,19 +4,20 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls,
+  Vcl.ToolWin;
 
 type
   TfrmLog = class(TForm)
     lbLog: TListBox;
     tmrLog: TTimer;
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    Shape1: TShape;
     procedure OnMove(var Msg: TWMMove); message WM_MOVE;
     procedure tmrLogTimer(Sender: TObject);
     procedure lbLogMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure Splitter1CanResize(Sender: TObject; var NewSize: Integer;
-      var Accept: Boolean);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   	procedure HitTest(var Msg: TWMNcHitTest); message WM_NCHITTEST;
 
@@ -35,8 +36,15 @@ uses uMain, Logic;
 
 procedure TfrmLog.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-frmMain.tbtnLog.Down:=False;
-FreeAndNil(frmLog)
+	frmMain.tbtnLog.Down:=False;
+	Self.Release;
+end;
+
+procedure TfrmLog.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+if Ord(Key) = vk_Escape then begin
+	frmLog.Close;
+end;
 end;
 
 procedure TfrmLog.lbLogMouseDown(Sender: TObject; Button: TMouseButton;
@@ -53,12 +61,6 @@ procedure TfrmLog.OnMove(var Msg: TWMMove);
 begin
 tmrLog.Enabled:=False;
 tmrLog.Enabled:=True;
-end;
-
-procedure TfrmLog.Splitter1CanResize(Sender: TObject; var NewSize: Integer;
-  var Accept: Boolean);
-begin
-
 end;
 
 //Липни, форма! Липни крепче!

@@ -136,13 +136,17 @@ implementation
 uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog;
 {//////////////////////////////////////////////////////////////////////////////}
 
-{$REGION '#Логирование'}
+{$REGION '#Форма логирования'}
 //Открытие формы Логирования.
 //Код логирования переехал в Logic
 procedure TfrmMain.tbtnLogClick(Sender: TObject);
 begin
-	if (not Assigned(frmLog)) then begin
-        frmLog:=  TfrmLog.Create(Self);
+	if Assigned(frmLog) and frmLog.Visible then begin
+          	FreeAndNil(frmLog);
+        	tbtnLog.Down:=False;
+        end
+    else begin
+        frmLog:=  TfrmLog.Create(nil);
         frmLog.Left:=frmMain.Left + frmMain.Width +3;
         frmLog.Top:=frmMain.Top;
         frmLog.Height:=frmMain.Height;
@@ -152,9 +156,6 @@ begin
         bLogDocked:=True;
         tbtnLog.Down:=True;
         frmLog.tmrLog.OnTimer(nil);
-	end else begin
-    	frmLog.Close;
-        tbtnLog.Down:=False;
     end;
 end;
 {$ENDREGION}

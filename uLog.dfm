@@ -11,10 +11,24 @@ object frmLog: TfrmLog
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
+  object Shape1: TShape
+    Left = 0
+    Top = 0
+    Width = 400
+    Height = 400
+    Align = alClient
+    Pen.Color = clBtnShadow
+    ExplicitLeft = 344
+    ExplicitTop = 376
+    ExplicitWidth = 65
+    ExplicitHeight = 65
+  end
   object lbLog: TListBox
     AlignWithMargins = True
     Left = 3
@@ -26,16 +40,12 @@ object frmLog: TfrmLog
     TabOrder = 0
     StyleElements = [seFont, seClient]
     OnMouseDown = lbLogMouseDown
-    ExplicitLeft = 0
-    ExplicitTop = 0
-    ExplicitWidth = 400
-    ExplicitHeight = 400
   end
   object tmrLog: TTimer
     Enabled = False
     Interval = 300
     OnTimer = tmrLogTimer
-    Left = 232
-    Top = 208
+    Left = 131
+    Top = 232
   end
 end
