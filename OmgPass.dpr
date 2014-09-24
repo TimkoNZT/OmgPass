@@ -1,5 +1,7 @@
 program OmgPass;
 
+
+
 uses
   Vcl.Forms,
   uMain in 'uMain.pas' {frmMain},

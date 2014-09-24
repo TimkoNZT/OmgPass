@@ -13,7 +13,6 @@ type
     btnClose: TButton;
     btnOK: TButton;
     fpEdit: TScrollBox;
-    DateTimePicker1: TDateTimePicker;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -61,7 +60,7 @@ end;
 constructor TfrmEditItem.Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False);
 begin
     inherited Create(AOwner);
-    GeneratePanel(nItem, fpEdit, True);
+    GeneratePanel(nItem, fpEdit, True, IsNew);
     editedItem:=nItem;
     if isNew then self.Caption:= 'Новая запись'
     else Self.Caption:='Редактирование записи';

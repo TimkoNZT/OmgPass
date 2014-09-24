@@ -189,7 +189,7 @@ object frmGenerator: TfrmGenerator
     end
   end
   object btnModal: TButton
-    Left = 8
+    Left = 318
     Top = 228
     Width = 80
     Height = 33
@@ -198,7 +198,7 @@ object frmGenerator: TfrmGenerator
     OnClick = btnModalClick
   end
   object btnClose: TButton
-    Left = 317
+    Left = 144
     Top = 228
     Width = 81
     Height = 33

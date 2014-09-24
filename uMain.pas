@@ -73,6 +73,7 @@ TfrmMain = class(TForm)
     btnDeletePage: TSpeedButton;
     tmrRenameTab: TTimer;
     tbtnLog: TToolButton;
+    ComboBoxEx1: TComboBoxEx;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -115,6 +116,10 @@ TfrmMain = class(TForm)
       var AllowCollapse: Boolean);
     procedure tbtnLogClick(Sender: TObject);
     procedure OnMove(var Msg: TWMMove); message WM_MOVE;
+    procedure tvMainStartDrag(Sender: TObject; var DragObject: TDragObject);
+    procedure tvMainDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -299,7 +304,7 @@ end;
         if selNode = nil then selNode:=tvMain.Selected;
    	log('menuTreePopup: Выбраная нода: ' + selNode.Text + ', Sender:' + Sender.UnitName);
         //От этой лапши стоит отказаться, бо расширить кейсы для все пунктов.
-    	   	case GetNodeType(IXMLNode(selNode.Data)) of
+    	   	{case GetNodeType(IXMLNode(selNode.Data)) of
             	ntItem: begin
         			mnuPopupInsertItem.Enabled:=False;
                     mnuPopupInsertFolder.Enabled:=False;
@@ -318,7 +323,7 @@ end;
                     mnuPopupEditItem.Enabled:=True;
                     mnuPopupDelete.Enabled:=True;
            	end;
-        end;
+        end; }
     end;
 
 {$ENDREGION}
@@ -407,6 +412,38 @@ procedure TfrmMain.tvMainCollapsing(Sender: TObject; Node: TTreeNode;
 //Запрет сворачивания первой записи
 begin
 if Node.IsFirstNode then AllowCollapse:= False;
+end;
+{$ENDREGION}
+
+{$REGION '#ДрагДроп у дерева'}
+procedure TfrmMain.tvMainStartDrag(Sender: TObject;
+var DragObject: TDragObject);
+begin
+     //
+end;
+procedure TfrmMain.tvMainDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  trgNode, selNode: TTreeNode;
+begin
+  	trgNode := tvMain.GetNodeAt(X, Y);
+  	selNode := tvMain.Selected;
+  	if (trgNode = nil) or
+    	(trgNode=selNode) then Exit;
+	DragAndDrop(trgNode, selNode);
+end;
+
+procedure TfrmMain.tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
+State: TDragState; var Accept: Boolean);
+var
+  trgNode, selNode: TTreeNode;
+begin
+  	trgNode := tvMain.GetNodeAt(x, y);
+  	selNode := tvMain.Selected;
+    if (trgNode=nil) or (trgNode = selNode.Parent) then Accept:=False
+    else while (trgNode.Parent <> nil) do begin
+        trgNode := trgNode.Parent;
+        if trgNode = SelNode then Accept := False;
+    end;
 end;
 {$ENDREGION}
 

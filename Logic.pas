@@ -9,7 +9,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
     XMLutils, uFieldFrame, uSmartMethods
   	;
 const
-	bShowLogAtStart: Boolean = False;
+	bShowLogAtStart: Boolean = True;
 var
 	xmlMain: IXMLDocument;          //Основной наш документ
     LogList: TStringList;           //Переменная для логирования
@@ -23,9 +23,9 @@ procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
-function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
+function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
-function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
+function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : Boolean;
 procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
@@ -40,9 +40,22 @@ function CreateClearPage(): IXMLNode;
 procedure InsertItem(treeNode: TTreeNode);
 procedure SetNodeExpanded(treeNode: TTreeNode);
 function GetNodeExpanded(Node: IXMLNode): Boolean;
+function GeneratePassword(Len: Integer): String;
+function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
+procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 
 implementation
-uses uMain, uLog, uEditItem;
+uses uMain, uLog, uEditItem, uGenerator;
+
+function GeneratePassword(Len: Integer): String;
+begin
+   if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(nil);
+   frmGenerator.UpDown.Position:=Len;
+   frmGenerator.btnGenerateClick(nil);
+   Result:= frmGenerator.lblResult.Caption;
+   FreeAndNil(frmGenerator);
+end;
 
 procedure Log(Text: String);
 begin
@@ -75,7 +88,7 @@ var
 begin
 	if realCln then
 	    while Panel.ControlCount <> 0 do
-    		Panel.Controls[0].Free
+    		Panel.Controls[0].Destroy
     else
 		for i := 0 to Panel.ControlCount - 1 do
 			Panel.Controls[i].Visible:=False;
@@ -90,7 +103,7 @@ begin
     end;
 end;
 
-function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
+function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 //Рисуем панельку с полями и всё такое, важное место!
 //Внутрь надо подавать ноду формата ntItem c полями Field
 var i: Integer;
@@ -99,25 +112,24 @@ begin
 	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
+    //Против лагов в изображении
+    Panel.Visible:=False;
     //Чистим панельку
     CleaningPanel(Panel);
     if GetNodeType(nItem) <> ntItem then begin
     	result:=false;
     	Log('Error: GeneratePanel: Входная нода не типа ntItem!');
         Log('End: GeneratePanel(' + nItem.NodeName + ', ' + Panel.Name +') = ', result);
+        Panel.Visible:=True;
         Exit;
     end;
-    //Против лагов в изображении
-    Panel.Visible:=False;
 	// и разбиваем ноду по полям
-    for i := nItem.ChildNodes.Count - 1 downto 0  do begin
-        GenerateField(nItem.ChildNodes[i], Panel, IsEdit);
-    end;
+    for i := nItem.ChildNodes.Count -1 downto 0 do
+    	GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
     Panel.Visible:=True;
-    result:=True;
 end;
 
-function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False) : Boolean;
+function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 //Рисуем отдельные поля в панельку,
 //У ноды должен быть формат поля (ntField)
 var
@@ -171,6 +183,7 @@ begin
             		OnResize(nil);
                     btnAdditional.OnClick:= clsSmartMethods.Create.GeneratePass;
                     SetButtonImg(btnAdditional, 5);
+                    if isNew then textInfo.Text:=GeneratePassword(10);
                 end
             end;
         SetButtonImg(btnSmart, 4);
@@ -240,6 +253,7 @@ begin
             ntItem: begin
                 ChildTreeNode.ImageIndex:=1;
                 ChildTreeNode.SelectedIndex:=1;
+                ChildTreeNode.DropTarget:=False;
             end;
             ntFolder: begin
                 ChildTreeNode.ImageIndex:= 0;
@@ -461,6 +475,53 @@ begin
     	result:=False
     else
     	result:=StrToBool(tmp);
+end;
+
+function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
+var
+selNode, trgNode: IXMLNode;
+begin
+//Пока заглушка, надо разобраться с логикой
+//selNode:=IXMLNode(selTreeNode.Data);
+//trgNode:=IXMLNode(trgTreeNode.Data);
+Result:=True;
+end;
+
+procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+//Попой чую, здесь можно было проще, но проще глючило.
+var
+	rootTreeNode: TTreeNode;
+	selNode, trgNode, newNode: IXMLNode;
+begin
+    selNode:=IXMLNode(selTreeNode.Data);
+	trgNode:=IXMLNode(trgTreeNode.Data);
+    newNode:= selNode.CloneNode(True);
+    LogNodeInfo(selNode);
+    LogNodeInfo(trgNode);
+    LogNodeInfo(newNode);
+    case GetNodeType(trgNode) of
+    ntPage, ntFolder:
+    	trgNode.ChildNodes.Add(newNode);
+    ntItem:
+    	trgNode.ParentNode.ChildNodes.Insert(trgNode.ParentNode.ChildNodes.IndexOf(trgNode), newNode);
+    end;
+    selNode.ParentNode.ChildNodes.Remove(selNode);
+    Logic.ParsePageToTree(Logic.intCurrentPage, frmMain.tvMain);
+	rootTreeNode:=selTreeNode.Parent;
+    while rootTreeNode.Parent<> nil do rootTreeNode:=rootTreeNode.Parent;
+    IterateTree(rootTreeNode, Pointer(newNode));
+end;
+
+procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
+var
+   	i: Integer;
+begin
+	Log('IterateTree: Start: '+ ParentNode.Text );
+    For i := 0 to ParentNode.Count - 1 do
+        if ParentNode.Item[i].Data = Data then
+        	ParentNode.Item[i].Selected:=True
+        else IterateTree(ParentNode.Item[i], Data);
+    Log('IterateTree: End');
 end;
 
 end.

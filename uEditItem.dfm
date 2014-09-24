@@ -28,7 +28,7 @@ object frmEditItem: TfrmEditItem
     Width = 81
     Height = 33
     Anchors = [akRight, akBottom]
-    Caption = #1047#1072#1082#1088#1099#1090#1100
+    Caption = #1054#1090#1084#1077#1085#1072
     TabOrder = 0
     OnClick = btnCloseClick
   end
@@ -57,14 +57,5 @@ object frmEditItem: TfrmEditItem
     ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
-  end
-  object DateTimePicker1: TDateTimePicker
-    Left = 24
-    Top = 320
-    Width = 105
-    Height = 21
-    Date = 41906.168889039350000000
-    Time = 41906.168889039350000000
-    TabOrder = 3
   end
 end

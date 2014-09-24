@@ -84,7 +84,7 @@ begin
         Self.SetBounds(
         				frmMain.Left,
   						frmMain.Top + frmMain.Height,
-						frmMain.Width,
+						800,
         				200);
         bLogDocked:=True;
     end else

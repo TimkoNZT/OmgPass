@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 186
   Caption = 'Omg!Pass'
   ClientHeight = 407
-  ClientWidth = 505
+  ClientWidth = 507
   Color = clBtnFace
   Constraints.MinHeight = 330
   Constraints.MinWidth = 388
@@ -23,7 +23,7 @@ object frmMain: TfrmMain
   object ToolBarMain: TToolBar
     Left = 0
     Top = 0
-    Width = 505
+    Width = 507
     Height = 55
     ButtonHeight = 55
     ButtonWidth = 55
@@ -117,7 +117,7 @@ object frmMain: TfrmMain
   object tabMain: TTabControl
     Left = 0
     Top = 55
-    Width = 505
+    Width = 507
     Height = 333
     Margins.Left = 2
     Margins.Top = 2
@@ -139,12 +139,12 @@ object frmMain: TfrmMain
     OnMouseDown = tabMainMouseDown
     OnMouseLeave = tabMainMouseLeave
     DesignSize = (
-      505
+      507
       333)
     object Splitter: TSplitter
       Left = 205
       Top = 31
-      Width = 5
+      Width = 7
       Height = 298
       Margins.Left = 2
       Margins.Top = 2
@@ -152,12 +152,10 @@ object frmMain: TfrmMain
       Margins.Bottom = 2
       MinSize = 20
       ResizeStyle = rsUpdate
-      ExplicitLeft = 158
-      ExplicitTop = 26
-      ExplicitHeight = 257
+      ExplicitHeight = 299
     end
     object btnAddPage: TSpeedButton
-      Left = 477
+      Left = 479
       Top = 0
       Width = 26
       Height = 26
@@ -167,7 +165,7 @@ object frmMain: TfrmMain
       ExplicitLeft = 458
     end
     object btnDeletePage: TSpeedButton
-      Left = 449
+      Left = 451
       Top = 0
       Width = 26
       Height = 26
@@ -187,33 +185,36 @@ object frmMain: TfrmMain
       Margins.Bottom = 2
       Align = alLeft
       Color = clBtnHighlight
+      DragMode = dmAutomatic
       HideSelection = False
       Images = imlTree
-      Indent = 17
+      Indent = 15
       PopupMenu = menuTreePopup
       RightClickSelect = True
       ShowLines = False
       ShowRoot = False
-      StateImages = imlField
       TabOrder = 0
       OnChange = tvMainChange
       OnCollapsed = tvMainCollapsed
       OnCollapsing = tvMainCollapsing
       OnDblClick = tvMainDblClick
+      OnDragDrop = tvMainDragDrop
+      OnDragOver = tvMainDragOver
       OnEdited = tvMainEdited
       OnEditing = tvMainEditing
       OnExpanded = tvMainExpanded
-      ExplicitHeight = 299
+      OnStartDrag = tvMainStartDrag
     end
     object fpMain: TScrollBox
-      Left = 210
+      AlignWithMargins = True
+      Left = 212
       Top = 31
-      Width = 291
-      Height = 298
+      Width = 289
+      Height = 297
       Margins.Left = 0
       Margins.Top = 0
-      Margins.Right = 0
-      Margins.Bottom = 0
+      Margins.Right = 2
+      Margins.Bottom = 1
       HorzScrollBar.Visible = False
       VertScrollBar.Increment = 27
       VertScrollBar.Tracking = True
@@ -227,11 +228,72 @@ object frmMain: TfrmMain
       TabOrder = 1
       OnMouseWheel = fpMainMouseWheel
     end
+    object ComboBoxEx1: TComboBoxEx
+      Left = 405
+      Top = 96
+      Width = 49
+      Height = 28
+      ItemsEx = <
+        item
+          ImageIndex = 0
+          SelectedImageIndex = 0
+        end
+        item
+          ImageIndex = 1
+          SelectedImageIndex = 1
+        end
+        item
+          ImageIndex = 2
+          SelectedImageIndex = 2
+        end
+        item
+          ImageIndex = 3
+          SelectedImageIndex = 3
+        end
+        item
+          ImageIndex = 4
+          SelectedImageIndex = 4
+        end
+        item
+          ImageIndex = 5
+          SelectedImageIndex = 5
+        end
+        item
+          ImageIndex = 6
+          SelectedImageIndex = 6
+        end
+        item
+          ImageIndex = 7
+          SelectedImageIndex = 7
+        end
+        item
+          ImageIndex = 8
+          SelectedImageIndex = 8
+        end
+        item
+          ImageIndex = 9
+          SelectedImageIndex = 9
+        end
+        item
+          ImageIndex = 10
+          SelectedImageIndex = 10
+        end
+        item
+          ImageIndex = 11
+          SelectedImageIndex = 11
+        end>
+      Style = csExDropDownList
+      Ctl3D = True
+      ParentCtl3D = False
+      TabOrder = 2
+      Visible = False
+      Images = imlTab
+    end
   end
   object sbMain: TStatusBar
     Left = 0
     Top = 388
-    Width = 505
+    Width = 507
     Height = 19
     Margins.Left = 2
     Margins.Top = 2
@@ -241,7 +303,7 @@ object frmMain: TfrmMain
       item
         Width = 50
       end>
-    ExplicitTop = 389
+    Visible = False
   end
   object menuMain: TMainMenu
     Left = 347
@@ -375,7 +437,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 96
     Bitmap = {
-      494C010108001800200130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800280130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3955,7 +4017,7 @@ object frmMain: TfrmMain
     Left = 347
     Top = 144
     Bitmap = {
-      494C01010D002401140217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D0024011C0217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5059,11 +5121,12 @@ object frmMain: TfrmMain
     AllocBy = 1
     DrawingStyle = dsTransparent
     Height = 22
+    ShareImages = True
     Width = 22
     Left = 347
     Top = 96
     Bitmap = {
-      494C01010200BC010C0216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010102003400440016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5307,18 +5370,7 @@ object frmMain: TfrmMain
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000424D3E000000000000003E000000
-      2800000058000000160000000100010000000000080100000000000000000000
-      000000000000000000000000FFFFFF0000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000}
+      000000000000000000000000000000000000}
   end
   object imlTab: TImageList
     ColorDepth = cd32Bit
@@ -5329,7 +5381,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 144
     Bitmap = {
-      494C01015D00CC01280216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D00CC01300216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -11344,7 +11396,6 @@ object frmMain: TfrmMain
   end
   object menuTreePopup: TPopupMenu
     Images = imlPopup
-    TrackButton = tbLeftButton
     OnPopup = menuTreePopupPopup
     Left = 291
     Top = 192
@@ -11381,7 +11432,7 @@ object frmMain: TfrmMain
     Left = 403
     Top = 96
     Bitmap = {
-      494C01010400F001500216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010400F001580216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
