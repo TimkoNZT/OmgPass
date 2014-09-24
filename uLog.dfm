@@ -36,7 +36,13 @@ object frmLog: TfrmLog
     Width = 394
     Height = 394
     Align = alClient
-    ItemHeight = 13
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Consolas'
+    Font.Style = []
+    ItemHeight = 15
+    ParentFont = False
     TabOrder = 0
     StyleElements = [seFont, seClient]
     OnMouseDown = lbLogMouseDown

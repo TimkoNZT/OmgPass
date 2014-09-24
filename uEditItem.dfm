@@ -16,7 +16,7 @@ object frmEditItem: TfrmEditItem
   Padding.Top = 10
   Padding.Bottom = 5
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poOwnerFormCenter
   DesignSize = (
     339
     359)
@@ -32,7 +32,7 @@ object frmEditItem: TfrmEditItem
     TabOrder = 0
     OnClick = btnCloseClick
   end
-  object btnGenerate: TButton
+  object btnOK: TButton
     Left = 157
     Top = 314
     Width = 81
@@ -40,7 +40,7 @@ object frmEditItem: TfrmEditItem
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     TabOrder = 1
-    OnClick = btnGenerateClick
+    OnClick = btnOKClick
   end
   object fpEdit: TScrollBox
     Left = 15
@@ -57,5 +57,14 @@ object frmEditItem: TfrmEditItem
     ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
+  end
+  object DateTimePicker1: TDateTimePicker
+    Left = 24
+    Top = 320
+    Width = 105
+    Height = 21
+    Date = 41906.168889039350000000
+    Time = 41906.168889039350000000
+    TabOrder = 3
   end
 end

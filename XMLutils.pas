@@ -37,8 +37,10 @@ function GetAttribute(Node: IXMLNode; attrName: String): String;
 function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
 function GetNodeTitle(Node:IXMLNode): String;
 function SetNodeTitle(Node:IXMLNode; Title: String): Boolean;
-
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');
+function GetNodeValue(Node: IXMLNode): String;
+function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
+
 
     type
     TTreeToXML = Class
@@ -206,6 +208,26 @@ uses Logic;
     //    end;
     //end;
 {$ENDREGION}
+function GetNodeValue(Node: IXMLNode): String;
+begin
+    //
+end;
+
+function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
+begin
+	case GetNodeType(Node) of
+    ntNone:
+    	Exit;
+    ntField: begin
+		Node.NodeValue:=Value;
+    	end;
+	else
+    	SetNodeTitle(Node, Value);
+    end;
+    result:=True;
+end;
+
+
 
 function GetBaseTitle(x:IXMLDocument): String;
 begin
@@ -226,7 +248,7 @@ begin
     ntDefItem:
         for i := 0 to Node.ChildNodes.Count - 1 do begin
         	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then
-            result:=Node.ChildNodes[i].Text;
+            	result:=Node.ChildNodes[i].Text;
     	end;
     ntPage,
     ntFolder,
@@ -333,6 +355,8 @@ if isTVal <> nil then Vl:=VarToStr(Node.ChildNodes['#text'].NodeValue);
 Log(Msg + ': NodeInfo: Title= ' + GetNodeTitle(Node) +
  	', Value= ' +  Vl +
    	', Type= ' + GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(Node))) +
+    ', @=' + IntToStr(Integer(Node)) +
+
     ', BasicType=' + GetEnumName(TypeInfo(TNodeType), Ord(Node.NodeType)) +
 	', Childs= ' + IntToStr(Node.ChildNodes.Count) +
     ', isTextElem= ' + BoolToStr(Node.IsTextElement, True));

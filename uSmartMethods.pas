@@ -22,7 +22,7 @@ End;
 function GetEditFromTag(Sender: TObject): String;
 
 implementation
-uses uMain, uGenerator, Logic;
+uses uMain, uGenerator, Logic, uEditField, uEditItem;
 
 procedure clsSmartMethods.CopyToClipboard(Sender: TObject);
 begin
@@ -66,8 +66,13 @@ FreeAndNil(frmGenerator);
 end;
 procedure clsSmartMethods.EditField(Sender: TObject);
 begin
-    //
+    if (not Assigned(frmEditField)) then frmEditField:= TfrmEditField.Create(frmEditItem);
+	if frmEditField.ShowModal = mrOk then begin
+    	//
+	end;
+FreeAndNil(frmEditField);
 end;
+
 function GetEditFromTag(Sender: TObject): String;
 begin
     result:=TRichEdit(Pointer((Sender as TSpeedButton).Tag)).Lines.Text

@@ -27,7 +27,7 @@ type
   end;
 
 var
-  frmLog: TfrmLog;
+   frmLog: TfrmLog;
 
 implementation
 uses uMain, Logic;
@@ -37,7 +37,9 @@ uses uMain, Logic;
 procedure TfrmLog.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	frmMain.tbtnLog.Down:=False;
-	Self.Release;
+    Action:=caFree;       	//Не закрываем, а выгружаем
+	Self.Release;			//Контрольный в голову
+    frmLog:=nil;
 end;
 
 procedure TfrmLog.FormKeyPress(Sender: TObject; var Key: Char);
@@ -63,7 +65,7 @@ tmrLog.Enabled:=False;
 tmrLog.Enabled:=True;
 end;
 
-//Липни, форма! Липни крепче!
+//Липни, форма! Липни крепче! //Пока только справа и снизу
 procedure TfrmLog.tmrLogTimer(Sender: TObject);
 begin
 //Log ('X', Self.Left - frmMain.Left - frmMain.Width);
@@ -86,7 +88,7 @@ begin
         				200);
         bLogDocked:=True;
     end else
-        bLogDocked:=False;
+    bLogDocked:=False;
 	tmrLog.Enabled:=False;
 end;
 

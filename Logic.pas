@@ -9,7 +9,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
     XMLutils, uFieldFrame, uSmartMethods
   	;
 const
-	bShowLogAtStart: Boolean = True;
+	bShowLogAtStart: Boolean = False;
 var
 	xmlMain: IXMLDocument;          //Основной наш документ
     LogList: TStringList;           //Переменная для логирования
@@ -31,7 +31,8 @@ function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeLis
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
 procedure InsertFolder(treeNode: TTreeNode);
-procedure EditItem(treeNode: TTreeNode);
+procedure EditNode(treeNode: TTreeNode);
+function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
 procedure AddPage();
@@ -45,9 +46,9 @@ uses uMain, uLog, uEditItem;
 
 procedure Log(Text: String);
 begin
-	LogList.Add(TimeToStr(Now) +': '+ Text);
+	LogList.Add({TimeToStr(Now) +}'> '+ Text);
     if Assigned(frmLog) then begin
-	    frmLog.lbLog.Items.Add(TimeToStr(Now) +': '+ Text);
+	    frmLog.lbLog.Items.Add({TimeToStr(Now) +}'> '+ Text);
     	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
     end;
 end;
@@ -95,7 +96,7 @@ function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = Fa
 var i: Integer;
 begin
 //Проверяем корректность входящей ноды
-	Log('Start: GeneratePanel(' + nItem.NodeName + ', ' + Panel.Name +')');
+	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
     //Чистим панельку
@@ -122,7 +123,7 @@ function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = F
 var
 	fieldFormat: eFieldFormat;
 begin
-	Log('--------------------GenerateField:Start');
+	//Log('--------------------GenerateField:Start');
     LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
 	With TFieldFrame.CreateParented(Panel.Handle) do begin
@@ -142,7 +143,7 @@ begin
 		Tag:=LongInt(nField);
 
         if IsEdit=False then begin
-            if UpperCase(GetAttribute(nField, 'button')) = 'FALSE' then
+            if LowerCase(GetAttribute(nField, 'button')) = 'false' then
                 btnSmart.Enabled:=false
             else
                 case fieldFormat of
@@ -163,7 +164,7 @@ begin
                     SetButtonImg(btnSmart, 0);
                 end;
             end;
-        end else begin
+        end else begin                                 //Режим редактирования
         	case fieldFormat of
                 ffPass: begin
         			btnAdditional.Visible:=True;
@@ -176,7 +177,7 @@ begin
         btnSmart.OnClick:= clsSmartMethods.Create.EditField;
         end;
     end;
-    Log('--------------------GenerateField:End');
+    //Log('--------------------GenerateField:End');
 end;
 
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
@@ -213,7 +214,7 @@ begin
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
     RootNode.Data:=Pointer(PageList[pageIndex]);
 	IterateNodesToTree(PageList[pageIndex], RootNode, Tree);
-    log(RootNode.AbsoluteIndex);
+    //log(RootNode.AbsoluteIndex);
     //RootNode.DropTarget:=True;
     RootNode.Expand(False);
     RootNode.Selected:=True;
@@ -250,10 +251,10 @@ begin
     Log('--------------------IterateNodesToTree:End');
 end;
 
-procedure EditItem(treeNode: TTreeNode);
+procedure EditNode(treeNode: TTreeNode);
 var
 	trgNode: IXMLNode;
-    tmpNode: IXMLNode;
+    //tmpNode: IXMLNode;
 begin
 	if treeNode.Data = nil then Exit;
     //Если узел в режиме редактирования то просто применяем изменения
@@ -263,23 +264,42 @@ begin
             Exit;
     end;
     trgNode:= IXMLNode(treeNode.Data);
-    tmpNode:= trgNode.CloneNode(True);
     LogNodeInfo(TrgNode, 'EditItem:Target');
-    LogNodeInfo(tmpNode, 'EditItem:Temp');
 	case GetNodeType(TrgNode) of
     ntItem: begin
-        if (not Assigned(frmEditItem)) then frmEditItem:= TfrmEditItem.Create(frmMain);
-        GeneratePanel(TrgNode, frmEditItem.fpEdit, True);
-        frmEditItem.Hide;
-        frmEditItem.ShowModal;
-        FreeAndNil(frmEditItem);
+    	if EditItem(trgNode) then begin
+        	treeNode.Data:=Pointer(trgNode);
+            treeNode.Text:=GetNodeTitle(trgNode);
+            GeneratePanel(trgNode, frmMain.fpMain, False);
+        end;
     end;
-    ntFolder:
-    	Exit;
-    ntPage:
+    ntFolder, ntPage:
     	treeNode.EditText;
     end;
 
+end;
+
+function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+var
+	//trgNode: IXMLNode;
+    tmpNode: IXMLNode;
+begin
+	Log('EditItem, isNew=' + BoolToStr(isNew,True));
+    LogNodeInfo(Node, 'EditItem:InputNode');
+	tmpNode:= Node.CloneNode(True);
+    LogNodeInfo(tmpNode, 'EditItem:Temp');
+    if (not Assigned(frmEditItem)) then frmEditItem:= TfrmEditItem.Create(frmMain, tmpNode, isNew);
+    if frmEditItem.ShowModal=mrOK then begin
+        	Log('frmEditItem: mrOK');
+            if not isNew then Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
+            Node:= tmpNode;
+            Result:=True;
+        end else begin
+            Log('frmEditItem: mrCancel');
+            Result:=False;
+        end;
+        FreeAndNil(frmEditItem);
+        LogNodeInfo(Node, 'EditItem:OutNode');
 end;
 
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
@@ -395,6 +415,7 @@ var
 	defItem: IXMLNode;
 	newItem: IXMLNode;
     destNode: IXMLNode;     //ntFolder;
+    newTreeNode: TTreeNode;
 begin
 	destNode:=IXMLNode(treeNode.Data);
 	LogNodeInfo(destNode, 'InsertItem');
@@ -409,16 +430,18 @@ begin
         newItem.ChildNodes.Add(defItem.ChildNodes[i].CloneNode(True));
     for i := 0 to defItem.AttributeNodes.Count - 1 do
         newItem.AttributeNodes.Add(defItem.AttributeNodes[i].CloneNode(True));
-	destNode.ChildNodes.Add(newItem);
-	if (not treeNode.Expanded) then treeNode.Expand(False);
-    with TTreeView(treeNode.TreeView).Items.AddChild(treeNode, GetNodeTitle(newItem)) do begin
-        Data:= Pointer(newItem);
-        ImageIndex:=1;
-        SelectedIndex:=1;
-        Selected:=True;
-        EditText;
-    end;
-
+    if EditItem(newItem, True) = True then begin
+		destNode.ChildNodes.Add(newItem);
+		if (not treeNode.Expanded) then treeNode.Expand(False);
+    	newTreeNode:=TTreeView(treeNode.TreeView).Items.AddChild(treeNode, GetNodeTitle(newItem));
+    	with newTreeNode do begin
+            Data:= Pointer(newItem);
+            ImageIndex:=1;
+            SelectedIndex:=1;
+            Selected:=True;
+        end;
+        //EditText;
+    end else newItem._Release;
 end;
 
 procedure SetNodeExpanded(treeNode: TTreeNode);

@@ -15,7 +15,8 @@ uses
   uEditItem in 'uEditItem.pas' {frmEditItem},
   Vcl.Themes,
   Vcl.Styles,
-  uLog in 'uLog.pas' {frmLog};
+  uLog in 'uLog.pas' {frmLog},
+  uEditField in 'uEditField.pas' {frmEditField};
 
 {$R *.res}
 

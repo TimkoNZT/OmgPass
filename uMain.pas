@@ -163,9 +163,8 @@ end;
 {$REGION '#Прилипание формы лога к краю основной'}
 procedure TfrmMain.OnMove(var Msg: TWMMove);
 begin
-    if Assigned(frmLog) and bLogDocked then begin
+    if Assigned(frmLog) and bLogDocked then
       frmLog.tmrLog.OnTimer(nil);
-end;
 end;
 {$ENDREGION}
 
@@ -209,11 +208,12 @@ end;
 procedure TfrmMain.tvMainDblClick(Sender: TObject);
 //Здесь просто
 begin
-	EditItem(tvMain.Selected);
+	if not tvMain.Selected.HasChildren then
+		EditNode(tvMain.Selected);
 end;
 procedure TfrmMain.mnuEditItemClick(Sender: TObject);
 begin
-	EditItem(tvMain.Selected);
+	EditNode(tvMain.Selected);
 end;
 procedure TfrmMain.mnuPopupEditItemClick(Sender: TObject);
 //А тут не так всё просто
@@ -223,11 +223,11 @@ begin
     						tvMain.ScreenToClient(menuTreePopup.PopupPoint).Y);
     if selNode = nil then selNode:=tvMain.Selected;
     selNode.Selected:=True;
-	EditItem(selNode);
+	EditNode(selNode);
 end;
 procedure TfrmMain.tbtnEditClick(Sender: TObject);
 begin
-	EditItem(tvMain.Selected);
+	EditNode(tvMain.Selected);
 end;
 procedure TfrmMain.tvMainEdited(Sender: TObject; Node: TTreeNode;
   var Title: string);
@@ -414,6 +414,8 @@ end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
 	tvMain.Width:= frmMain.ClientWidth div 5 * 2;
+    if Assigned(frmLog) and bLogDocked then
+    	frmLog.tmrLog.OnTimer(nil);
 end;
 procedure TfrmMain.fpMainMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
