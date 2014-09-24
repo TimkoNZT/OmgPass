@@ -1,6 +1,7 @@
 del *.dcu
 del *.exe
 del *.local
+del *.vlb
 del *.identcache
 ;del win32\debug\*.dcu
 ;del win32\debug\*.exe
