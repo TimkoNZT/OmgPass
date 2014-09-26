@@ -10,9 +10,7 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  XMLutils, VersionUtils, Logic, Data.Bind.EngExt, Vcl.Bind.DBEngExt,
-  System.Rtti, System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Components
-  ;
+  XMLutils, VersionUtils, Logic, uCustomEdit;
 type
 TfrmMain = class(TForm)
     menuMain: TMainMenu;
@@ -451,6 +449,8 @@ end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
 	tvMain.Width:= frmMain.ClientWidth div 5 * 2;
+    tvMain.Align:=alLeft;
+    Splitter.Left:=tvMain.Width;
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
 end;

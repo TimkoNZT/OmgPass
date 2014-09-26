@@ -18,7 +18,8 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   uLog in 'uLog.pas' {frmLog},
-  uEditField in 'uEditField.pas' {frmEditField};
+  uEditField in 'uEditField.pas' {frmEditField},
+  uCustomEdit in 'uCustomEdit.pas';
 
 {$R *.res}
 

@@ -5,29 +5,29 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons,
-  Vcl.ComCtrls;
+  Vcl.ComCtrls, uCustomEdit;
 
 type
   TFieldFrame = class(TFrame)
     lblTitle: TLabel;
-    textInfo: TRichEdit;
     btnSmart: TSpeedButton;
     btnAdditional: TSpeedButton;
+    textInfo: TEditMultiLine;
     procedure FrameResize(Sender: TObject);
   private
     { Private declarations }
   public
+	constructor Create(AOwner: TComponent); override;
     { Public declarations }
   end;
-
-FieldType = (ftText, ftPass, ftComment);
-
-//var
-
 
 implementation
 
 {$R *.dfm}
+constructor TFieldFrame.Create(AOwner: TComponent);
+begin
+    inherited Create(AOwner);
+end;
 
 procedure TFieldFrame.FrameResize(Sender: TObject);
 begin

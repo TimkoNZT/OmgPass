@@ -39,20 +39,22 @@ object FieldFrame: TFieldFrame
     Flat = True
     Visible = False
   end
-  object textInfo: TRichEdit
+  object textInfo: TEditMultiLine
     Left = 0
     Top = 15
-    Width = 112
+    Width = 108
     Height = 22
-    BorderWidth = 1
+    AutoSize = False
+    BevelInner = bvSpace
+    BevelKind = bkSoft
+    BevelOuter = bvSpace
     Font.Charset = RUSSIAN_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    ReadOnly = True
     TabOrder = 0
-    WantTabs = True
+    Multiline = False
   end
 end

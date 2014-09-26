@@ -45,7 +45,7 @@ var
 begin
 	for i := 0 to fpEdit.ControlCount - 1 do begin
 		With (fpEdit.Controls[i] as TFieldFrame) do begin
-            SetNodeValue(IXMLNode(Tag), textInfo.Text);
+            SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
         end;
     end;
 	ModalResult:=mrOK;

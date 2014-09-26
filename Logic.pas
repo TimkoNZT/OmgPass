@@ -144,10 +144,11 @@ begin
         lblTitle.Caption:=GetAttribute(nField, 'name');
         if fieldFormat = ffComment then begin
 			textInfo.Height:=60;
-            textInfo.ScrollBars:=ssVertical;
-            textInfo.HideScrollBars:=True;
-			textInfo.Lines.Text:=StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
-        end else textInfo.Lines.Text:=VarToStr(nField.NodeValue);
+            textInfo.Multiline:=True;
+            //textInfo.ScrollBars:=ssVertical;
+            //textInfo.HideScrollBars:=True;
+			textInfo{.Lines}.Text:=StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
+        end else textInfo{.Lines}.Text:=VarToStr(nField.NodeValue);
         textInfo.ReadOnly:=not IsEdit;
 		btnSmart.Tag:=NativeInt(textInfo);		//“‡-‰‡‡‡‡‡‡!
         btnAdditional.Tag:=LongInt(textInfo);
@@ -184,7 +185,7 @@ begin
                     btnAdditional.OnClick:= clsSmartMethods.Create.GeneratePass;
                     SetButtonImg(btnAdditional, 5);
                     if isNew then textInfo.Text:=GeneratePassword(10);
-                end
+                end;
             end;
         SetButtonImg(btnSmart, 4);
         btnSmart.OnClick:= clsSmartMethods.Create.EditField;

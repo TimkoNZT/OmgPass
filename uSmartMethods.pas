@@ -22,11 +22,10 @@ End;
 function GetEditFromTag(Sender: TObject): String;
 
 implementation
-uses uMain, uGenerator, Logic, uEditField, uEditItem;
+uses uMain, uGenerator, Logic, uEditField, uEditItem, uCustomEdit;
 
 procedure clsSmartMethods.CopyToClipboard(Sender: TObject);
 begin
-	//Beep();
 	Clipboard.Clear;
 	Clipboard.AsText:=GetEditFromTag(Sender);
     log(Clipboard.AsText, (Sender as TSpeedButton).Tag);
@@ -60,7 +59,7 @@ procedure clsSmartMethods.GeneratePass(Sender: TObject);
 begin
     if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(nil);
 	if frmGenerator.ShowModal = mrOk then begin
-  	TRichEdit(Pointer((Sender as TSpeedButton).Tag)).Lines.Text:= frmGenerator.lblResult.Caption;
+  	TEditMultiline(Pointer((Sender as TSpeedButton).Tag)).Text:= frmGenerator.lblResult.Caption;
 end;
 FreeAndNil(frmGenerator);
 end;
@@ -72,10 +71,9 @@ begin
 	end;
 FreeAndNil(frmEditField);
 end;
-
 function GetEditFromTag(Sender: TObject): String;
 begin
-    result:=TRichEdit(Pointer((Sender as TSpeedButton).Tag)).Lines.Text
+    result:=TEditMultiline(Pointer((Sender as TSpeedButton).Tag)).Text
 end;
 
 end.
