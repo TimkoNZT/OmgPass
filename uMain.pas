@@ -427,14 +427,21 @@ begin
   	selNode := tvMain.Selected;
   	if (trgNode = nil) or
     	(trgNode=selNode) then Exit;
-	DragAndDrop(trgNode, selNode);
+	DragAndDrop(trgNode, selNode,(GetKeyState(VK_CONTROL) AND 128) = 128);
 end;
 
 procedure TfrmMain.tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
 State: TDragState; var Accept: Boolean);
+const
+  crDragCopy: Integer = -23;          //Кто бы мог подумать, уроды криворукие
 var
   trgNode, selNode: TTreeNode;
 begin
+    if (GetKeyState(VK_CONTROL) AND 128) = 128 then
+        tvMain.DragCursor:= crDragCopy
+    else
+        tvMain.DragCursor:= crDrag;
+
   	trgNode := tvMain.GetNodeAt(x, y);
   	selNode := tvMain.Selected;
     if (trgNode=nil) or (trgNode = selNode.Parent) then Accept:=False
@@ -482,6 +489,7 @@ mnuThemes.Items[0].Checked:= True;
 finally end;
 InitGlobal();
 end;
+
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);
 //Выбор стиля оформления
 begin

@@ -42,7 +42,7 @@ procedure SetNodeExpanded(treeNode: TTreeNode);
 function GetNodeExpanded(Node: IXMLNode): Boolean;
 function GeneratePassword(Len: Integer): String;
 function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
-procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean = False);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 
 implementation
@@ -143,7 +143,7 @@ begin
         Align:=alTop;
         lblTitle.Caption:=GetAttribute(nField, 'name');
         if fieldFormat = ffComment then begin
-			textInfo.Height:=60;
+			textInfo.Height:=70;
             textInfo.Multiline:=True;
             //textInfo.ScrollBars:=ssVertical;
             //textInfo.HideScrollBars:=True;
@@ -151,10 +151,9 @@ begin
         end else textInfo{.Lines}.Text:=VarToStr(nField.NodeValue);
         textInfo.ReadOnly:=not IsEdit;
 		btnSmart.Tag:=NativeInt(textInfo);		//Та-даааааа!
-        btnAdditional.Tag:=LongInt(textInfo);
-		textInfo.Tag:=Long(nField);
-		Tag:=LongInt(nField);
-
+        btnAdditional.Tag:=NativeInt(textInfo);
+		textInfo.Tag:=NativeInt(nField);
+		Tag:=NativeInt(nField);
         if IsEdit=False then begin
             if LowerCase(GetAttribute(nField, 'button')) = 'false' then
                 btnSmart.Enabled:=false
@@ -303,18 +302,20 @@ begin
     LogNodeInfo(Node, 'EditItem:InputNode');
 	tmpNode:= Node.CloneNode(True);
     LogNodeInfo(tmpNode, 'EditItem:Temp');
-    if (not Assigned(frmEditItem)) then frmEditItem:= TfrmEditItem.Create(frmMain, tmpNode, isNew);
+    if (not Assigned(frmEditItem)) then
+        frmEditItem:= TfrmEditItem.Create(frmMain, tmpNode, isNew);
     if frmEditItem.ShowModal=mrOK then begin
-        	Log('frmEditItem: mrOK');
-            if not isNew then Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
-            Node:= tmpNode;
-            Result:=True;
-        end else begin
-            Log('frmEditItem: mrCancel');
-            Result:=False;
-        end;
-        FreeAndNil(frmEditItem);
+        Log('frmEditItem: mrOK');
         LogNodeInfo(Node, 'EditItem:OutNode');
+        if not isNew then
+            Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
+        Node:= tmpNode;
+        Result:=True;
+    end else begin
+        Log('frmEditItem: mrCancel');
+        Result:=False;
+    end;
+    FreeAndNil(frmEditItem);
 end;
 
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
@@ -488,7 +489,7 @@ begin
 Result:=True;
 end;
 
-procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean=False);
 //Попой чую, здесь можно было проще, но проще глючило.
 var
 	rootTreeNode: TTreeNode;
@@ -506,7 +507,7 @@ begin
     ntItem:
     	trgNode.ParentNode.ChildNodes.Insert(trgNode.ParentNode.ChildNodes.IndexOf(trgNode), newNode);
     end;
-    selNode.ParentNode.ChildNodes.Remove(selNode);
+    if not isCopy then selNode.ParentNode.ChildNodes.Remove(selNode);
     Logic.ParsePageToTree(Logic.intCurrentPage, frmMain.tvMain);
 	rootTreeNode:=selTreeNode.Parent;
     while rootTreeNode.Parent<> nil do rootTreeNode:=rootTreeNode.Parent;
