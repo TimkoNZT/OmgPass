@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 353
   Top = 186
   Caption = 'Omg!Pass'
-  ClientHeight = 407
-  ClientWidth = 507
+  ClientHeight = 428
+  ClientWidth = 578
   Color = clBtnFace
   Constraints.MinHeight = 330
   Constraints.MinWidth = 388
@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Menu = menuMain
   OldCreateOrder = False
   Position = poDesigned
@@ -23,7 +24,7 @@ object frmMain: TfrmMain
   object ToolBarMain: TToolBar
     Left = 0
     Top = 0
-    Width = 507
+    Width = 578
     Height = 55
     ButtonHeight = 55
     ButtonWidth = 55
@@ -117,8 +118,8 @@ object frmMain: TfrmMain
   object tabMain: TTabControl
     Left = 0
     Top = 55
-    Width = 507
-    Height = 333
+    Width = 578
+    Height = 354
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -139,13 +140,13 @@ object frmMain: TfrmMain
     OnMouseDown = tabMainMouseDown
     OnMouseLeave = tabMainMouseLeave
     DesignSize = (
-      507
-      333)
+      578
+      354)
     object Splitter: TSplitter
       Left = 205
       Top = 31
       Width = 7
-      Height = 298
+      Height = 319
       Hint = 'DblClick for restore position'
       Margins.Left = 2
       Margins.Top = 2
@@ -157,7 +158,7 @@ object frmMain: TfrmMain
       ExplicitHeight = 299
     end
     object btnAddPage: TSpeedButton
-      Left = 479
+      Left = 550
       Top = 0
       Width = 26
       Height = 26
@@ -167,7 +168,7 @@ object frmMain: TfrmMain
       ExplicitLeft = 458
     end
     object btnDeletePage: TSpeedButton
-      Left = 451
+      Left = 522
       Top = 0
       Width = 26
       Height = 26
@@ -180,7 +181,7 @@ object frmMain: TfrmMain
       Left = 4
       Top = 31
       Width = 201
-      Height = 298
+      Height = 319
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -211,8 +212,8 @@ object frmMain: TfrmMain
       AlignWithMargins = True
       Left = 212
       Top = 31
-      Width = 289
-      Height = 297
+      Width = 360
+      Height = 318
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 2
@@ -231,8 +232,8 @@ object frmMain: TfrmMain
       OnMouseWheel = fpMainMouseWheel
     end
     object ComboBoxEx1: TComboBoxEx
-      Left = 405
-      Top = 96
+      Left = 433
+      Top = 48
       Width = 49
       Height = 28
       ItemsEx = <
@@ -294,8 +295,8 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 388
-    Width = 507
+    Top = 409
+    Width = 578
     Height = 19
     Margins.Left = 2
     Margins.Top = 2
@@ -305,11 +306,10 @@ object frmMain: TfrmMain
       item
         Width = 50
       end>
-    Visible = False
   end
   object menuMain: TMainMenu
-    Left = 347
-    Top = 192
+    Left = 291
+    Top = 336
     object N1: TMenuItem
       Caption = #1040#1082#1082#1072#1091#1085#1090
       SubMenuImages = imlTab
@@ -436,10 +436,10 @@ object frmMain: TfrmMain
     Masked = False
     ShareImages = True
     Width = 48
-    Left = 291
-    Top = 96
+    Left = 235
+    Top = 240
     Bitmap = {
-      494C010108001800380130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800480130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4016,10 +4016,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 23
     Width = 23
-    Left = 347
-    Top = 144
+    Left = 291
+    Top = 288
     Bitmap = {
-      494C01010D0024012C0217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D0024013C0217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5125,10 +5125,10 @@ object frmMain: TfrmMain
     Height = 22
     ShareImages = True
     Width = 22
-    Left = 347
-    Top = 96
+    Left = 291
+    Top = 240
     Bitmap = {
-      494C010102003400540016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C010102003400640016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5380,10 +5380,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 291
-    Top = 144
+    Left = 235
+    Top = 288
     Bitmap = {
-      494C01015D00CC01400216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D00CC01500216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -11399,8 +11399,8 @@ object frmMain: TfrmMain
   object menuTreePopup: TPopupMenu
     Images = imlPopup
     OnPopup = menuTreePopupPopup
-    Left = 291
-    Top = 192
+    Left = 235
+    Top = 336
     object mnuPopupInsertItem: TMenuItem
       Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100'...'
       ImageIndex = 0
@@ -11431,10 +11431,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 403
-    Top = 96
+    Left = 347
+    Top = 240
     Bitmap = {
-      494C01010400F001680216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010400F001780216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -11950,7 +11950,7 @@ object frmMain: TfrmMain
     Enabled = False
     Interval = 700
     OnTimer = tmrRenameTabTimer
-    Left = 403
-    Top = 192
+    Left = 347
+    Top = 336
   end
 end

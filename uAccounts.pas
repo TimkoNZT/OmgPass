@@ -5,13 +5,13 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  VCLTee.TeCanvas, VCLTee.TeePenDlg, Vcl.StdCtrls, Vcl.CategoryButtons,
-  Vcl.ExtCtrls, Vcl.Buttons, Vcl.ComCtrls, Vcl.DBCtrls;
+  StdCtrls, Vcl.CategoryButtons,
+  Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs, Vcl.ImgList,
+  Vcl.Imaging.pngimage;
 
 type
   TfrmAccounts = class(TForm)
     btnNext: TSpeedButton;
-    lblInfo: TLabel;
     pcWizard: TPageControl;
     TabSheet1: TTabSheet;
     tabOpen: TTabSheet;
@@ -22,11 +22,9 @@ type
     btnCancel: TSpeedButton;
     txtOpenBase: TRichEdit;
     txtOpenPass: TRichEdit;
-    Label1: TLabel;
     btnOpenBase: TSpeedButton;
     Label3: TLabel;
     SpeedButton4: TSpeedButton;
-    Label4: TLabel;
     Label5: TLabel;
     RadioButton4: TRadioButton;
     radOpenDefault: TRadioButton;
@@ -38,17 +36,27 @@ type
     Label10: TLabel;
     RadioButton1: TRadioButton;
     OpenDialog: TOpenDialog;
-    btnNewBase: TSpeedButton;
-    txtNewBase: TRichEdit;
-    Label2: TLabel;
+    SaveDialog: TSaveDialog;
+    txtPassConfirm: TEdit;
     lblPassConfirm: TLabel;
+    Label4: TLabel;
+    txtNewBase: TRichEdit;
+    txtNewPass: TEdit;
+    Label2: TLabel;
+    chkShowPass: TCheckBox;
     CheckBox1: TCheckBox;
     RichEdit6: TRichEdit;
-    chkShowPass: TCheckBox;
+    TabSheet5: TTabSheet;
+    imlTab: TImageList;
+    ListView1: TListView;
+    Label1: TLabel;
+    CheckBox2: TCheckBox;
+    Label6: TLabel;
+    SpeedButton1: TSpeedButton;
     btnGeneratePass: TSpeedButton;
-    txtNewPass: TEdit;
-    txtPassConfirm: TEdit;
-    SaveDialog: TSaveDialog;
+    btnNewBase: TSpeedButton;
+    Image1: TImage;
+    Edit1: TEdit;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnNextClick(Sender: TObject);
     procedure radOpenBaseClick(Sender: TObject);
@@ -61,9 +69,17 @@ type
     procedure btnOpenBaseClick(Sender: TObject);
     procedure btnNewBaseClick(Sender: TObject);
     procedure btnGeneratePassClick(Sender: TObject);
-  private
+    procedure TabSheet5ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure FormCreate(Sender: TObject);
+private
+    FShowHoriz: Boolean;
+    FShowVert: Boolean;
+    FListViewWndProc: TWndMethod;
+    procedure ListViewWndProc(var Msg: TMessage);
+
     { Private declarations }
-  public
+public
     { Public declarations }
   end;
 
@@ -76,12 +92,28 @@ var
                                             'Работа в облаке',
                                             'Резервные копии');
   currentDatabase: String = 'Default.opwd';
+procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
 
 implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator;
+uses uMain, uGenerator, Logic;
+
+procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
+begin
+    if Button is TSpeedButton then begin
+        //frmAccounts.imlTab.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
+    end;
+end;
+
+
+procedure TfrmAccounts.ListViewWndProc(var Msg: TMessage);
+begin
+   ShowScrollBar(ListView1.Handle, SB_HORZ, False);
+   ShowScrollBar(ListView1.Handle, SB_VERT, True);
+   FListViewWndProc(Msg); // process message
+end;
 
 procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -91,6 +123,19 @@ end;
 procedure TfrmAccounts.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
 //CanClose:=False;
+end;
+
+procedure TfrmAccounts.FormCreate(Sender: TObject);
+begin
+//    FListViewWndProc := ListView1.WindowProc; // save old window proc
+//    ListView1.WindowProc := ListViewWndProc; // subclass
+if listview1.Items.Count>4 then
+    listview1.Column[0].Width:=(listview1.ClientRect.Width - 30);
+//SetWindowLongPtr(listview1.Handle, GWL_STYLE,
+//      GetWindowLongPtr(listview1.Handle, GWL_STYLE) or WS_VSCROLL);
+SetButtonImg(btnNewBase, 38);
+SetButtonImg(btnGeneratePass, 1);
+
 end;
 
 procedure TfrmAccounts.lblDefaultExtClick(Sender: TObject);
@@ -121,6 +166,12 @@ if not True then begin     // Посмотреть в настройках недавние файлы
 
 end;
 
+procedure TfrmAccounts.TabSheet5ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
+end;
+
 //Кнопка Далее, или ОК, возвращение модального результата
 procedure TfrmAccounts.btnGeneratePassClick(Sender: TObject);
 begin
@@ -141,17 +192,17 @@ end;
 
 procedure TfrmAccounts.btnNextClick(Sender: TObject);
 begin
-
-case pcWizard.ActivePageIndex of
-0:begin
-    lblInfo.Caption:=infoText[intNextPage];
-    btnCancel.Caption:='Назад';
-    btnNext.Caption:='OK';
-    pcWizard.ActivePageIndex:=intNextPage;
-    end;
-1: frmAccounts.Close;
-2: frmAccounts.Close;
-end;
+  Self.Close;
+//case pcWizard.ActivePageIndex of
+//0:begin
+//    lblInfo.Caption:=infoText[intNextPage];
+//    btnCancel.Caption:='Назад';
+//    btnNext.Caption:='OK';
+//    pcWizard.ActivePageIndex:=intNextPage;
+//    end;
+//1: frmAccounts.Close;
+//2: frmAccounts.Close;
+//end;
 
 end;
 
@@ -181,10 +232,10 @@ procedure TfrmAccounts.btnCancelClick(Sender: TObject);
 begin
 if pcWizard.ActivePageIndex = 0 then Close
 else begin
-    lblInfo.Caption:=infoText[0];
-    btnCancel.Caption:='Отмена';
-    btnNext.Caption:='Далее';
-    pcWizard.ActivePageIndex:=0;
+//    lblInfo.Caption:=infoText[0];
+//    btnCancel.Caption:='Отмена';
+//    btnNext.Caption:='Далее';
+//    pcWizard.ActivePageIndex:=0;
 end;
 end;
 

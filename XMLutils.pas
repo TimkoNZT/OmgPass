@@ -355,7 +355,7 @@ if isTVal <> nil then Vl:=VarToStr(Node.ChildNodes['#text'].NodeValue);
 Log(Msg + ': NodeInfo: Title= ' + GetNodeTitle(Node) +
  	', Value= ' +  Vl +
    	', Type= ' + GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(Node))) +
-    ', @=' + IntToStr(Integer(Node)) +
+    ', @=' + IntToStr(NativeInt(Node)) +
 
     ', BasicType=' + GetEnumName(TypeInfo(TNodeType), Ord(Node.NodeType)) +
 	', Childs= ' + IntToStr(Node.ChildNodes.Count) +
