@@ -194,6 +194,7 @@ object frmGenerator: TfrmGenerator
     Width = 80
     Height = 33
     Caption = #1054#1050
+    Default = True
     TabOrder = 3
     OnClick = btnModalClick
   end

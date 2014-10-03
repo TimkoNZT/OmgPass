@@ -29,10 +29,10 @@ procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
+procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : Boolean;
-procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
@@ -47,10 +47,10 @@ procedure InsertItem(treeNode: TTreeNode);
 procedure SetNodeExpanded(treeNode: TTreeNode);
 function GetNodeExpanded(Node: IXMLNode): Boolean;
 function GeneratePassword(Len: Integer): String;
-function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean = False);
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
+procedure CloneNode(treeNode: TTreeNode);
 
 implementation
 uses uMain, uLog, uEditItem, uGenerator;
@@ -103,10 +103,10 @@ begin
     Log('ClearPanel(' + Panel.Name + ') =', result);
 end;
 
-procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
+procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 begin
     if Button is TSpeedButton then begin
-        frmMain.imlField.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
+        List.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
     end;
 end;
 
@@ -134,6 +134,7 @@ begin
     for i := nItem.ChildNodes.Count -1 downto 0 do
     	GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
     Panel.Visible:=True;
+    Result:=True;
 end;
 
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
@@ -168,19 +169,19 @@ begin
                 case fieldFormat of
                 ffWeb: begin
                     btnSmart.OnClick:= clsSmartMethods.Create.OpenURL;
-                    SetButtonImg(btnSmart, 1);
+                    SetButtonImg(btnSmart, frmMain.imlField, 1);
                 end;
                 ffMail: begin
                     btnSmart.OnClick:= clsSmartMethods.Create.OpenMail;
-                    SetButtonImg(btnSmart, 2);
+                    SetButtonImg(btnSmart, frmMain.imlField, 2);
                 end;
                 ffFile: begin
                     btnSmart.OnClick:= clsSmartMethods.Create.AttachedFile;
-                    SetButtonImg(btnSmart, 3);
+                    SetButtonImg(btnSmart, frmMain.imlField, 3);
                 end;
                 else begin
                     btnSmart.OnClick:= clsSmartMethods.Create.CopyToClipboard;
-                    SetButtonImg(btnSmart, 0);
+                    SetButtonImg(btnSmart, frmMain.imlField, 0);
                 end;
             end;
         end else begin                                 //Режим редактирования
@@ -189,15 +190,16 @@ begin
         			btnAdditional.Visible:=True;
             		OnResize(nil);
                     btnAdditional.OnClick:= clsSmartMethods.Create.GeneratePass;
-                    SetButtonImg(btnAdditional, 5);
+                    SetButtonImg(btnAdditional, frmMain.imlField, 5);
                     if isNew then textInfo.Text:=GeneratePassword(10);
                 end;
             end;
-        SetButtonImg(btnSmart, 4);
+        SetButtonImg(btnSmart, frmMain.imlField, 4);
         btnSmart.OnClick:= clsSmartMethods.Create.EditField;
         end;
     end;
     //Log('--------------------GenerateField:End');
+    Result:=True;
 end;
 
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
@@ -413,7 +415,7 @@ end;
 procedure InsertFolder(treeNode: TTreeNode);
 var
 	newFolderNode: IXMLNode;
-	newTreeNode: TTreeNode;
+	//newTreeNode: TTreeNode;
 begin
 	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then begin
         treeNode:=treeNode.Parent;
@@ -448,11 +450,13 @@ begin
     end;
     Log(destNode.NodeName);
 	defItem:=PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
+    //
 	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do
         newItem.ChildNodes.Add(defItem.ChildNodes[i].CloneNode(True));
     for i := 0 to defItem.AttributeNodes.Count - 1 do
         newItem.AttributeNodes.Add(defItem.AttributeNodes[i].CloneNode(True));
+    //
     if EditItem(newItem, True) = True then begin
 		destNode.ChildNodes.Add(newItem);
 		if (not treeNode.Expanded) then treeNode.Expand(False);
@@ -465,6 +469,40 @@ begin
         end;
         //EditText;
     end else newItem._Release;
+end;
+
+procedure CloneNode(treeNode: TTreeNode);
+var
+	Node: IXMLNode;
+begin
+    Node:=IXMLNode(treeNode.Data);
+    case GetNodeType(Node) of
+    ntPage:
+        Log('Page clone not realised yet...');
+    ntFolder: begin
+            Log('Clone folder');
+            DragAndDropVisual(treeNode.Parent, treeNode);
+            DragAndDrop(treeNode.Parent, treeNode, True);
+        end;
+    ntItem: begin
+            Log('Clone item');
+            {newNode:= Node.CloneNode(True);
+            Node.ParentNode.ChildNodes.Insert(
+            Node.ParentNode.ChildNodes.IndexOf(Node), newNode);
+            newTreeNode:= TTreeView(TreeNode.TreeView).Items.Insert(
+            TreeNode, TreeNode.Text);
+            With newTreeNode do begin
+                Data:=Pointer(newNode);
+                Enabled:=True;
+                ImageIndex:=treeNode.ImageIndex;
+                SelectedIndex:=treeNode.SelectedIndex;
+                Selected:=True;
+            end;}
+            DragAndDropVisual(treeNode, treeNode);
+            DragAndDrop(treeNode, treeNode, True);
+        end;
+    end;
+
 end;
 
 procedure SetNodeExpanded(treeNode: TTreeNode);
@@ -486,20 +524,9 @@ begin
     	result:=StrToBool(tmp);
 end;
 
-function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
-var
-selNode, trgNode: IXMLNode;
-begin
-//Пока заглушка, надо разобраться с логикой
-//selNode:=IXMLNode(selTreeNode.Data);
-//trgNode:=IXMLNode(trgTreeNode.Data);
-Result:=True;
-end;
-
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean=False);
 //Попой чую, здесь можно было проще, но проще глючило.
 var
-	rootTreeNode: TTreeNode;
 	selNode, trgNode, newNode: IXMLNode;
 begin
     selNode:=IXMLNode(selTreeNode.Data);
@@ -539,21 +566,21 @@ begin
 end;
 
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
-//Две похожих процедуры, позже обьединить
 var
-selNode, trgNode: IXMLNode;
+//selNode: IXMLNode;
+trgNode: IXMLNode;
 begin
     if trgTreeNode = DragGhostNode then Exit;
     if DragGhostNode<> nil then frmMain.tvMain.Items.Delete(DragGhostNode);
     if (selTreeNode= nil) or (trgTreeNode=nil) then Exit;
-    selNode:=IXMLNode(selTreeNode.Data);
+    //selNode:=IXMLNode(selTreeNode.Data);
     trgNode:=IXMLNode(trgTreeNode.Data);
-    if (selNode= nil) or (trgNode=nil) then Exit;
+    //if (selNode= nil) or (trgNode=nil) then Exit;
     case GetNodeType(trgNode) of
     ntPage, ntFolder:
-        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.AddChild(trgTreeNode, GetNodeTitle(selNode));
+        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.AddChild(trgTreeNode, selTreeNode.Text);
     ntItem: 
-        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.Insert(trgTreeNode, GetNodeTitle(selNode));
+        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.Insert(trgTreeNode, selTreeNode.Text);
     end;
     DragGhostNode.Enabled:=False;
     DragGhostNode.ImageIndex:=selTreeNode.ImageIndex;

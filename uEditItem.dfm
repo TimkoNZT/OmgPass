@@ -29,6 +29,7 @@ object frmEditItem: TfrmEditItem
     Height = 33
     Anchors = [akRight, akBottom]
     Caption = #1054#1090#1084#1077#1085#1072
+    Default = True
     TabOrder = 0
     OnClick = btnCloseClick
   end

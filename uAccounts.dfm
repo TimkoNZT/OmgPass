@@ -350,7 +350,6 @@ object frmAccounts: TfrmAccounts
         ReadOnly = True
         TabOrder = 0
         WordWrap = False
-        Zoom = 100
       end
       object txtOpenPass: TRichEdit
         Left = 19
@@ -364,7 +363,6 @@ object frmAccounts: TfrmAccounts
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        Zoom = 100
       end
       object RadioButton4: TRadioButton
         Left = 3
@@ -462,7 +460,6 @@ object frmAccounts: TfrmAccounts
         ReadOnly = True
         TabOrder = 1
         WordWrap = False
-        Zoom = 100
       end
       object txtNewPass: TEdit
         Left = 19
@@ -507,7 +504,6 @@ object frmAccounts: TfrmAccounts
         ParentFont = False
         ScrollBars = ssVertical
         TabOrder = 5
-        Zoom = 100
       end
     end
   end
@@ -531,7 +527,7 @@ object frmAccounts: TfrmAccounts
     Left = 51
     Top = 328
     Bitmap = {
-      494C01015D00CC01540216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D00CC01580216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

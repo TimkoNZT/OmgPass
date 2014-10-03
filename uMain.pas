@@ -71,7 +71,8 @@ TfrmMain = class(TForm)
     btnDeletePage: TSpeedButton;
     tmrRenameTab: TTimer;
     tbtnLog: TToolButton;
-    ComboBoxEx1: TComboBoxEx;
+    mnuPopupCloneItem: TMenuItem;
+    mnuCloneItem: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -119,6 +120,8 @@ TfrmMain = class(TForm)
     procedure tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure tmrTreeExpandTimer(Sender: TObject);
+    procedure mnuPopupCloneItemClick(Sender: TObject);
+    procedure mnuCloneItemClick(Sender: TObject);
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -187,6 +190,7 @@ if (not Assigned(frmProperties)) then frmProperties:= TfrmProperties.Create(Self
 if frmProperties.ShowModal = mrOK then log('Изменены свойства БД');
 FreeAndNil(frmProperties);
 end;
+
 procedure TfrmMain.mnuGeneratorClick(Sender: TObject);
 begin
 if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(Self);
@@ -346,6 +350,22 @@ begin
     if selNode = nil then selNode:=tvMain.Selected;
     selNode.Selected:=True;
 	DeleteNode(selNode);
+end;
+{$ENDREGION}
+
+{$REGION '#Клонирование овечек'}
+procedure TfrmMain.mnuPopupCloneItemClick(Sender: TObject);
+    var selNode: TTreeNode;
+    begin
+  	selNode:= tvMain.GetNodeAt(tvMain.ScreenToClient(menuTreePopup.PopupPoint).X,
+      						tvMain.ScreenToClient(menuTreePopup.PopupPoint).Y);
+    if selNode = nil then selNode:=tvMain.Selected;
+    selNode.Selected:=True;
+  	CloneNode(selNode);
+end;
+procedure TfrmMain.mnuCloneItemClick(Sender: TObject);
+begin
+    CloneNode(tvMain.Selected);
 end;
 {$ENDREGION}
 
@@ -554,8 +574,8 @@ begin
 	xmlMain:=TXMLDocument.Create(frmMain);
 	xmlMain.LoadFromFile('../../omgpass.xml');
 	xmlMain.Active:=True;
-    SetButtonImg(frmMain.btnAddPage, 10);
-    SetButtonImg(frmMain.btnDeletePage, 12);
+    SetButtonImg(btnAddPage, imlField, 10);
+    SetButtonImg(btnDeletePage, imlField, 12);
     Log('Проверка версии');
     if CheckVersion(xmlMain) then Log('Версия базы актуальна')
     else begin
@@ -570,11 +590,12 @@ begin
     ParsePagesToTabs(xmlMain, tabMain);
     tabMainChange(nil);
 	if bShowLogAtStart then tbtnLogClick(nil);
-
+    tvMain.Items[9].Selected:=True;
 end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
+Log(tvMain.Selected.AbsoluteIndex);
 //xmlMain.SaveToFile('temp.txt');
 end;
 

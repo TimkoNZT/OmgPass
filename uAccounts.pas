@@ -92,21 +92,12 @@ var
                                             'Работа в облаке',
                                             'Резервные копии');
   currentDatabase: String = 'Default.opwd';
-procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
 
 implementation
 
 {$R *.dfm}
 
 uses uMain, uGenerator, Logic;
-
-procedure SetButtonImg(Button: TSpeedButton; ImgIndex: Integer);
-begin
-    if Button is TSpeedButton then begin
-        //frmAccounts.imlTab.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
-    end;
-end;
-
 
 procedure TfrmAccounts.ListViewWndProc(var Msg: TMessage);
 begin
@@ -133,8 +124,8 @@ if listview1.Items.Count>4 then
     listview1.Column[0].Width:=(listview1.ClientRect.Width - 30);
 //SetWindowLongPtr(listview1.Handle, GWL_STYLE,
 //      GetWindowLongPtr(listview1.Handle, GWL_STYLE) or WS_VSCROLL);
-SetButtonImg(btnNewBase, 38);
-SetButtonImg(btnGeneratePass, 1);
+SetButtonImg(btnNewBase,imlTab, 38);
+SetButtonImg(btnGeneratePass, imlTab, 1);
 
 end;
 
