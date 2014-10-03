@@ -66,7 +66,7 @@ TfrmMain = class(TForm)
     mnuPopupDelete: TMenuItem;
     imlPopup: TImageList;
     N23: TMenuItem;
-    Timer1: TTimer;
+    tmrTreeExpand: TTimer;
     btnAddPage: TSpeedButton;
     btnDeletePage: TSpeedButton;
     tmrRenameTab: TTimer;
@@ -118,6 +118,7 @@ TfrmMain = class(TForm)
     procedure tvMainDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
+    procedure tmrTreeExpandTimer(Sender: TObject);
 
 private
     procedure ThemeMenuClick(Sender: TObject);
@@ -129,8 +130,6 @@ end;
 
 var
     frmMain: TfrmMain;
-    strCurrentBase: String;
-    bLogDocked: Boolean;
 
 implementation
 
@@ -413,21 +412,27 @@ if Node.IsFirstNode then AllowCollapse:= False;
 end;
 {$ENDREGION}
 
-{$REGION '#ДрагДроп у дерева'}
+{$REGION '#Драг&Дроп у дерева'}
 procedure TfrmMain.tvMainStartDrag(Sender: TObject;
 var DragObject: TDragObject);
 begin
-     //
+    Log('Drag!');
 end;
+
 procedure TfrmMain.tvMainDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   trgNode, selNode: TTreeNode;
 begin
+Log('Drop!');
   	trgNode := tvMain.GetNodeAt(X, Y);
   	selNode := tvMain.Selected;
+    if trgNode = DragGhostNode then trgNode:= DragGhostNode.getNextSibling;
+    
   	if (trgNode = nil) or
     	(trgNode=selNode) then Exit;
 	DragAndDrop(trgNode, selNode,(GetKeyState(VK_CONTROL) AND 128) = 128);
+    tmrTreeExpand.Enabled:=False;
+    intTickToExpand:= 0;
 end;
 
 procedure TfrmMain.tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
@@ -435,19 +440,60 @@ State: TDragState; var Accept: Boolean);
 const
   crDragCopy: Integer = -23;          //Кто бы мог подумать, уроды криворукие
 var
-  trgNode, selNode: TTreeNode;
+  trgNode, selNode, tmpNode: TTreeNode;
 begin
     if (GetKeyState(VK_CONTROL) AND 128) = 128 then
         tvMain.DragCursor:= crDragCopy
     else
         tvMain.DragCursor:= crDrag;
-
   	trgNode := tvMain.GetNodeAt(x, y);
   	selNode := tvMain.Selected;
-    if (trgNode=nil) or (trgNode = selNode.Parent) then Accept:=False
-    else while (trgNode.Parent <> nil) do begin
-        trgNode := trgNode.Parent;
-        if trgNode = SelNode then Accept := False;
+    nodeToExpand:=trgNode;                             
+    tmrTreeExpand.Enabled:=True;
+    
+    if (trgNode=nil) or
+    (trgNode = selNode) or
+    //(trgNode = selNode.Parent) or
+    (selNode = nil) then begin
+        Accept:=False;
+        DragAndDropVisual(nil, nil);
+        Exit;
+    end;
+    
+    //Маленькая проверка на временные парадоксы
+    tmpNode:=trgNode;
+    while (tmpNode.Parent <> nil) do begin
+        tmpNode := tmpNode.Parent;
+        if tmpNode = SelNode then begin
+            Accept := False;
+            DragAndDropVisual(nil, nil);
+            Exit;
+        end;
+    end;
+    
+    //Здесь!
+    DragAndDropVisual(trgNode, selNode);
+end;
+
+procedure TfrmMain.tmrTreeExpandTimer(Sender: TObject);
+//Кривовато
+begin
+    if (oldNode <> nil) and (nodeToExpand <> nil) then
+    Log('Expand timer: ' + IntToStr(intTickToExpand) +
+        ', OldNode: ' + oldNode.Text + 
+        ', ActualNode: ' + nodeToExpand.Text);
+        
+    if (nodeToExpand = oldNode) then
+        if intTickToExpand = 5 then begin
+            //nodeToExpand.Expanded:= not nodeToExpand.Expanded;
+            if nodeToExpand<>nil then nodeToExpand.Expand(False);
+            tmrTreeExpand.Enabled:=False;
+            Exit;
+        end else 
+              inc(intTickToExpand)
+    else begin
+        intTickToExpand:= 0;
+        oldNode:= nodeToExpand;
     end;
 end;
 {$ENDREGION}
@@ -531,5 +577,6 @@ procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
 //xmlMain.SaveToFile('temp.txt');
 end;
+
 
 end.

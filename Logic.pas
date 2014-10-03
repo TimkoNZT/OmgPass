@@ -15,10 +15,16 @@ var
     LogList: TStringList;           //Переменная для логирования
 	PageList: IXMLNodeList;      	//Список страниц
     intCurrentPage: Integer;    	//Текущая страничка
-    intProgramState: Integer;    	//Состояние программы
+    intExpandFlag: Integer;    	//Состояние программы
     								//0 - нормальная работа
                                     //1 - загрузка страницы
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
+    DragGhostNode: TTreeNode;       //Призрачный узел
+    strCurrentBase: String;
+    intTickToExpand: Integer;
+    oldNode: TTreeNode;
+    nodeToExpand: TTreeNode;
+
 procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
@@ -43,6 +49,7 @@ function GetNodeExpanded(Node: IXMLNode): Boolean;
 function GeneratePassword(Len: Integer): String;
 function DragDropAccept(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode): Boolean;
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean = False);
+procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 
 implementation
@@ -200,7 +207,7 @@ begin
 	Log('--------------------ParsePagesToTabs:Start');
     xmlMain.Active:=False;
 	xmlMain.Active:=True;
-    intProgramState:=1;
+    intExpandFlag:=1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
 	PageList:= NodeByPath(x, 'Root/Data').ChildNodes;
@@ -214,7 +221,7 @@ begin
     else
        	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     //frmMain.btnAddPage.Left:=tabControl.TabRect(tabControl.Tabs.Count-1).Width + tabControl.TabRect(tabControl.Tabs.Count-1).Left + 3;
-    intProgramState:=0;
+    intExpandFlag:=0;
     Log('--------------------ParsePagesToTabs:End');
 end;
 
@@ -222,7 +229,7 @@ procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start');
-    intProgramState:=1;
+    intExpandFlag:=1;
 	Tree.Items.Clear;
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
     RootNode.Data:=Pointer(PageList[pageIndex]);
@@ -232,7 +239,7 @@ begin
     RootNode.Expand(False);
     RootNode.Selected:=True;
     intCurrentPage:= pageIndex;
-    intProgramState:=0;
+    intExpandFlag:=0;
     Log('--------------------ParsePageToTree:End');
 end;
 
@@ -462,7 +469,7 @@ end;
 
 procedure SetNodeExpanded(treeNode: TTreeNode);
 begin
-	if intProgramState <> 0 then Exit;
+	if intExpandFlag <> 0 then Exit;
     if treeNode.IsFirstNode then Exit;
 	SetAttribute(IXMLNode(treeNode.Data), 'expand',
                 BoolToStr(treeNode.Expanded, True));
@@ -498,20 +505,59 @@ begin
     selNode:=IXMLNode(selTreeNode.Data);
 	trgNode:=IXMLNode(trgTreeNode.Data);
     newNode:= selNode.CloneNode(True);
-    LogNodeInfo(selNode);
-    LogNodeInfo(trgNode);
-    LogNodeInfo(newNode);
+    intExpandFlag:=1;
     case GetNodeType(trgNode) of
     ntPage, ntFolder:
     	trgNode.ChildNodes.Add(newNode);
     ntItem:
     	trgNode.ParentNode.ChildNodes.Insert(trgNode.ParentNode.ChildNodes.IndexOf(trgNode), newNode);
     end;
-    if not isCopy then selNode.ParentNode.ChildNodes.Remove(selNode);
-    Logic.ParsePageToTree(Logic.intCurrentPage, frmMain.tvMain);
+    if GetNodeType(newNode) <> ntItem then begin
+        TTreeView(DragGhostNode.TreeView).Items.BeginUpdate;
+        IterateNodesToTree(newNode, DragGhostNode, TTreeView(DragGhostNode.TreeView));
+        TTreeView(DragGhostNode.TreeView).Items.EndUpdate;
+    end;
+    With DragGhostNode do begin
+        Data:=Pointer(newNode);
+        Enabled:=True;
+        Selected:=True;
+        Expanded:=GetNodeExpanded(newNode);
+    end;
+    if not isCopy then begin
+        selNode.ParentNode.ChildNodes.Remove(selNode);
+        selTreeNode.Delete;
+    end;
+    DragGhostNode:=nil;
+    intExpandFlag:=0;
+
+    //Жалко, старый код полностью перерисовывал дерево
+    //  IterateTree теперь не нужна... используем в поиске...
+    {Logic.ParsePageToTree(Logic.intCurrentPage, frmMain.tvMain);
 	rootTreeNode:=selTreeNode.Parent;
     while rootTreeNode.Parent<> nil do rootTreeNode:=rootTreeNode.Parent;
-    IterateTree(rootTreeNode, Pointer(newNode));
+    IterateTree(rootTreeNode, Pointer(newNode));}
+end;
+
+procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+//Две похожих процедуры, позже обьединить
+var
+selNode, trgNode: IXMLNode;
+begin
+    if trgTreeNode = DragGhostNode then Exit;
+    if DragGhostNode<> nil then frmMain.tvMain.Items.Delete(DragGhostNode);
+    if (selTreeNode= nil) or (trgTreeNode=nil) then Exit;
+    selNode:=IXMLNode(selTreeNode.Data);
+    trgNode:=IXMLNode(trgTreeNode.Data);
+    if (selNode= nil) or (trgNode=nil) then Exit;
+    case GetNodeType(trgNode) of
+    ntPage, ntFolder:
+        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.AddChild(trgTreeNode, GetNodeTitle(selNode));
+    ntItem: 
+        DragGhostNode:= TTreeView(trgTreeNode.TreeView).Items.Insert(trgTreeNode, GetNodeTitle(selNode));
+    end;
+    DragGhostNode.Enabled:=False;
+    DragGhostNode.ImageIndex:=selTreeNode.ImageIndex;
+    DragGhostNode.SelectedIndex:=selTreeNode.SelectedIndex;
 end;
 
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
