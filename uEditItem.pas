@@ -18,7 +18,7 @@ type
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); overload;
-    function EditField(var nField: IXMLNode): IXMLNode;
+    procedure FormActivate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -31,9 +31,8 @@ var
 implementation
 uses Logic, uFieldFrame, XMLUtils;
 {$R *.dfm}
-var
-	editedItem: IXMLNode;
-
+//var
+//	editedItem: IXMLNode;
 procedure TfrmEditItem.btnCloseClick(Sender: TObject);
 begin
 	ModalResult:=mrCancel;
@@ -61,14 +60,13 @@ constructor TfrmEditItem.Create(AOwner: TComponent; nItem: IXMLNode; isNew: Bool
 begin
     inherited Create(AOwner);
     GeneratePanel(nItem, fpEdit, True, IsNew);
-    editedItem:=nItem;
     if isNew then self.Caption:= 'Новая запись'
     else Self.Caption:='Редактирование записи';
 end;
 
-function TfrmEditItem.EditField(var nField: IXMLNode): IXMLNode;
+procedure TfrmEditItem.FormActivate(Sender: TObject);
 begin
-    //
+TFieldFrame(fpEdit.Controls[fpEdit.ControlCount - 1]).textInfo.SetFocus;
 end;
 
 end.

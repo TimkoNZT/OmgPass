@@ -73,6 +73,7 @@ TfrmMain = class(TForm)
     tbtnLog: TToolButton;
     mnuPopupCloneItem: TMenuItem;
     mnuCloneItem: TMenuItem;
+    btnTheme: TSpeedButton;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -124,6 +125,7 @@ TfrmMain = class(TForm)
     procedure mnuCloneItemClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ThemeMenuClick(Sender: TObject);
+    procedure btnThemeClick(Sender: TObject);
 
 private
     procedure InitGlobal();
@@ -335,6 +337,14 @@ procedure TfrmMain.btnDeletePageClick(Sender: TObject);
 begin
     DeleteNode(tvMain.Selected, True);
 end;
+procedure TfrmMain.btnThemeClick(Sender: TObject);
+begin
+    if intThemeIndex <> mnuThemes.Count - 1 then
+        mnuThemes.Items[intThemeIndex + 1].Click
+    else
+        mnuThemes.Items[0].Click;
+end;
+
 procedure TfrmMain.tbtnDeleteClick(Sender: TObject);
 begin
 	DeleteNode(tvMain.Selected);
@@ -571,6 +581,7 @@ begin
 
     SetButtonImg(btnAddPage, imlField, 10);
     SetButtonImg(btnDeletePage, imlField, 12);
+    SetButtonImg(btnTheme, imlTab, 41);
 
     Log('Проверка версии');
     if not CheckVersion(xmlMain) then Exit;

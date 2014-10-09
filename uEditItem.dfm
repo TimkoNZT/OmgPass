@@ -12,50 +12,48 @@ object frmEditItem: TfrmEditItem
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Padding.Left = 15
-  Padding.Top = 10
-  Padding.Bottom = 5
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
   DesignSize = (
     339
     359)
   PixelsPerInch = 96
   TextHeight = 13
   object btnClose: TButton
-    Left = 244
-    Top = 314
+    Left = 156
+    Top = 315
     Width = 81
     Height = 33
     Anchors = [akRight, akBottom]
     Caption = #1054#1090#1084#1077#1085#1072
-    Default = True
     TabOrder = 0
     OnClick = btnCloseClick
   end
   object btnOK: TButton
-    Left = 157
-    Top = 314
+    Left = 245
+    Top = 315
     Width = 81
     Height = 33
     Anchors = [akRight, akBottom]
     Caption = 'OK'
+    Default = True
     TabOrder = 1
     OnClick = btnOKClick
   end
   object fpEdit: TScrollBox
-    Left = 15
-    Top = 10
-    Width = 324
-    Height = 292
+    Left = 0
+    Top = 0
+    Width = 339
+    Height = 306
     VertScrollBar.Increment = 26
     VertScrollBar.Tracking = True
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     BorderStyle = bsNone
-    DoubleBuffered = True
-    Padding.Right = 10
-    ParentDoubleBuffered = False
+    Padding.Left = 15
+    Padding.Top = 10
+    Padding.Right = 15
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
   end

@@ -41,7 +41,7 @@ procedure SetTheme(Theme: String);
 procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
-function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : Boolean;
+function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : TFieldFrame;
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
@@ -139,14 +139,19 @@ begin
         Panel.Visible:=True;
         Exit;
     end;
-	// и разбиваем ноду по полям
+	//И разбиваем ноду по полям
     for i := nItem.ChildNodes.Count -1 downto 0 do
     	GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
+    //Установка TabOrder
+    for i := Panel.ControlCount - 1 downto 0 do begin
+    	TFieldFrame(Panel.Controls[i]).TabOrder:= Panel.ControlCount - 1 - i;
+        log('TabOrder: ' + TFieldFrame(Panel.Controls[i]).lblTitle.Caption + ' set to ',  TFieldFrame(Panel.Controls[i]).TabOrder);
+    end;
     Panel.Visible:=True;
     Result:=True;
 end;
 
-function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
+function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : TFieldFrame;
 //Рисуем отдельные поля в панельку,
 //У ноды должен быть формат поля (ntField)
 var
@@ -155,7 +160,8 @@ begin
 	//Log('--------------------GenerateField:Start');
     LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
-	With TFieldFrame.CreateParented(Panel.Handle) do begin
+    Result:= TFieldFrame.CreateParented(Panel.Handle);
+	With Result do begin
 		Parent:=Panel;
         Align:=alTop;
         lblTitle.Caption:=GetAttribute(nField, 'name');
@@ -208,7 +214,6 @@ begin
         end;
     end;
     //Log('--------------------GenerateField:End');
-    Result:=True;
 end;
 
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;

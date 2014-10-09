@@ -16,16 +16,12 @@ type
     TabSheet1: TTabSheet;
     tabOpen: TTabSheet;
     TabSheet3: TTabSheet;
-    RadioButton3: TRadioButton;
-    radNewBase: TRadioButton;
-    radOpenBase: TRadioButton;
     btnCancel: TSpeedButton;
     txtOpenBase: TRichEdit;
     txtOpenPass: TRichEdit;
     btnOpenBase: TSpeedButton;
     Label3: TLabel;
     SpeedButton4: TSpeedButton;
-    Label5: TLabel;
     RadioButton4: TRadioButton;
     radOpenDefault: TRadioButton;
     lblDefaultExt: TLabel;
@@ -34,7 +30,6 @@ type
     lblRecentFile2: TLabel;
     lblRecentFile3: TLabel;
     Label10: TLabel;
-    RadioButton1: TRadioButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     txtPassConfirm: TEdit;
