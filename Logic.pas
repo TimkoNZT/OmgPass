@@ -6,29 +6,38 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
-    XMLutils, uFieldFrame, uSmartMethods
+    XMLutils, uFieldFrame, uSmartMethods, uSettings,
+    {Themes}
+    Styles, Themes
   	;
 const
 	bShowLogAtStart: Boolean = True;
 var
 	xmlMain: IXMLDocument;          //Основной наш документ
+    xmlCfg: TSettings;
     LogList: TStringList;           //Переменная для логирования
 	PageList: IXMLNodeList;      	//Список страниц
     intCurrentPage: Integer;    	//Текущая страничка
-    intExpandFlag: Integer;    	//Состояние программы
+    intThemeIndex: Integer;         //Номер выбранной темы
+    intExpandFlag: Integer;    	    //Состояние программы
     								//0 - нормальная работа
                                     //1 - загрузка страницы
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
     strCurrentBase: String;
-    intTickToExpand: Integer;
-    oldNode: TTreeNode;
-    nodeToExpand: TTreeNode;
+    intTickToExpand: Integer;       //  \
+    oldNode: TTreeNode;             //  }Разворачивание узлов при перетаскивании
+    nodeToExpand: TTreeNode;        // /
 
 procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
+procedure LoadSettings;
+procedure SaveSettings;
+procedure LoadThemes;
+procedure SetTheme(Theme: String);
+
 procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
@@ -230,7 +239,7 @@ end;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
 var RootNode: TTreeNode;
 begin
-	Log('--------------------ParsePageToTree:Start');
+	Log('--------------------ParsePageToTree:Start---------------------------');
     intExpandFlag:=1;
 	Tree.Items.Clear;
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
@@ -239,10 +248,10 @@ begin
     //log(RootNode.AbsoluteIndex);
     //RootNode.DropTarget:=True;
     RootNode.Expand(False);
-    RootNode.Selected:=True;
+    //RootNode.Selected:=True;
     intCurrentPage:= pageIndex;
     intExpandFlag:=0;
-    Log('--------------------ParsePageToTree:End');
+    Log('--------------------ParsePageToTree:End-----------------------------');
 end;
 
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
@@ -429,7 +438,8 @@ begin
 		Data:=Pointer(newFolderNode);
         ImageIndex:=0;
         SelectedIndex:=0;
-		Selected:=True;
+        //Expanded:=True;             //Бесполезно без дочерних узлов
+        Selected:=True;
 		EditText;
 	end;
 end;
@@ -530,7 +540,8 @@ var
 	selNode, trgNode, newNode: IXMLNode;
 begin
     selNode:=IXMLNode(selTreeNode.Data);
-	trgNode:=IXMLNode(trgTreeNode.Data);
+	//trgNode:=IXMLNode(trgTreeNode.Data);  //Цель уже не нужна, данные есть в призраке
+    trgNode:=IXMLNode(DragGhostNode.Data);
     newNode:= selNode.CloneNode(True);
     intExpandFlag:=1;
     case GetNodeType(trgNode) of
@@ -585,6 +596,8 @@ begin
     DragGhostNode.Enabled:=False;
     DragGhostNode.ImageIndex:=selTreeNode.ImageIndex;
     DragGhostNode.SelectedIndex:=selTreeNode.SelectedIndex;
+    //Внимание! В призрак временно заносятся данные цели, а не источника!
+    DragGhostNode.Data:=Pointer(trgNode);
 end;
 
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
@@ -597,6 +610,76 @@ begin
         	ParentNode.Item[i].Selected:=True
         else IterateTree(ParentNode.Item[i], Data);
     Log('IterateTree: End');
+end;
+
+procedure LoadSettings;
+begin
+    xmlCfg:=TSettings.Create('..\..\config.xml');
+    frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
+    if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
+    if frmMain.WindowState = wsNormal then begin
+        frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
+            xmlCfg.GetValue('Top', 0, 'Position'),
+            xmlCfg.GetValue('Width', 0, 'Position'),
+            xmlCfg.GetValue('Height', 0, 'Position'));
+        if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
+    end;
+    if xmlCfg.GetValue('Page', 0) < PageList.Count then
+        frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0);
+    //frmMain.tabMainChange(nil);
+    ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
+
+    if xmlCfg.GetValue('Selected', 0, 'Position') < frmMain.tvMain.Items.Count  then
+        frmMain.tvMain.Items[xmlCfg.GetValue('Selected', 0, 'Position')].Selected:=True;
+
+    if xmlCfg.GetValue('Theme', 0) < frmMain.mnuThemes.Count  then
+        frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
+
+//    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
+        frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100);
+end;
+
+procedure SaveSettings;
+begin
+    if xmlCfg = nil then Exit;
+    xmlCfg.SetValue('Selected', frmMain.tvMain.Selected.AbsoluteIndex, 'Position');
+    if frmMain.WindowState = wsNormal then begin
+         xmlCfg.SetValue('Left', frmMain.Left, 'Position');
+         xmlCfg.SetValue('Top', frmMain.Top, 'Position');
+         xmlCfg.SetValue('Width', frmMain.Width, 'Position');
+         xmlCfg.SetValue('Height', frmMain.Height, 'Position');
+         xmlCfg.SetValue('ShowLog', BoolToStr(Assigned(frmLog), True));
+    end;
+    xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
+    xmlCfg.SetValue('Page', intCurrentPage);
+    xmlCfg.SetValue('Theme', intThemeIndex);
+    xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width);
+
+    xmlCfg.Save;
+end;
+
+procedure LoadThemes;
+var
+  	i:Integer;
+	newMenuItem: TmenuItem;
+begin
+try
+With TStyleManager.Create do begin
+    for i := 0 to Length(StyleNames)-1 do begin
+        newMenuItem:= TMenuItem.Create(frmMain.mnuThemes);
+        newMenuItem.Caption:= StyleNames[i];
+        newMenuItem.RadioItem:=True;
+        newMenuItem.OnClick:= frmMain.ThemeMenuClick;
+        frmMain.mnuThemes.Insert(i, newMenuItem);
+    end;
+end;
+finally end;
+end;
+
+procedure SetTheme(Theme: String);
+//Выбор стиля оформления
+begin
+  TStyleManager.TrySetStyle(Theme, true);
 end;
 
 end.

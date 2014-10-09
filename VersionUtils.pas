@@ -10,10 +10,19 @@ function CheckVersion(i: IXMLDocument): Boolean;
 function GetVersion(i: IXMLDocument): String;
 
 implementation
+uses Logic;
 
 function CheckVersion(i: IXMLDocument): Boolean;
 begin
-	result:= GetVersion(i) = ACTUALVERSION
+    if GetVersion(i) <> ACTUALVERSION then begin
+        log('Версия устарела. Обновляем.');
+		if not UpgradeVersion(i) then begin
+            log('Обновление завершилось ошибкой. Всё пропало.');
+            exit;
+        end else log('Обновление успешно');
+    end;
+    Log('Версия базы актуальна');
+    result:=True;
 {$REGION '#Old'} //Версия самостоятельного обновления
     //    if GetVersion(i) = CURRENTVERSION then
     //    	result:= True

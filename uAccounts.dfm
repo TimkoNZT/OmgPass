@@ -3,7 +3,7 @@ object frmAccounts: TfrmAccounts
   Top = 269
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Omg!Pass - '#1052#1077#1085#1077#1076#1078#1077#1088' '#1072#1082#1082#1072#1091#1085#1090#1086#1074
-  ClientHeight = 367
+  ClientHeight = 301
   ClientWidth = 346
   Color = clBtnFace
   DoubleBuffered = True
@@ -20,12 +20,12 @@ object frmAccounts: TfrmAccounts
   OnCreate = FormCreate
   DesignSize = (
     346
-    367)
+    301)
   PixelsPerInch = 96
   TextHeight = 13
   object btnNext: TSpeedButton
     Left = 172
-    Top = 326
+    Top = 260
     Width = 80
     Height = 33
     Anchors = [akRight, akBottom]
@@ -36,7 +36,7 @@ object frmAccounts: TfrmAccounts
   end
   object btnCancel: TSpeedButton
     Left = 258
-    Top = 326
+    Top = 260
     Width = 80
     Height = 33
     Anchors = [akRight, akBottom]
@@ -47,7 +47,7 @@ object frmAccounts: TfrmAccounts
   end
   object SpeedButton1: TSpeedButton
     Left = 86
-    Top = 326
+    Top = 260
     Width = 80
     Height = 33
     Anchors = [akRight, akBottom]
@@ -60,18 +60,16 @@ object frmAccounts: TfrmAccounts
     Left = 8
     Top = 8
     Width = 330
-    Height = 312
+    Height = 246
     ActivePage = TabSheet3
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabHeight = 20
     TabOrder = 0
+    ExplicitHeight = 312
     object TabSheet1: TTabSheet
       Caption = #1054#1073#1083#1072#1082#1086
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 282
       object Label5: TLabel
         Left = 3
         Top = 211
@@ -131,30 +129,27 @@ object frmAccounts: TfrmAccounts
       Caption = #1054#1090#1082#1088#1099#1090#1100' '#1072#1082#1082#1072#1091#1085#1090
       ImageIndex = 3
       OnContextPopup = TabSheet5ContextPopup
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 282
       DesignSize = (
         322
-        282)
+        216)
       object Label1: TLabel
         Left = 11
-        Top = 198
+        Top = 134
         Width = 41
         Height = 13
         Caption = #1055#1072#1088#1086#1083#1100':'
       end
       object Label6: TLabel
         Left = 11
-        Top = 8
+        Top = 5
         Width = 119
         Height = 13
         Caption = #1055#1086#1089#1083#1077#1076#1085#1080#1077' '#1076#1086#1082#1091#1084#1077#1085#1090#1099':'
       end
       object Image1: TImage
         Left = 283
-        Top = 216
+        Top = 152
         Width = 22
         Height = 22
         AutoSize = True
@@ -209,8 +204,8 @@ object frmAccounts: TfrmAccounts
       end
       object ListView1: TListView
         Left = 11
-        Top = 27
-        Width = 294
+        Top = 24
+        Width = 296
         Height = 97
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
@@ -230,7 +225,7 @@ object frmAccounts: TfrmAccounts
       end
       object CheckBox2: TCheckBox
         Left = 11
-        Top = 244
+        Top = 180
         Width = 158
         Height = 13
         Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1089#1080#1084#1074#1086#1083#1099
@@ -239,7 +234,7 @@ object frmAccounts: TfrmAccounts
       end
       object Edit1: TEdit
         Left = 11
-        Top = 217
+        Top = 153
         Width = 266
         Height = 21
         Ctl3D = True
@@ -253,10 +248,7 @@ object frmAccounts: TfrmAccounts
       ImageIndex = 1
       TabVisible = False
       OnShow = tabOpenShow
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 282
       object btnOpenBase: TSpeedButton
         Left = 278
         Top = 84
@@ -387,10 +379,7 @@ object frmAccounts: TfrmAccounts
     object TabSheet3: TTabSheet
       Caption = #1057#1086#1079#1076#1072#1090#1100' '#1085#1086#1074#1099#1081
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 282
       object SpeedButton4: TSpeedButton
         Left = 336
         Top = 27
@@ -399,22 +388,22 @@ object frmAccounts: TfrmAccounts
         Caption = '...'
       end
       object lblPassConfirm: TLabel
-        Left = 19
-        Top = 116
+        Left = 11
+        Top = 97
         Width = 87
-        Height = 13
+        Height = 12
         Caption = #1055#1086#1076#1090#1074#1077#1088#1078#1076#1077#1085#1080#1077':'
       end
       object Label4: TLabel
-        Left = 19
-        Top = 4
+        Left = 11
+        Top = 5
         Width = 178
         Height = 13
         Caption = #1055#1086#1078#1072#1083#1091#1081#1089#1090#1072' '#1091#1082#1072#1078#1080#1090#1077' '#1092#1072#1081#1083' '#1089' '#1073#1072#1079#1086#1081
       end
       object Label2: TLabel
-        Left = 19
-        Top = 68
+        Left = 11
+        Top = 50
         Width = 41
         Height = 13
         Caption = #1055#1072#1088#1086#1083#1100':'
@@ -436,10 +425,10 @@ object frmAccounts: TfrmAccounts
         OnClick = btnNewBaseClick
       end
       object txtPassConfirm: TEdit
-        Left = 19
-        Top = 135
-        Width = 244
-        Height = 21
+        Left = 11
+        Top = 116
+        Width = 294
+        Height = 20
         Ctl3D = True
         Enabled = False
         ParentCtl3D = False
@@ -447,9 +436,9 @@ object frmAccounts: TfrmAccounts
         TabOrder = 0
       end
       object txtNewBase: TRichEdit
-        Left = 19
-        Top = 25
-        Width = 244
+        Left = 11
+        Top = 24
+        Width = 294
         Height = 21
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
@@ -462,9 +451,9 @@ object frmAccounts: TfrmAccounts
         WordWrap = False
       end
       object txtNewPass: TEdit
-        Left = 19
-        Top = 89
-        Width = 244
+        Left = 11
+        Top = 71
+        Width = 294
         Height = 21
         Ctl3D = True
         ParentCtl3D = False
@@ -472,8 +461,8 @@ object frmAccounts: TfrmAccounts
         TabOrder = 2
       end
       object chkShowPass: TCheckBox
-        Left = 183
-        Top = 70
+        Left = 175
+        Top = 52
         Width = 80
         Height = 13
         Alignment = taLeftJustify
@@ -482,8 +471,8 @@ object frmAccounts: TfrmAccounts
         OnClick = chkShowPassClick
       end
       object CheckBox1: TCheckBox
-        Left = 19
-        Top = 178
+        Left = 11
+        Top = 146
         Width = 134
         Height = 13
         Caption = #1055#1086#1076#1089#1082#1072#1079#1082#1072' '#1076#1083#1103' '#1087#1072#1088#1086#1083#1103
@@ -491,10 +480,10 @@ object frmAccounts: TfrmAccounts
         TabOrder = 4
       end
       object RichEdit6: TRichEdit
-        Left = 19
-        Top = 197
-        Width = 278
-        Height = 40
+        Left = 11
+        Top = 165
+        Width = 294
+        Height = 36
         Enabled = False
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
@@ -527,7 +516,7 @@ object frmAccounts: TfrmAccounts
     Left = 51
     Top = 328
     Bitmap = {
-      494C01015D00CC01580216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D00CC015C0216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

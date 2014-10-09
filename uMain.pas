@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
   StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin,
-  Styles, Themes, Vcl.DBCtrls, Vcl.Mask, Vcl.Samples.Spin,
+  Vcl.DBCtrls, Vcl.Mask, Vcl.Samples.Spin,
   Vcl.ButtonGroup, Vcl.Buttons,
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
@@ -28,14 +28,14 @@ TfrmMain = class(TForm)
     mnuOptions: TMenuItem;
     mnuGenerator: TMenuItem;
     N14: TMenuItem;
-    N15: TMenuItem;
-    N16: TMenuItem;
+    mnuExport: TMenuItem;
+    mnuPrint: TMenuItem;
     N17: TMenuItem;
     N18: TMenuItem;
-    N19: TMenuItem;
-    N20: TMenuItem;
+    mnuChowPass: TMenuItem;
+    mnuClearClip: TMenuItem;
     N21: TMenuItem;
-    N22: TMenuItem;
+    mnuTop: TMenuItem;
     N24: TMenuItem;
     ToolBarMain: TToolBar;
     imlToolBar: TImageList;
@@ -122,9 +122,10 @@ TfrmMain = class(TForm)
     procedure tmrTreeExpandTimer(Sender: TObject);
     procedure mnuPopupCloneItemClick(Sender: TObject);
     procedure mnuCloneItemClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ThemeMenuClick(Sender: TObject);
 
 private
-    procedure ThemeMenuClick(Sender: TObject);
     procedure InitGlobal();
 	{ Private declarations }
 public
@@ -369,7 +370,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION '#Переименование таба по щелчку с ожиданием'}
+{$REGION '#Переименование таба по щелчку с задержкой'}
 procedure TfrmMain.tabMainMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 //Запуск таймера для переименования
@@ -409,20 +410,23 @@ begin
 end;
 procedure TfrmMain.tabMainChange(Sender: TObject);
 begin
-		tmrRenameTab.Tag:=1;
+  		tmrRenameTab.Tag:=1;
     	CleaningPanel(fpMain, True);
     	ParsePageToTree(tabMain.TabIndex, tvMain);
+        tvMain.Items[0].Selected:=True;
 end;
 {$ENDREGION}
 
 {$REGION '#Запись состояния дерева'}
 procedure TfrmMain.tvMainCollapsed(Sender: TObject; Node: TTreeNode);
 begin
-SetNodeExpanded(Node);
+if Node.Selected then SetNodeExpanded(Node);
+Log('Collapsing ' + Node.Text);
 end;
 procedure TfrmMain.tvMainExpanded(Sender: TObject; Node: TTreeNode);
 begin
-SetNodeExpanded(Node);
+if Node.Selected then SetNodeExpanded(Node);
+Log('Expanding ' + Node.Text);
 end;
 procedure TfrmMain.tvMainCollapsing(Sender: TObject; Node: TTreeNode;
   var AllowCollapse: Boolean);
@@ -446,10 +450,9 @@ begin
 Log('Drop!');
   	trgNode := tvMain.GetNodeAt(X, Y);
   	selNode := tvMain.Selected;
-    if trgNode = DragGhostNode then trgNode:= DragGhostNode.getNextSibling;
+    //if trgNode = DragGhostNode then trgNode:= DragGhostNode.getNextSibling;
     
-  	if (trgNode = nil) or
-    	(trgNode=selNode) then Exit;
+  	if (trgNode = nil) or (trgNode=selNode) then Exit;
 	DragAndDrop(trgNode, selNode,(GetKeyState(VK_CONTROL) AND 128) = 128);
     tmrTreeExpand.Enabled:=False;
     intTickToExpand:= 0;
@@ -521,9 +524,10 @@ end;
 {$REGION '#Всякая хрень'}
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-	tvMain.Width:= frmMain.ClientWidth div 5 * 2;
+	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
     tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;
+    Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
 end;
@@ -534,70 +538,52 @@ begin
 fpMain.VertScrollBar.Position:= fpMain.VertScrollBar.Position - WheelDelta div 5;
 end;
 
-procedure TfrmMain.FormCreate(Sender: TObject);
-//Создание окна. Вся инициализация вынесена в InitGlobal()
-var
-  	i:Integer;
-	newM: TmenuItem;
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+    SaveSettings;
+end;
 
-try
-With TStyleManager.Create do begin
-for i := 0 to Length(StyleNames)-1 do begin
-    newM:= TMenuItem.Create(self);
-    newM.Caption:= StyleNames[i];
-    newM.RadioItem:=True;
-    newM.OnClick:= ThemeMenuClick;
-    mnuThemes.Insert(i, NewM);
-end;
-end;
-mnuThemes.Items[0].Checked:= True;
-finally end;
-InitGlobal();
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+    InitGlobal;
 end;
 
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);
-//Выбор стиля оформления
 begin
-  With TMenuItem(Sender) do begin
-  TStyleManager.TrySetStyle(Caption, true);
-  Checked:=True;
-  end;
+    With TMenuItem(Sender) do begin
+        SetTheme(Caption);
+        Checked:=True;
+        intThemeIndex:=MenuIndex;
+    end;
 end;
 {$ENDREGION}
 
 //Инициализация всего
 procedure TfrmMain.InitGlobal();
 begin
+    LoadThemes;
 	LogList:= TStringList.Create;
 	Log('Инициализация...');
 	xmlMain:=TXMLDocument.Create(frmMain);
 	xmlMain.LoadFromFile('../../omgpass.xml');
 	xmlMain.Active:=True;
+    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+
     SetButtonImg(btnAddPage, imlField, 10);
     SetButtonImg(btnDeletePage, imlField, 12);
+
     Log('Проверка версии');
-    if CheckVersion(xmlMain) then Log('Версия базы актуальна')
-    else begin
-        log('Версия устарела. Обновляем.');
-		if UpgradeVersion(xmlMain) then
-			log('Обновление успешно')
-        else log('Обновление завершилось ошибкой. Всё пропало.');
-    end;
-    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    if not CheckVersion(xmlMain) then Exit;
 	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
-    //log(GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(NodeByPath(xmlMain, 'Root.Data.Page.Folder.Item')))));
+
     ParsePagesToTabs(xmlMain, tabMain);
-    tabMainChange(nil);
-	if bShowLogAtStart then tbtnLogClick(nil);
-    tvMain.Items[9].Selected:=True;
+    LoadSettings;
+
 end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
-Log(tvMain.Selected.AbsoluteIndex);
-//xmlMain.SaveToFile('temp.txt');
+frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);//
 end;
-
 
 end.

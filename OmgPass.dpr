@@ -19,7 +19,8 @@ uses
   Vcl.Styles,
   uLog in 'uLog.pas' {frmLog},
   uEditField in 'uEditField.pas' {frmEditField},
-  uCustomEdit in 'uCustomEdit.pas';
+  uCustomEdit in 'uCustomEdit.pas',
+  uSettings in 'uSettings.pas';
 
 {$R *.res}
 

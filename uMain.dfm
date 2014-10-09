@@ -17,6 +17,7 @@ object frmMain: TfrmMain
   OldCreateOrder = False
   Position = poDesigned
   Scaled = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
@@ -143,7 +144,7 @@ object frmMain: TfrmMain
       509
       324)
     object Splitter: TSplitter
-      Left = 205
+      Left = 190
       Top = 31
       Width = 7
       Height = 289
@@ -155,6 +156,7 @@ object frmMain: TfrmMain
       AutoSnap = False
       MinSize = 1
       ResizeStyle = rsUpdate
+      ExplicitLeft = 205
       ExplicitHeight = 299
     end
     object btnAddPage: TSpeedButton
@@ -180,7 +182,7 @@ object frmMain: TfrmMain
     object tvMain: TTreeView
       Left = 4
       Top = 31
-      Width = 201
+      Width = 186
       Height = 289
       Margins.Left = 2
       Margins.Top = 2
@@ -210,9 +212,9 @@ object frmMain: TfrmMain
     end
     object fpMain: TScrollBox
       AlignWithMargins = True
-      Left = 212
+      Left = 197
       Top = 31
-      Width = 291
+      Width = 306
       Height = 288
       Margins.Left = 0
       Margins.Top = 0
@@ -230,6 +232,8 @@ object frmMain: TfrmMain
       ParentBackground = True
       TabOrder = 1
       OnMouseWheel = fpMainMouseWheel
+      ExplicitLeft = 212
+      ExplicitWidth = 291
     end
   end
   object sbMain: TStatusBar
@@ -245,10 +249,11 @@ object frmMain: TfrmMain
       item
         Width = 50
       end>
+    Visible = False
   end
   object menuMain: TMainMenu
-    Left = 291
-    Top = 336
+    Left = 347
+    Top = 96
     object N1: TMenuItem
       Caption = #1040#1082#1082#1072#1091#1085#1090
       SubMenuImages = imlTab
@@ -306,15 +311,15 @@ object frmMain: TfrmMain
       Caption = #1057#1077#1088#1074#1080#1089
       SubMenuImages = imlTab
       ImageIndex = 5
-      object N19: TMenuItem
+      object mnuChowPass: TMenuItem
         Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1087#1072#1088#1086#1083#1080
         ShortCut = 116
       end
-      object N20: TMenuItem
+      object mnuClearClip: TMenuItem
         Caption = #1054#1095#1080#1089#1090#1080#1090#1100' '#1073#1091#1092#1077#1088
         ShortCut = 119
       end
-      object N22: TMenuItem
+      object mnuTop: TMenuItem
         Caption = #1055#1086#1074#1077#1088#1093' '#1074#1089#1077#1093' '#1086#1082#1086#1085
         ShortCut = 122
       end
@@ -327,11 +332,11 @@ object frmMain: TfrmMain
         ShortCut = 120
         OnClick = mnuGeneratorClick
       end
-      object N15: TMenuItem
+      object mnuExport: TMenuItem
         Caption = #1069#1082#1089#1087#1086#1088#1090
         ShortCut = 16463
       end
-      object N16: TMenuItem
+      object mnuPrint: TMenuItem
         Caption = #1055#1077#1095#1072#1090#1100'...'
         ShortCut = 16464
       end
@@ -383,7 +388,7 @@ object frmMain: TfrmMain
     Left = 235
     Top = 240
     Bitmap = {
-      494C0101080018005C0130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101080018006C0130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3963,7 +3968,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 288
     Bitmap = {
-      494C01010D002401500217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D002401600217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5072,7 +5077,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 240
     Bitmap = {
-      494C010103003400840016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C010103003400940016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5327,7 +5332,7 @@ object frmMain: TfrmMain
     Left = 235
     Top = 288
     Bitmap = {
-      494C01013800CC01700216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01013800CC01800216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000004A0100000100200000000000C0C5
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9090,8 +9095,8 @@ object frmMain: TfrmMain
   object menuTreePopup: TPopupMenu
     Images = imlPopup
     OnPopup = menuTreePopupPopup
-    Left = 235
-    Top = 336
+    Left = 347
+    Top = 144
     object mnuPopupInsertItem: TMenuItem
       Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
       ImageIndex = 0
@@ -9127,10 +9132,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 347
+    Left = 339
     Top = 240
     Bitmap = {
-      494C01010500F001B00216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010500F001C00216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -9641,14 +9646,14 @@ object frmMain: TfrmMain
     Enabled = False
     Interval = 200
     OnTimer = tmrTreeExpandTimer
-    Left = 344
-    Top = 184
+    Left = 448
+    Top = 96
   end
   object tmrRenameTab: TTimer
     Enabled = False
     Interval = 700
     OnTimer = tmrRenameTabTimer
-    Left = 347
-    Top = 336
+    Left = 448
+    Top = 144
   end
 end
