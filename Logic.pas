@@ -48,6 +48,7 @@ procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeVie
 procedure InsertFolder(treeNode: TTreeNode);
 procedure EditNode(treeNode: TTreeNode);
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
 procedure AddPage();
@@ -62,7 +63,7 @@ procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 procedure CloneNode(treeNode: TTreeNode);
 
 implementation
-uses uMain, uLog, uEditItem, uGenerator;
+uses uMain, uLog, uEditItem, uEditField, uGenerator;
 
 function GeneratePassword(Len: Integer): String;
 begin
@@ -164,20 +165,27 @@ begin
 	With Result do begin
 		Parent:=Panel;
         Align:=alTop;
-        lblTitle.Caption:=GetAttribute(nField, 'name');
+        //Заполняем метку
+        lblTitle.Caption:=GetNodeTitle(nField);
+        //Заполняем текст, в комментариях поле выше и требует обработки текста
         if fieldFormat = ffComment then begin
 			textInfo.Height:=70;
             textInfo.Multiline:=True;
-            //textInfo.ScrollBars:=ssVertical;
-            //textInfo.HideScrollBars:=True;
-			textInfo{.Lines}.Text:=StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
-        end else textInfo{.Lines}.Text:=VarToStr(nField.NodeValue);
+			textInfo{.Lines}.Text:=
+                StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
+        end else
+            textInfo{.Lines}.Text:=VarToStr(nField.NodeValue);
+        //Доступность текста для редактирования
         textInfo.ReadOnly:=not IsEdit;
-		btnSmart.Tag:=NativeInt(textInfo);		//Та-даааааа!
+        //Присваивание указателей
+		btnSmart.Tag:=NativeInt(textInfo);		        //Кнопки ссылаются на текстовое поле
         btnAdditional.Tag:=NativeInt(textInfo);
-		textInfo.Tag:=NativeInt(nField);
+		textInfo.Tag:=NativeInt(nField);                //Текст и рамка ссылаются на поле
 		Tag:=NativeInt(nField);
+        //разная отрисовка при редактировании и обычной работе
         if IsEdit=False then begin
+            textInfo.Enabled:=False;
+            //EnableWindow(textInfo.Handle, False);
             if LowerCase(GetAttribute(nField, 'button')) = 'false' then
                 btnSmart.Enabled:=false
             else
@@ -210,7 +218,8 @@ begin
                 end;
             end;
         SetButtonImg(btnSmart, frmMain.imlField, 4);
-        btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+//        btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+        btnSmart.OnClick:= frmEditItem.StartEditField;
         end;
     end;
     //Log('--------------------GenerateField:End');
@@ -313,7 +322,6 @@ begin
     ntFolder, ntPage:
     	treeNode.EditText;
     end;
-
 end;
 
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
@@ -321,15 +329,15 @@ var
 	//trgNode: IXMLNode;
     tmpNode: IXMLNode;
 begin
-	Log('EditItem, isNew=' + BoolToStr(isNew,True));
+	Log('EditItem, isNew=' + BoolToStr(isNew, True));
     LogNodeInfo(Node, 'EditItem:InputNode');
 	tmpNode:= Node.CloneNode(True);
-    LogNodeInfo(tmpNode, 'EditItem:Temp');
+    LogNodeInfo(tmpNode, 'EditItem:Temp     ');
     if (not Assigned(frmEditItem)) then
         frmEditItem:= TfrmEditItem.Create(frmMain, tmpNode, isNew);
     if frmEditItem.ShowModal=mrOK then begin
         Log('frmEditItem: mrOK');
-        LogNodeInfo(Node, 'EditItem:OutNode');
+        LogNodeInfo(tmpNode, 'EditItem:OutNode  ');
         if not isNew then
             Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
         Node:= tmpNode;
@@ -339,6 +347,30 @@ begin
         Result:=False;
     end;
     FreeAndNil(frmEditItem);
+end;
+
+function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+var
+    tmpNode: IXMLNode;
+begin
+	Log('EditField, isNew=' + BoolToStr(isNew, True));
+    LogNodeInfo(Node, 'EditField:InputNode');
+	tmpNode:= Node.CloneNode(True);
+    LogNodeInfo(tmpNode, 'EditField:Temp     ');
+    if (not Assigned(frmEditField)) then
+        frmEditField:= TfrmEditField.Create(frmEditItem, tmpNode, isNew);
+    if frmEditField.ShowModal=mrOK then begin
+        Log('frmEditField: mrOK');
+        LogNodeInfo(tmpNode, 'EditField:OutNode  ');
+        if not isNew then
+            Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
+        Node:= tmpNode;
+        Result:=True;
+    end else begin
+        Log('frmEditField: mrCancel');
+        Result:=False;
+    end;
+    FreeAndNil(frmEditField);
 end;
 
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
@@ -629,8 +661,8 @@ begin
             xmlCfg.GetValue('Height', 0, 'Position'));
         if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
     end;
-    if xmlCfg.GetValue('Page', 0) < PageList.Count then
-        frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0);
+    if xmlCfg.GetValue('Page', 0, 'Position') < PageList.Count then
+        frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0, 'Position');
     //frmMain.tabMainChange(nil);
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
 
@@ -641,7 +673,7 @@ begin
         frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
 
 //    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
-        frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100);
+        frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100, 'Position');
 end;
 
 procedure SaveSettings;
@@ -656,9 +688,10 @@ begin
          xmlCfg.SetValue('ShowLog', BoolToStr(Assigned(frmLog), True));
     end;
     xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
-    xmlCfg.SetValue('Page', intCurrentPage);
+    xmlCfg.SetValue('Page', intCurrentPage, 'Position');
+    xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width, 'Position');
     xmlCfg.SetValue('Theme', intThemeIndex);
-    xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width);
+
 
     xmlCfg.Save;
 end;
@@ -685,6 +718,7 @@ procedure SetTheme(Theme: String);
 //Выбор стиля оформления
 begin
   TStyleManager.TrySetStyle(Theme, true);
+  //InvalidateRect(0, nil, TRUE);
 end;
 
 end.

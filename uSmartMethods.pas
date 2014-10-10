@@ -16,7 +16,7 @@ public
 	procedure OpenMail(Sender: TObject);
 	procedure AttachedFile(Sender: TObject);
     procedure GeneratePass(Sender: TObject);
-    procedure EditField(Sender: TObject);
+//    procedure EditField(Sender: TObject);
 End;
 
 function GetEditFromTag(Sender: TObject): String;
@@ -63,14 +63,16 @@ begin
 end;
 FreeAndNil(frmGenerator);
 end;
-procedure clsSmartMethods.EditField(Sender: TObject);
-begin
-    if (not Assigned(frmEditField)) then frmEditField:= TfrmEditField.Create(frmEditItem);
-	if frmEditField.ShowModal = mrOk then begin
-    	//
-	end;
-FreeAndNil(frmEditField);
-end;
+//procedure clsSmartMethods.EditField(Sender: TObject);
+//begin
+//    if (not Assigned(frmEditField)) then frmEditField:= TfrmEditField.Create(frmEditItem);
+//    Log('EditField');
+//    Log(Sender.ToString);
+//	if frmEditField.ShowModal = mrOk then begin
+//    	//
+//	end;
+//FreeAndNil(frmEditField);
+//end;
 function GetEditFromTag(Sender: TObject): String;
 begin
     result:=TEditMultiline(Pointer((Sender as TSpeedButton).Tag)).Text

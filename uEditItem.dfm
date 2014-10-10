@@ -21,7 +21,7 @@ object frmEditItem: TfrmEditItem
   PixelsPerInch = 96
   TextHeight = 13
   object btnClose: TButton
-    Left = 156
+    Left = 148
     Top = 315
     Width = 81
     Height = 33
@@ -31,7 +31,7 @@ object frmEditItem: TfrmEditItem
     OnClick = btnCloseClick
   end
   object btnOK: TButton
-    Left = 245
+    Left = 237
     Top = 315
     Width = 81
     Height = 33
@@ -45,7 +45,7 @@ object frmEditItem: TfrmEditItem
     Left = 0
     Top = 0
     Width = 339
-    Height = 306
+    Height = 303
     VertScrollBar.Increment = 26
     VertScrollBar.Tracking = True
     Align = alTop

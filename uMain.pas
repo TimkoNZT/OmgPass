@@ -52,7 +52,6 @@ TfrmMain = class(TForm)
     N29: TMenuItem;
     mnuThemes: TMenuItem;
     tvMain: TTreeView;
-    Splitter: TSplitter;
     fpMain: TScrollBox;
     mnuBaseProperties: TMenuItem;
     sbMain: TStatusBar;
@@ -74,6 +73,7 @@ TfrmMain = class(TForm)
     mnuPopupCloneItem: TMenuItem;
     mnuCloneItem: TMenuItem;
     btnTheme: TSpeedButton;
+    Splitter: TSplitter;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -537,7 +537,7 @@ begin
 	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
     tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;
-    Log(Sender.ToString);
+    //Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
 end;
@@ -594,7 +594,7 @@ end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
-frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);//
+frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);
 end;
 
 end.

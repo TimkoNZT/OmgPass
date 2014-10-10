@@ -267,7 +267,7 @@ begin
 	Log('SetNodeTitle');
     case GetNodeType(Node) of
     ntField:
-    	Exit;
+    	SetAttribute(Node, 'name', Title);
     ntItem,
     ntDefItem:
         for i := 0 to Node.ChildNodes.Count - 1 do begin
