@@ -8,7 +8,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 type eNodeType = (ntRoot, ntHeader, ntData,
 					ntPage, ntFolder, ntDefFolder,
                     ntItem, ntDefItem, ntField, ntNone);
-type eFieldFormat = (ffTitle, ffText, ffPass, ffComment, ffWeb, ffDate, ffMail, ffFile);
+type eFieldFormat = (ffTitle, ffText, ffPass, ffWeb, ffComment, ffDate, ffMail, ffFile);
 
 const arrNodeTypes: array[0..9] of String = ('root',
 											'header',
@@ -23,8 +23,8 @@ const arrNodeTypes: array[0..9] of String = ('root',
 const arrFieldFormats: array[0..7] of String = ('title',
                                                 'text',
                                                 'pass',
-                                                'comment',
                                                 'web',
+                                                'comment',
                                                 'date',
                                                 'mail',
                                                 'file');
@@ -35,6 +35,7 @@ function GetNodeType(Node: IXMLNode): eNodeType;
 function GetFieldFormat(Field: IXMLNode): eFieldFormat;
 function GetAttribute(Node: IXMLNode; attrName: String): String;
 function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
+function RemoveAttribute(Node: IXMLNode; attrName: String) : Boolean;
 function GetNodeTitle(Node:IXMLNode): String;
 function SetNodeTitle(Node:IXMLNode; Title: String): Boolean;
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');
@@ -227,8 +228,6 @@ begin
     result:=True;
 end;
 
-
-
 function GetBaseTitle(x:IXMLDocument): String;
 begin
 	result:= NodeByPath(x, 'Root\Header\Title').Text;
@@ -249,6 +248,7 @@ begin
         for i := 0 to Node.ChildNodes.Count - 1 do begin
         	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then
             	result:=Node.ChildNodes[i].Text;
+                Exit;
     	end;
     ntPage,
     ntFolder,
@@ -273,6 +273,8 @@ begin
         for i := 0 to Node.ChildNodes.Count - 1 do begin
         	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then
             Node.ChildNodes[i].Text:=Title;
+            Result:=True;
+            Exit;
     	end;
     ntFolder,
     ntDefFolder,
@@ -343,6 +345,17 @@ function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Bool
 begin
     	Node.Attributes[attrName]:=attrValue;
         result:=True;
+end;
+
+function RemoveAttribute(Node: IXMLNode; attrName: String) : Boolean;
+var
+    attr: iXMLNode;
+begin
+    attr:= Node.AttributeNodes.FindNode(attrName);
+    if attr <> nil then begin
+        Node.AttributeNodes.Remove(attr);
+        result:=True;
+    end else result:= False;
 end;
 
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');

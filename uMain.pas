@@ -136,6 +136,8 @@ end;
 
 var
     frmMain: TfrmMain;
+resourcestring
+    rsAppname = 'OmgPass';
 
 implementation
 

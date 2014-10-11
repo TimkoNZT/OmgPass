@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   {XML}
-  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc;
+  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ImgList;
 
 type
   TfrmEditField = class(TForm)
@@ -18,7 +18,7 @@ type
     btnClose: TButton;
     chkShowButton: TCheckBox;
     CheckBox1: TCheckBox;
-    procedure FormCreate(Sender: TObject);
+    imlTypes: TImageList;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); overload;
@@ -32,6 +32,19 @@ var
   frmEditField: TfrmEditField;
   fNode: IXMLNode;
 
+resourcestring
+    rsFrmEditFieldCaption = 'Edit field properties';
+    rsFrmEditFieldCaptionNew = 'New field...';
+    rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
+    rsTitleDefName = 'Title';
+    rsTextDefName = 'Login';
+    rsPassDefName = 'Password';
+    rsCommentDefName = 'Comment';
+    rsLinkDefName = 'Website';
+    rsDateDefName = 'Date';
+    rsMailDefName = 'Mail';
+    rsFileDefName = 'File';
+
 implementation
 uses Logic, XMLUtils;
 {$R *.dfm}
@@ -44,21 +57,31 @@ end;
 procedure TfrmEditField.btnOKClick(Sender: TObject);
 begin
     SetNodeTitle(fNode, txtFieldTitle.Text);
+    SetAttribute(fNode, 'format', arrFieldFormats[cmbFieldType.ItemIndex]);
+    if chkShowButton.Checked then
+        Log(RemoveAttribute(fNode, 'button'))
+    else
+        setAttribute(fNode, 'button', 'false');
+
+
     Self.ModalResult:=mrOk;
 end;
 
-procedure TfrmEditField.FormCreate(Sender: TObject);
-begin
-self.cmbFieldType.ItemIndex:=0;
-end;
-
 constructor TfrmEditField.Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False);
+var i: Integer;
 begin
     inherited Create(AOwner);
-    if isNew then Self.Caption:= 'Новое поле' else Self.Caption:='Редактирование поля';
+    if isNew then Self.Caption:= rsFrmEditFieldCaptionNew else Self.Caption:=rsFrmEditFieldCaption;
     fNode:=Node;
     txtFieldTitle.Text:=GetNodeTitle(Node);
 //    txtFieldTitle.SetFocus;
+    cmbFieldType.Items.Delimiter:='|';
+    cmbFieldType.Items.QuoteChar:=#0;
+    cmbFieldType.Items.DelimitedText:=rsTypes;
+    cmbFieldType.ItemIndex:=Ord(GetFieldFormat(fNode));
+    for I := 0 to cmbFieldType.Items.Count - 1 do cmbFieldType.ItemsEx[i].ImageIndex:=i;
+    chkShowButton.Checked:= not (LowerCase(GetAttribute(fNode, 'button')) = 'false');
+
 end;
 
 end.

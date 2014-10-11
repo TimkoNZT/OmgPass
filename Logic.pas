@@ -317,6 +317,7 @@ begin
         	treeNode.Data:=Pointer(trgNode);
             treeNode.Text:=GetNodeTitle(trgNode);
             GeneratePanel(trgNode, frmMain.fpMain, False);
+            frmMain.tvMain.Selected.Text:=GetNodeTitle(trgNode);
         end;
     end;
     ntFolder, ntPage:
