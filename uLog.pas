@@ -12,6 +12,7 @@ type
     lbLog: TListBox;
     tmrLog: TTimer;
     Shape1: TShape;
+    StatusBar1: TStatusBar;
     procedure OnMove(var Msg: TWMMove); message WM_MOVE;
     procedure tmrLogTimer(Sender: TObject);
     procedure lbLogMouseDown(Sender: TObject; Button: TMouseButton;

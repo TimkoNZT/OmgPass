@@ -51,7 +51,6 @@ TfrmMain = class(TForm)
     tabMain: TTabControl;
     N29: TMenuItem;
     mnuThemes: TMenuItem;
-    tvMain: TTreeView;
     fpMain: TScrollBox;
     mnuBaseProperties: TMenuItem;
     sbMain: TStatusBar;
@@ -74,6 +73,11 @@ TfrmMain = class(TForm)
     mnuCloneItem: TMenuItem;
     btnTheme: TSpeedButton;
     Splitter: TSplitter;
+    Panel1: TPanel;
+    tvMain: TTreeView;
+    txtSearch: TButtonedEdit;
+    imlSearch: TImageList;
+    tmrSearch: TTimer;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -126,6 +130,12 @@ TfrmMain = class(TForm)
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ThemeMenuClick(Sender: TObject);
     procedure btnThemeClick(Sender: TObject);
+    procedure txtSearchEnter(Sender: TObject);
+    procedure txtSearchRightButtonClick(Sender: TObject);
+    procedure txtSearchChange(Sender: TObject);
+    procedure tmrSearchTimer(Sender: TObject);
+    procedure txtSearchExit(Sender: TObject);
+    procedure txtSearchKeyPress(Sender: TObject; var Key: Char);
 
 private
     procedure InitGlobal();
@@ -143,7 +153,7 @@ implementation
 
 {$R *.dfm}
 
-uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog;
+uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings;
 {//////////////////////////////////////////////////////////////////////////////}
 
 {$REGION '#Форма логирования'}
@@ -533,11 +543,62 @@ begin
 end;
 {$ENDREGION}
 
+{$Region '#Поиск'}
+procedure TfrmMain.tmrSearchTimer(Sender: TObject);
+begin
+    //Beep;
+    txtSearch.RightButton.ImageIndex:=1;
+    txtSearch.RightButton.Enabled:=True;
+    tmrSearch.Enabled:=False;
+end;
+
+procedure TfrmMain.txtSearchChange(Sender: TObject);
+begin
+    with txtSearch do begin
+        if (Text = String.Empty) or (Font.Color = clGrayText) then Exit;
+        RightButton.ImageIndex:=2;
+        tmrSearch.Enabled:=False;
+        tmrSearch.Enabled:=True;
+    end;
+
+end;
+
+procedure TfrmMain.txtSearchEnter(Sender: TObject);
+begin
+    with txtSearch do begin
+        Text:= String.Empty;
+        Font.Color:=clWindowText;
+    end;
+end;
+
+procedure TfrmMain.txtSearchExit(Sender: TObject);
+begin
+    if (txtSearch.Text = String.Empty) then txtSearchRightButtonClick(nil);
+end;
+
+procedure TfrmMain.txtSearchRightButtonClick(Sender: TObject);
+begin
+    with txtSearch do begin
+        Font.Color:=clGrayText;
+        Text:=rsSearchText;
+        RightButton.ImageIndex:=0;
+        RightButton.Enabled:=False;
+        ParsePageToTree(intCurrentPage, tvMain);
+        tvMain.SetFocus;
+    end;
+end;
+
+procedure TfrmMain.txtSearchKeyPress(Sender: TObject; var Key: Char);
+begin
+if Ord(Key) = vk_Escape then txtSearchRightButtonClick(nil);
+end;
+{$Endregion}
+
 {$REGION '#Всякая хрень'}
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
 	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
-    tvMain.Align:=alLeft;
+    //tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;
     //Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
@@ -572,6 +633,7 @@ end;
 
 //Инициализация всего
 procedure TfrmMain.InitGlobal();
+var i: Integer;
 begin
     LoadThemes;
 	LogList:= TStringList.Create;
@@ -584,19 +646,24 @@ begin
     SetButtonImg(btnAddPage, imlField, 10);
     SetButtonImg(btnDeletePage, imlField, 12);
     SetButtonImg(btnTheme, imlTab, 41);
-
+    txtSearch.AutoSize:=False;
+    //txtSearch.Height:= txtSearch.Height + 3;
     Log('Проверка версии');
     if not CheckVersion(xmlMain) then Exit;
 	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
 
     ParsePagesToTabs(xmlMain, tabMain);
     LoadSettings;
+    for i := 0 to 10 do
+    TfrmEditItem.Create(nil);
 
 end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
+var i: Integer;
 begin
 frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);
+
 end;
 
 end.

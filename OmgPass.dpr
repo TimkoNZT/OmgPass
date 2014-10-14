@@ -20,7 +20,8 @@ uses
   uLog in 'uLog.pas' {frmLog},
   uEditField in 'uEditField.pas' {frmEditField},
   uCustomEdit in 'uCustomEdit.pas',
-  uSettings in 'uSettings.pas';
+  uSettings in 'uSettings.pas',
+  uStrings in 'uStrings.pas';
 
 {$R *.res}
 

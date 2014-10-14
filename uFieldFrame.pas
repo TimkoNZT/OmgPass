@@ -12,21 +12,41 @@ type
     lblTitle: TLabel;
     btnSmart: TSpeedButton;
     btnAdditional: TSpeedButton;
-    textInfo: TEditMultiLine;
     procedure FrameResize(Sender: TObject);
+    constructor CreateParented(ParentWindow: HWnd); overload;
+
   private
     { Private declarations }
   public
-	constructor Create(AOwner: TComponent); override;
+    textInfo: TEditMultiline;
+    procedure DisableTextFrame;
+    procedure SetTextMultiline;
     { Public declarations }
   end;
 
 implementation
 
 {$R *.dfm}
-constructor TFieldFrame.Create(AOwner: TComponent);
+constructor TFieldFrame.CreateParented(ParentWindow: HWnd);
 begin
-    inherited Create(AOwner);
+    inherited CreateParented(ParentWindow);
+    textInfo:= TEditMultiline.Create(Self);
+    textInfo.SetParentComponent(Self);
+    btnSmart.SetBounds(Self.Width - lblTitle.Height * 2,
+                       lblTitle.Height,
+                       lblTitle.Height * 2,
+                       lblTitle.Height * 2);
+    btnAdditional.SetBounds(Self.Width - lblTitle.Height * 4 - 3,
+                       lblTitle.Height,
+                       lblTitle.Height * 2,
+                       lblTitle.Height * 2);
+    textInfo.AutoSize:=False;
+    textInfo.Height:=lblTitle.Height + 9;
+    textInfo.Top:= lblTitle.Height + 2;
+    //textInfo.BevelEdges:= [beTop, beLeft];
+    textInfo.BevelInner:=bvSpace;
+    textInfo.BevelOuter:=bvSpace;
+    textInfo.BevelKind:=bkTile;
 end;
 
 procedure TFieldFrame.FrameResize(Sender: TObject);
@@ -37,4 +57,15 @@ begin
 		textInfo.Width:=btnAdditional.Left - 3;
 end;
 
+procedure TFieldFrame.DisableTextFrame;
+begin
+    SetWindowLongPtr(textInfo.Handle, GWL_STYLE,
+    GetWindowLongPtr(textInfo.Handle, GWL_STYLE) or WS_DISABLED);
+end;
+
+procedure TFieldFrame.SetTextMultiline;
+begin
+    SetWindowLongPtr(textInfo.Handle, GWL_STYLE,
+    GetWindowLongPtr(textInfo.Handle, GWL_STYLE) or ES_MULTILINE);
+end;
 end.

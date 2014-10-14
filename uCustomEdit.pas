@@ -28,7 +28,7 @@ inherited createParams(Params);
 //Params.ExStyle:=Params.ExStyle or WS_EX_CLIENTEDGE ;
 if FMultiline then
 	Params.Style:=Params.Style
-		or ES_MULTILINE or WS_VSCROLL;
+		or ES_MULTILINE {or WS_VSCROLL};
 end;
 
 procedure TEditMultiLine.SetEnabled(Value: Boolean);

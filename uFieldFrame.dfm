@@ -2,14 +2,14 @@ object FieldFrame: TFieldFrame
   Left = 0
   Top = 0
   Width = 170
-  Height = 42
+  Height = 41
   AutoSize = True
   Padding.Bottom = 3
   TabOrder = 0
   OnResize = FrameResize
   DesignSize = (
     170
-    42)
+    41)
   object lblTitle: TLabel
     AlignWithMargins = True
     Left = 1
@@ -24,7 +24,7 @@ object FieldFrame: TFieldFrame
   end
   object btnSmart: TSpeedButton
     Left = 144
-    Top = 13
+    Top = 12
     Width = 26
     Height = 26
     Anchors = [akTop, akRight]
@@ -32,29 +32,11 @@ object FieldFrame: TFieldFrame
   end
   object btnAdditional: TSpeedButton
     Left = 115
-    Top = 13
+    Top = 12
     Width = 26
     Height = 26
     Anchors = [akTop, akRight]
     Flat = True
     Visible = False
-  end
-  object textInfo: TEditMultiLine
-    Left = 0
-    Top = 15
-    Width = 108
-    Height = 22
-    AutoSize = False
-    BevelInner = bvSpace
-    BevelKind = bkSoft
-    BevelOuter = bvSpace
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 0
-    Multiline = False
   end
 end

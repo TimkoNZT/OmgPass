@@ -18,17 +18,17 @@ object frmEditField: TfrmEditField
     200)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object lblFieldCaption: TLabel
     Left = 16
     Top = 16
-    Width = 64
+    Width = 166
     Height = 13
     Caption = 'Field caption:'
   end
-  object Label2: TLabel
+  object lblFieldType: TLabel
     Left = 16
     Top = 64
-    Width = 51
+    Width = 132
     Height = 13
     Caption = 'Field type:'
   end
@@ -36,11 +36,12 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 33
     Width = 255
-    Height = 21
+    Height = 25
     Anchors = [akLeft, akTop, akRight]
+    BevelEdges = [beLeft, beTop]
     BevelInner = bvSpace
-    BevelKind = bkSoft
-    BevelOuter = bvNone
+    BevelKind = bkTile
+    BevelOuter = bvSpace
     TabOrder = 0
     Text = '1234567890'
   end
@@ -53,7 +54,6 @@ object frmEditField: TfrmEditField
     Style = csExDropDownList
     Anchors = [akLeft, akTop, akRight]
     Color = clBtnFace
-    ItemHeight = 16
     TabOrder = 1
     Images = imlTypes
   end
@@ -67,8 +67,6 @@ object frmEditField: TfrmEditField
     Default = True
     TabOrder = 3
     OnClick = btnOKClick
-    ExplicitLeft = 171
-    ExplicitTop = 189
   end
   object btnClose: TButton
     Left = 101
@@ -76,11 +74,9 @@ object frmEditField: TfrmEditField
     Width = 81
     Height = 33
     Anchors = [akRight, akBottom]
-    Caption = #1054#1090#1084#1077#1085#1072
+    Caption = 'Cancel'
     TabOrder = 2
     OnClick = btnCloseClick
-    ExplicitLeft = 82
-    ExplicitTop = 189
   end
   object chkShowButton: TCheckBox
     Left = 154
@@ -105,7 +101,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C0101080018002C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

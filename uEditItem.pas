@@ -20,8 +20,8 @@ type
     constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); overload;
     procedure FormActivate(Sender: TObject);
     procedure StartEditField(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
+    procedure SaveValues;
     { Private declarations }
   public
     { Public declarations }
@@ -33,29 +33,30 @@ var
 implementation
 uses Logic, uFieldFrame, XMLUtils, uEditField;
 {$R *.dfm}
-//var
-//	editedItem: IXMLNode;
+
 procedure TfrmEditItem.btnCloseClick(Sender: TObject);
 begin
 	ModalResult:=mrCancel;
 end;
 
 procedure TfrmEditItem.btnOKClick(Sender: TObject);
-var
-	i: Integer;
 begin
-	for i := 0 to fpEdit.ControlCount - 1 do begin
-		With (fpEdit.Controls[i] as TFieldFrame) do begin
-            Log(Tag);
-            SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
-        end;
-    end;
+	Self.SaveValues;
 	ModalResult:=mrOK;
 end;
 
-procedure TfrmEditItem.Button1Click(Sender: TObject);
+procedure TfrmEditItem.SaveValues;
+var
+	i: Integer;
 begin
-    TfrmEditField.Create(self).ShowModal;
+    Log('frmEditItem: SaveValues');
+    for i := 0 to fpEdit.ControlCount - 1 do begin
+		With (fpEdit.Controls[i] as TFieldFrame) do begin
+            SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+        end;
+    end;
+    for i := 0 to Application.ComponentCount - 1 do
+        Log(Application.Components[i].ToString);
 end;
 
 procedure TfrmEditItem.fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -82,9 +83,11 @@ var
     Node: IXMLNode;
 begin
     Node:= IXMLNode(TSpeedButton(Sender).Parent.Tag);
+    frmEditItem.SaveValues;
     if EditField(Node) then
         GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True)
-    else Log ('EditField = False');
+    else Log('EditField: False');
 end;
+
 
 end.

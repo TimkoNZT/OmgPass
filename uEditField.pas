@@ -11,8 +11,8 @@ uses
 type
   TfrmEditField = class(TForm)
     txtFieldTitle: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
+    lblFieldCaption: TLabel;
+    lblFieldType: TLabel;
     cmbFieldType: TComboBoxEx;
     btnOK: TButton;
     btnClose: TButton;
@@ -32,21 +32,8 @@ var
   frmEditField: TfrmEditField;
   fNode: IXMLNode;
 
-resourcestring
-    rsFrmEditFieldCaption = 'Edit field properties';
-    rsFrmEditFieldCaptionNew = 'New field...';
-    rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
-    rsTitleDefName = 'Title';
-    rsTextDefName = 'Login';
-    rsPassDefName = 'Password';
-    rsCommentDefName = 'Comment';
-    rsLinkDefName = 'Website';
-    rsDateDefName = 'Date';
-    rsMailDefName = 'Mail';
-    rsFileDefName = 'File';
-
 implementation
-uses Logic, XMLUtils;
+uses Logic, XMLUtils, uStrings;
 {$R *.dfm}
 
 procedure TfrmEditField.btnCloseClick(Sender: TObject);
@@ -62,7 +49,6 @@ begin
         Log(RemoveAttribute(fNode, 'button'))
     else
         setAttribute(fNode, 'button', 'false');
-
 
     Self.ModalResult:=mrOk;
 end;
@@ -81,7 +67,6 @@ begin
     cmbFieldType.ItemIndex:=Ord(GetFieldFormat(fNode));
     for I := 0 to cmbFieldType.Items.Count - 1 do cmbFieldType.ItemsEx[i].ImageIndex:=i;
     chkShowButton.Checked:= not (LowerCase(GetAttribute(fNode, 'button')) = 'false');
-
 end;
 
 end.

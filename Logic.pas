@@ -80,6 +80,7 @@ begin
     if Assigned(frmLog) then begin
 	    frmLog.lbLog.Items.Add({TimeToStr(Now) +}'> '+ Text);
     	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
     end;
 end;
 
@@ -169,7 +170,8 @@ begin
         lblTitle.Caption:=GetNodeTitle(nField);
         //«аполн€ем текст, в комментари€х поле выше и требует обработки текста
         if fieldFormat = ffComment then begin
-			textInfo.Height:=70;
+            textInfo.AutoSize:=False;
+            textInfo.Height:=70;
             textInfo.Multiline:=True;
 			textInfo{.Lines}.Text:=
                 StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
@@ -184,8 +186,9 @@ begin
 		Tag:=NativeInt(nField);
         //разна€ отрисовка при редактировании и обычной работе
         if IsEdit=False then begin
-            textInfo.Enabled:=False;
+            //textInfo.Enabled:=False;
             //EnableWindow(textInfo.Handle, False);
+            DisableTextFrame;
             if LowerCase(GetAttribute(nField, 'button')) = 'false' then
                 btnSmart.Enabled:=false
             else
@@ -218,7 +221,8 @@ begin
                 end;
             end;
         SetButtonImg(btnSmart, frmMain.imlField, 4);
-//        btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+        //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+        //«агадочное сука место
         btnSmart.OnClick:= frmEditItem.StartEditField;
         end;
     end;
@@ -257,6 +261,8 @@ begin
     intExpandFlag:=1;
 	Tree.Items.Clear;
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
+    RootNode.ImageIndex:=2;
+    RootNode.SelectedIndex:=2;
     RootNode.Data:=Pointer(PageList[pageIndex]);
 	IterateNodesToTree(PageList[pageIndex], RootNode, Tree);
     //log(RootNode.AbsoluteIndex);
@@ -680,7 +686,8 @@ end;
 procedure SaveSettings;
 begin
     if xmlCfg = nil then Exit;
-    xmlCfg.SetValue('Selected', frmMain.tvMain.Selected.AbsoluteIndex, 'Position');
+    //if frmMain.tvMain.Selected<>nil then
+        xmlCfg.SetValue('Selected', frmMain.tvMain.Selected.AbsoluteIndex, 'Position');
     if frmMain.WindowState = wsNormal then begin
          xmlCfg.SetValue('Left', frmMain.Left, 'Position');
          xmlCfg.SetValue('Top', frmMain.Top, 'Position');
