@@ -32,7 +32,7 @@ TfrmMain = class(TForm)
     mnuPrint: TMenuItem;
     N17: TMenuItem;
     N18: TMenuItem;
-    mnuChowPass: TMenuItem;
+    mnuShowPass: TMenuItem;
     mnuClearClip: TMenuItem;
     N21: TMenuItem;
     mnuTop: TMenuItem;
@@ -136,6 +136,7 @@ TfrmMain = class(TForm)
     procedure tmrSearchTimer(Sender: TObject);
     procedure txtSearchExit(Sender: TObject);
     procedure txtSearchKeyPress(Sender: TObject; var Key: Char);
+    procedure mnuShowPassClick(Sender: TObject);
 
 private
     procedure InitGlobal();
@@ -386,6 +387,7 @@ procedure TfrmMain.mnuPopupCloneItemClick(Sender: TObject);
     selNode.Selected:=True;
   	CloneNode(selNode);
 end;
+
 procedure TfrmMain.mnuCloneItemClick(Sender: TObject);
 begin
     CloneNode(tvMain.Selected);
@@ -632,6 +634,13 @@ begin
         intThemeIndex:=MenuIndex;
     end;
 end;
+//Скрыть-показать пароли
+procedure TfrmMain.mnuShowPassClick(Sender: TObject);
+begin
+    mnuShowPass.Checked:= not mnuShowPass.Checked;
+    bShowPasswords:= mnuShowPass.Checked;
+    ShowPasswords(bShowPasswords);
+end;
 {$ENDREGION}
 
 //Инициализация всего
@@ -657,8 +666,8 @@ begin
 
     ParsePagesToTabs(xmlMain, tabMain);
     LoadSettings;
-    for i := 0 to 10 do
-    TfrmEditItem.Create(nil);
+//    for i := 0 to 10 do
+//    TfrmEditItem.Create(nil);
 
 end;
 

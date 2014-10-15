@@ -25,6 +25,7 @@ var
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
     strCurrentBase: String;
+    bShowPasswords: Boolean;       //Загадочная переменная
     intTickToExpand: Integer;       //  \
     oldNode: TTreeNode;             //  }Разворачивание узлов при перетаскивании
     nodeToExpand: TTreeNode;        // /
@@ -61,6 +62,7 @@ procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: B
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 procedure CloneNode(treeNode: TTreeNode);
+procedure ShowPasswords(Flag: Boolean);
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator;
@@ -186,9 +188,13 @@ begin
 		Tag:=NativeInt(nField);
         //разная отрисовка при редактировании и обычной работе
         if IsEdit=False then begin
-            //textInfo.Enabled:=False;
-            //EnableWindow(textInfo.Handle, False);
-            DisableTextFrame;
+            //Показаны или скрыты пароли
+            if (fieldFormat = ffPass) then
+                if bShowPasswords then
+                    textInfo.PasswordChar:=#0
+                else
+                    textInfo.PasswordChar:=#149;
+            //Или скрываетм кнопку или присваиваем ей обработчики
             if LowerCase(GetAttribute(nField, 'button')) = 'false' then
                 btnSmart.Enabled:=false
             else
@@ -208,8 +214,11 @@ begin
                 else begin
                     btnSmart.OnClick:= clsSmartMethods.Create.CopyToClipboard;
                     SetButtonImg(btnSmart, frmMain.imlField, 0);
-                end;
-            end;
+                end; //case
+            end; //if
+            textInfo.Enabled:=False;
+            //EnableWindow(textInfo.Handle, False);
+            //DisableTextFrame;
         end else begin                                 //Режим редактирования
         	case fieldFormat of
                 ffPass: begin
@@ -679,6 +688,8 @@ begin
     end;
     if xmlCfg.GetValue('Page', 0, 'Position') < PageList.Count then
         frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0, 'Position');
+    bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
+    frmMain.mnuShowPass.Checked:= bShowPasswords;
     //frmMain.tabMainChange(nil);
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
 
@@ -708,7 +719,7 @@ begin
     xmlCfg.SetValue('Page', intCurrentPage, 'Position');
     xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width, 'Position');
     xmlCfg.SetValue('Theme', intThemeIndex);
-
+    xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
 
     xmlCfg.Save;
 end;
@@ -736,6 +747,26 @@ procedure SetTheme(Theme: String);
 begin
   TStyleManager.TrySetStyle(Theme, true);
   //InvalidateRect(0, nil, TRUE);
+end;
+
+procedure ShowPasswords(Flag: Boolean);
+var
+  i: Integer;
+  Frame: TFieldFrame;
+begin
+    for i := 0 to frmMain.fpMain.ControlCount - 1 do begin
+        Frame:= TFieldFrame(frmMain.fpMain.Controls[i]);
+        LogNodeInfo(IXMLNode(Frame.Tag));
+        if GetFieldFormat(IXMLNode(Frame.Tag)) = ffPass then begin
+            Frame.textInfo.Visible:=False;
+            if Flag then
+                Frame.textInfo.PasswordChar:=#0
+            else
+                Frame.textInfo.PasswordChar:=#149;
+            Frame.textInfo.Enabled:=False;
+            Frame.textInfo.Visible:=True;
+        end;
+    end;
 end;
 
 end.
