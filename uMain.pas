@@ -547,6 +547,9 @@ end;
 procedure TfrmMain.tmrSearchTimer(Sender: TObject);
 begin
     //Beep;
+    ParsePageToTree(intCurrentPage, tvMain, txtSearch.Text);
+    tvMain.Items[0].Selected:=True;
+    txtSearch.SetFocus;
     txtSearch.RightButton.ImageIndex:=1;
     txtSearch.RightButton.Enabled:=True;
     tmrSearch.Enabled:=False;

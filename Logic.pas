@@ -43,8 +43,8 @@ function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = Fa
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : TFieldFrame;
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
-procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
-procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
+procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
+procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView; SearchStr: String = '');
 procedure InsertFolder(treeNode: TTreeNode);
 procedure EditNode(treeNode: TTreeNode);
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
@@ -254,7 +254,7 @@ begin
     Log('--------------------ParsePagesToTabs:End');
 end;
 
-procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView);
+procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start---------------------------');
@@ -264,7 +264,7 @@ begin
     RootNode.ImageIndex:=2;
     RootNode.SelectedIndex:=2;
     RootNode.Data:=Pointer(PageList[pageIndex]);
-	IterateNodesToTree(PageList[pageIndex], RootNode, Tree);
+	IterateNodesToTree(PageList[pageIndex], RootNode, Tree, SearchStr);
     //log(RootNode.AbsoluteIndex);
     //RootNode.DropTarget:=True;
     RootNode.Expand(False);
@@ -274,7 +274,7 @@ begin
     Log('--------------------ParsePageToTree:End-----------------------------');
 end;
 
-procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView);
+procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView; SearchStr: String = '');
 var
 	ChildTreeNode: TTreeNode;
    	i: Integer;
@@ -286,17 +286,26 @@ begin
        (GetNodeType(xn.ChildNodes[i]) = ntItem) then begin
         ChildTreeNode := Tree.Items.AddChild(ParentNode, GetNodeTitle(xn.ChildNodes[i]));
         ChildTreeNode.Data:=Pointer(xn.ChildNodes[i]);
-        IterateNodesToTree(xn.ChildNodes[i], ChildTreeNode, Tree);
+        IterateNodesToTree(xn.ChildNodes[i], ChildTreeNode, Tree, SearchStr);
         Case GetNodeType(xn.ChildNodes[i]) of
             ntItem: begin
                 ChildTreeNode.ImageIndex:=1;
                 ChildTreeNode.SelectedIndex:=1;
                 ChildTreeNode.DropTarget:=False;
+                if (Pos(LowerCase(SearchStr), LowerCase(GetNodeTitle(xn.ChildNodes[i]))) = 0) and
+                    (SearchStr <> '') then
+                    ChildTreeNode.Delete
+                else
+                    ChildTreeNode.MakeVisible;
             end;
             ntFolder: begin
                 ChildTreeNode.ImageIndex:= 0;
                 ChildTreeNode.SelectedIndex:= 0;
-                ChildTreeNode.Expanded:=GetNodeExpanded(xn.ChildNodes[i]);
+                if SearchStr = '' then
+                    ChildTreeNode.Expanded:=GetNodeExpanded(xn.ChildNodes[i])
+                else
+                    if not ChildTreeNode.HasChildren then
+                        ChildTreeNode.Delete;
             end;
         end;
     end;
