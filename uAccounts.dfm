@@ -18,6 +18,7 @@ object frmAccounts: TfrmAccounts
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     347
     340)
@@ -66,10 +67,10 @@ object frmAccounts: TfrmAccounts
     MultiLine = True
     TabHeight = 20
     TabOrder = 0
-    ExplicitWidth = 330
-    ExplicitHeight = 246
     object TabSheet1: TTabSheet
       Caption = #1054#1073#1083#1072#1082#1086
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 322
       ExplicitHeight = 216
       object Label10: TLabel
@@ -85,8 +86,6 @@ object frmAccounts: TfrmAccounts
       Caption = #1054#1090#1082#1088#1099#1090#1100' '#1072#1082#1082#1072#1091#1085#1090
       ImageIndex = 3
       OnContextPopup = TabSheet5ContextPopup
-      ExplicitWidth = 322
-      ExplicitHeight = 216
       DesignSize = (
         323
         255)
@@ -184,8 +183,6 @@ object frmAccounts: TfrmAccounts
         SmallImages = imlTab
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitWidth = 296
-        ExplicitHeight = 97
       end
       object CheckBox2: TCheckBox
         Left = 11
@@ -196,7 +193,6 @@ object frmAccounts: TfrmAccounts
         Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1089#1080#1084#1074#1086#1083#1099
         TabOrder = 1
         OnClick = chkShowPassClick
-        ExplicitTop = 180
       end
       object Edit1: TEdit
         Left = 11
@@ -208,8 +204,6 @@ object frmAccounts: TfrmAccounts
         ParentCtl3D = False
         PasswordChar = '#'
         TabOrder = 2
-        ExplicitTop = 153
-        ExplicitWidth = 266
       end
     end
     object tabOpen: TTabSheet
@@ -217,6 +211,8 @@ object frmAccounts: TfrmAccounts
       ImageIndex = 1
       TabVisible = False
       OnShow = tabOpenShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 322
       ExplicitHeight = 216
       object btnOpenBase: TSpeedButton
@@ -349,6 +345,8 @@ object frmAccounts: TfrmAccounts
     object TabSheet3: TTabSheet
       Caption = #1057#1086#1079#1076#1072#1090#1100' '#1085#1086#1074#1099#1081
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 322
       ExplicitHeight = 216
       object SpeedButton4: TSpeedButton
@@ -487,7 +485,7 @@ object frmAccounts: TfrmAccounts
     Left = 51
     Top = 328
     Bitmap = {
-      494C01015D00CC01600216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D00CC01640216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

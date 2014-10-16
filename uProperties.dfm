@@ -14,6 +14,7 @@ object frmProperties: TfrmProperties
   OldCreateOrder = False
   Position = poDesigned
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     409
     272)

@@ -18,8 +18,8 @@ type
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); overload;
-    procedure FormActivate(Sender: TObject);
     procedure StartEditField(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     procedure SaveValues;
     { Private declarations }
@@ -73,8 +73,9 @@ begin
     else Self.Caption:='Редактирование записи';
 end;
 
-procedure TfrmEditItem.FormActivate(Sender: TObject);
+procedure TfrmEditItem.FormShow(Sender: TObject);
 begin
+WindowsOnTop(bWindowsOnTop, Self);
 TFieldFrame(fpEdit.Controls[fpEdit.ControlCount - 1]).textInfo.SetFocus;
 end;
 

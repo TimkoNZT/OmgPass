@@ -126,15 +126,9 @@ object frmMain: TfrmMain
     Margins.Bottom = 2
     Align = alClient
     DoubleBuffered = True
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
     Images = imlTab
     MultiLine = True
     ParentDoubleBuffered = False
-    ParentFont = False
     TabOrder = 1
     Tabs.Strings = (
       'Test'
@@ -223,13 +217,14 @@ object frmMain: TfrmMain
       Align = alLeft
       BevelOuter = bvNone
       Caption = 'Panel1'
-      ParentColor = True
+      Color = clBtnHighlight
+      ParentBackground = False
       TabOrder = 1
       object tvMain: TTreeView
         Left = 0
-        Top = 34
+        Top = 30
         Width = 186
-        Height = 256
+        Height = 260
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -244,7 +239,7 @@ object frmMain: TfrmMain
         RightClickSelect = True
         ShowLines = False
         ShowRoot = False
-        TabOrder = 0
+        TabOrder = 1
         OnChange = tvMainChange
         OnCollapsed = tvMainCollapsed
         OnCollapsing = tvMainCollapsing
@@ -259,11 +254,11 @@ object frmMain: TfrmMain
       object txtSearch: TButtonedEdit
         AlignWithMargins = True
         Left = 0
-        Top = 5
+        Top = 1
         Width = 186
         Height = 24
         Margins.Left = 0
-        Margins.Top = 5
+        Margins.Top = 1
         Margins.Right = 0
         Margins.Bottom = 5
         Align = alTop
@@ -273,21 +268,20 @@ object frmMain: TfrmMain
         BevelWidth = 2
         BorderStyle = bsNone
         Color = clBtnHighlight
-        Ctl3D = True
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clGrayText
         Font.Height = -13
         Font.Name = 'Tahoma'
-        Font.Style = []
+        Font.Style = [fsItalic]
         Images = imlSearch
         LeftButton.ImageIndex = 0
-        ParentCtl3D = False
         ParentFont = False
         RightButton.Enabled = False
         RightButton.ImageIndex = 0
         RightButton.Visible = True
-        TabOrder = 1
+        TabOrder = 0
         Text = 'Search'
+        StyleElements = [seFont, seClient]
         OnChange = txtSearchChange
         OnEnter = txtSearchEnter
         OnExit = txtSearchExit
@@ -379,10 +373,12 @@ object frmMain: TfrmMain
       object mnuClearClip: TMenuItem
         Caption = #1054#1095#1080#1089#1090#1080#1090#1100' '#1073#1091#1092#1077#1088
         ShortCut = 119
+        OnClick = mnuClearClipClick
       end
       object mnuTop: TMenuItem
         Caption = #1055#1086#1074#1077#1088#1093' '#1074#1089#1077#1093' '#1086#1082#1086#1085
         ShortCut = 122
+        OnClick = mnuTopClick
       end
       object N21: TMenuItem
         Caption = '-'
@@ -449,7 +445,7 @@ object frmMain: TfrmMain
     Left = 235
     Top = 240
     Bitmap = {
-      494C0101080018008C0130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800940130003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4029,7 +4025,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 288
     Bitmap = {
-      494C01010D002401800217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D002401880217001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5138,7 +5134,7 @@ object frmMain: TfrmMain
     Left = 291
     Top = 240
     Bitmap = {
-      494C010103003400D80016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C010103003400E00016001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5393,7 +5389,7 @@ object frmMain: TfrmMain
     Left = 235
     Top = 288
     Bitmap = {
-      494C01013800CC01A00216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01013800CC01A80216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000004A0100000100200000000000C0C5
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9196,7 +9192,7 @@ object frmMain: TfrmMain
     Left = 339
     Top = 240
     Bitmap = {
-      494C01010500F001E00216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010500F001E80216001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -9723,7 +9719,7 @@ object frmMain: TfrmMain
     Left = 339
     Top = 286
     Bitmap = {
-      494C010103000800580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103000800600010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000E00121B78002B

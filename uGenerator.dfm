@@ -12,9 +12,9 @@ object frmGenerator: TfrmGenerator
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesigned
-  OnActivate = FormActivate
+  Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox

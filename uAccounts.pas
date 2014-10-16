@@ -67,6 +67,7 @@ type
     procedure TabSheet5ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 private
     FShowHoriz: Boolean;
     FShowVert: Boolean;
@@ -124,6 +125,11 @@ SetButtonImg(btnGeneratePass, imlTab, 1);
 
 end;
 
+procedure TfrmAccounts.FormShow(Sender: TObject);
+begin
+WindowsOnTop(bWindowsOnTop, Self);
+end;
+
 procedure TfrmAccounts.lblDefaultExtClick(Sender: TObject);
 begin
 radOpenDefault.Checked:=True;
@@ -179,17 +185,6 @@ end;
 procedure TfrmAccounts.btnNextClick(Sender: TObject);
 begin
   Self.Close;
-//case pcWizard.ActivePageIndex of
-//0:begin
-//    lblInfo.Caption:=infoText[intNextPage];
-//    btnCancel.Caption:='Назад';
-//    btnNext.Caption:='OK';
-//    pcWizard.ActivePageIndex:=intNextPage;
-//    end;
-//1: frmAccounts.Close;
-//2: frmAccounts.Close;
-//end;
-
 end;
 
 procedure TfrmAccounts.btnOpenBaseClick(Sender: TObject);

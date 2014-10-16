@@ -15,6 +15,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -74,5 +75,10 @@ begin
     end;
 end;
 
+
+procedure TfrmProperties.FormShow(Sender: TObject);
+begin
+WindowsOnTop(bWindowsOnTop, Self);
+end;
 
 end.

@@ -22,6 +22,7 @@ type
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); overload;
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -67,6 +68,12 @@ begin
     cmbFieldType.ItemIndex:=Ord(GetFieldFormat(fNode));
     for I := 0 to cmbFieldType.Items.Count - 1 do cmbFieldType.ItemsEx[i].ImageIndex:=i;
     chkShowButton.Checked:= not (LowerCase(GetAttribute(fNode, 'button')) = 'false');
+end;
+
+procedure TfrmEditField.FormShow(Sender: TObject);
+begin
+WindowsOnTop(bWindowsOnTop, Self);
+txtFieldTitle.Height:=txtFieldTitle.Height + 2;
 end;
 
 end.

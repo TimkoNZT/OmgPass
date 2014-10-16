@@ -5,7 +5,9 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Clipbrd,
-  Vcl.ImgList;
+  Vcl.ImgList,
+
+  Logic;
 
 type
   TfrmGenerator = class(TForm)
@@ -37,7 +39,7 @@ type
     procedure chkDntReClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure UpDownClick(Sender: TObject; Button: TUDBtnType);
-    procedure FormActivate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 private
     { Private declarations }
 public
@@ -162,20 +164,21 @@ begin
     chkDntDouble.Enabled:=not chkDntRe.Checked;
 end;
 
-procedure TfrmGenerator.FormActivate(Sender: TObject);
-begin
-if formType = 0 then begin
-  btnModal.Caption:='ОК';
-  btnClose.Caption:='Отмена';
-end else begin
-  btnModal.Caption:='Копировать';
-  btnClose.Caption:='Закрыть';
-end;
-end;
-
 procedure TfrmGenerator.FormCreate(Sender: TObject);
 begin
-	btnGenerateClick(nil);
+btnGenerateClick(nil);
+end;
+
+procedure TfrmGenerator.FormShow(Sender: TObject);
+begin
+    WindowsOnTop(bWindowsOnTop, Self);
+    if formType = 0 then begin
+      btnModal.Caption:='ОК';
+      btnClose.Caption:='Отмена';
+    end else begin
+      btnModal.Caption:='Копировать';
+      btnClose.Caption:='Закрыть';
+    end;
 end;
 
 {Функция делает длинные строки фиксированной длины для равномерного

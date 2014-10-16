@@ -137,6 +137,8 @@ TfrmMain = class(TForm)
     procedure txtSearchExit(Sender: TObject);
     procedure txtSearchKeyPress(Sender: TObject; var Key: Char);
     procedure mnuShowPassClick(Sender: TObject);
+    procedure mnuClearClipClick(Sender: TObject);
+    procedure mnuTopClick(Sender: TObject);
 
 private
     procedure InitGlobal();
@@ -206,7 +208,6 @@ if (not Assigned(frmProperties)) then frmProperties:= TfrmProperties.Create(Self
 if frmProperties.ShowModal = mrOK then log('Изменены свойства БД');
 FreeAndNil(frmProperties);
 end;
-
 procedure TfrmMain.mnuGeneratorClick(Sender: TObject);
 begin
 if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(Self);
@@ -427,16 +428,18 @@ end;
 procedure TfrmMain.tvMainChange(Sender: TObject; Node: TTreeNode);
 begin
     if Node.Data = nil then Exit;
-    //log(Integer(Node.Data));
-    //log(IXMLNode(Node.Data).NodeName);
-    //ClearPanel(fpMain);
     GeneratePanel(IXMLNode(Node.Data), fpMain);
+    if not bSearchMode then iSelected:=tvMain.Selected.AbsoluteIndex;
 end;
 procedure TfrmMain.tabMainChange(Sender: TObject);
 begin
   		tmrRenameTab.Tag:=1;
+        iSelected:=0;
     	CleaningPanel(fpMain, True);
-    	ParsePageToTree(tabMain.TabIndex, tvMain);
+        if bSearchMode then        
+        	ParsePageToTree(tabMain.TabIndex, tvMain, txtSearch.Text)
+        else
+            ParsePageToTree(tabMain.TabIndex, tvMain);
         tvMain.Items[0].Selected:=True;
 end;
 {$ENDREGION}
@@ -550,17 +553,22 @@ procedure TfrmMain.tmrSearchTimer(Sender: TObject);
 begin
     //Beep;
     ParsePageToTree(intCurrentPage, tvMain, txtSearch.Text);
-    tvMain.Items[0].Selected:=True;
-    txtSearch.SetFocus;
-    txtSearch.RightButton.ImageIndex:=1;
-    txtSearch.RightButton.Enabled:=True;
+    with txtSearch do begin
+        if Text = '' then
+            tvMain.Items[iSelected].Selected:=True
+        else    
+            tvMain.Items[0].Selected:=True;
+        SetFocus;
+        RightButton.ImageIndex:=1;
+        RightButton.Enabled:=True;
+    end;
     tmrSearch.Enabled:=False;
 end;
 
 procedure TfrmMain.txtSearchChange(Sender: TObject);
 begin
     with txtSearch do begin
-        if (Text = String.Empty) or (Font.Color = clGrayText) then Exit;
+        if (Font.Color = clGrayText) then Exit;
         RightButton.ImageIndex:=2;
         tmrSearch.Enabled:=False;
         tmrSearch.Enabled:=True;
@@ -570,9 +578,13 @@ end;
 
 procedure TfrmMain.txtSearchEnter(Sender: TObject);
 begin
+    bSearchMode:=True;
     with txtSearch do begin
+        if (Font.Color = clGrayText) then
+            iSelected:=tvMain.Selected.AbsoluteIndex;
         Text:= String.Empty;
         Font.Color:=clWindowText;
+        Font.Style:= [];
     end;
 end;
 
@@ -585,17 +597,25 @@ procedure TfrmMain.txtSearchRightButtonClick(Sender: TObject);
 begin
     with txtSearch do begin
         Font.Color:=clGrayText;
-        Text:=rsSearchText;
+        Font.Style:= [fsItalic];
         RightButton.ImageIndex:=0;
         RightButton.Enabled:=False;
-        ParsePageToTree(intCurrentPage, tvMain);
-        tvMain.SetFocus;
+        if Text <> '' then begin
+            ParsePageToTree(intCurrentPage, tvMain);
+            tvMain.Items[iSelected].Selected:=True;
+            tvMain.SetFocus;
+        end;
+        Text:=rsSearchText;
+        bSearchMode:=False;
     end;
 end;
 
 procedure TfrmMain.txtSearchKeyPress(Sender: TObject; var Key: Char);
 begin
-if Ord(Key) = vk_Escape then txtSearchRightButtonClick(nil);
+if Ord(Key) = vk_Escape then begin
+    txtSearchRightButtonClick(nil);
+    tvMain.SetFocus;
+end;
 end;
 {$Endregion}
 
@@ -641,6 +661,22 @@ begin
     bShowPasswords:= mnuShowPass.Checked;
     ShowPasswords(bShowPasswords);
 end;
+//Поверх всех окон
+procedure TfrmMain.mnuTopClick(Sender: TObject);
+begin
+    Beep;
+    mnuTop.Checked:= not mnuTop.Checked;
+    bWindowsOnTop:= mnuTop.Checked;
+    Log('Forms on top:', bWindowsOnTop);
+    WindowsOnTop(bWindowsOnTop, frmMain);
+    //Для формы лога не работает
+    //if Assigned(frmLog) then WindowsOnTop(bWindowsOnTop, frmLog);
+end;
+//Очистка буфера
+procedure TfrmMain.mnuClearClipClick(Sender: TObject);
+begin
+    ClearClipboard;
+end;
 {$ENDREGION}
 
 //Инициализация всего
@@ -663,11 +699,9 @@ begin
     Log('Проверка версии');
     if not CheckVersion(xmlMain) then Exit;
 	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
-
     ParsePagesToTabs(xmlMain, tabMain);
+
     LoadSettings;
-//    for i := 0 to 10 do
-//    TfrmEditItem.Create(nil);
 
 end;
 

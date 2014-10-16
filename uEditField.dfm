@@ -13,6 +13,7 @@ object frmEditField: TfrmEditField
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnShow = FormShow
   DesignSize = (
     291
     200)
@@ -21,14 +22,14 @@ object frmEditField: TfrmEditField
   object lblFieldCaption: TLabel
     Left = 16
     Top = 16
-    Width = 166
+    Width = 64
     Height = 13
     Caption = 'Field caption:'
   end
   object lblFieldType: TLabel
     Left = 16
     Top = 64
-    Width = 132
+    Width = 51
     Height = 13
     Caption = 'Field type:'
   end
@@ -36,7 +37,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 33
     Width = 255
-    Height = 25
+    Height = 21
     Anchors = [akLeft, akTop, akRight]
     BevelEdges = [beLeft, beTop]
     BevelInner = bvSpace
@@ -101,7 +102,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C010108001800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

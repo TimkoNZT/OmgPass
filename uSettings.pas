@@ -17,24 +17,13 @@ private
 protected
     //
 public
-    //Section: String;
     constructor Create(const XMLFilePath: string; RootNodeName: string = 'Config');
-
     function GetValue(OptionName: String; Default: Variant; Section: String = 'Main'): Variant;
-//    function GetString(OptionName: String; Default: String): String;
-//    function GetBoolean(OptionName: String; Default: Boolean): Boolean;
-//
     procedure SetValue(OptionName: String; Value: Variant; Section: String = 'Main');
-//    procedure SetString(OptionName: String; Value: Integer);
-//    procedure SetBoolean(OptionName: String; Value: Integer);
     procedure Save;
 end;
 
 implementation
-
-//uses
-
-{ TXMLConfig }
 
 constructor TSettings.Create(const XMLFilePath: string; RootNodeName: string = 'Config');
 begin

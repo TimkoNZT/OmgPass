@@ -19,13 +19,13 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-  private
+private
   	procedure HitTest(var Msg: TWMNcHitTest); message WM_NCHITTEST;
 
     { Private declarations }
-  public
+public
     { Public declarations }
-  end;
+end;
 
 var
    frmLog: TfrmLog;

@@ -14,7 +14,7 @@ object frmEditItem: TfrmEditItem
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
-  OnActivate = FormActivate
+  OnShow = FormShow
   DesignSize = (
     339
     359)

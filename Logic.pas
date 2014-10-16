@@ -22,10 +22,13 @@ var
     intExpandFlag: Integer;    	    //Состояние программы
     								//0 - нормальная работа
                                     //1 - загрузка страницы
+    iSelected: Integer;             //Эппл подаст в суд
+    bSearchMode: Boolean;           //Режим поиска
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
     strCurrentBase: String;
-    bShowPasswords: Boolean;       //Загадочная переменная
+    bShowPasswords: Boolean;        //Загадочная переменная
+    bWindowsOnTop: Boolean;          //Ещё одна
     intTickToExpand: Integer;       //  \
     oldNode: TTreeNode;             //  }Разворачивание узлов при перетаскивании
     nodeToExpand: TTreeNode;        // /
@@ -38,7 +41,7 @@ procedure LoadSettings;
 procedure SaveSettings;
 procedure LoadThemes;
 procedure SetTheme(Theme: String);
-
+procedure ClearClipboard;
 procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
@@ -63,6 +66,7 @@ procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 procedure CloneNode(treeNode: TTreeNode);
 procedure ShowPasswords(Flag: Boolean);
+procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator;
@@ -273,8 +277,9 @@ begin
     RootNode.ImageIndex:=2;
     RootNode.SelectedIndex:=2;
     RootNode.Data:=Pointer(PageList[pageIndex]);
+    Tree.Items.BeginUpdate;
 	IterateNodesToTree(PageList[pageIndex], RootNode, Tree, SearchStr);
-    //log(RootNode.AbsoluteIndex);
+    Tree.Items.EndUpdate;
     //RootNode.DropTarget:=True;
     RootNode.Expand(False);
     //RootNode.Selected:=True;
@@ -677,6 +682,13 @@ end;
 procedure LoadSettings;
 begin
     xmlCfg:=TSettings.Create('..\..\config.xml');
+
+    bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
+    bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
+    frmMain.mnuShowPass.Checked:= bShowPasswords;
+    frmMain.mnuTop.Checked:= bWindowsOnTop;
+    WindowsOnTop(bWindowsOnTop, frmMain);
+
     frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
     if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
     if frmMain.WindowState = wsNormal then begin
@@ -688,8 +700,6 @@ begin
     end;
     if xmlCfg.GetValue('Page', 0, 'Position') < PageList.Count then
         frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0, 'Position');
-    bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
-    frmMain.mnuShowPass.Checked:= bShowPasswords;
     //frmMain.tabMainChange(nil);
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
 
@@ -706,7 +716,9 @@ end;
 procedure SaveSettings;
 begin
     if xmlCfg = nil then Exit;
-    //if frmMain.tvMain.Selected<>nil then
+    if bSearchMode then
+        xmlCfg.SetValue('Selected', iSelected, 'Position')
+    else if frmMain.tvMain.Selected<>nil then
         xmlCfg.SetValue('Selected', frmMain.tvMain.Selected.AbsoluteIndex, 'Position');
     if frmMain.WindowState = wsNormal then begin
          xmlCfg.SetValue('Left', frmMain.Left, 'Position');
@@ -720,6 +732,7 @@ begin
     xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width, 'Position');
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
+    xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
 
     xmlCfg.Save;
 end;
@@ -745,8 +758,8 @@ end;
 procedure SetTheme(Theme: String);
 //Выбор стиля оформления
 begin
-  TStyleManager.TrySetStyle(Theme, true);
-  //InvalidateRect(0, nil, TRUE);
+    if bSearchMode then frmMain.txtSearchRightButtonClick(nil);
+    TStyleManager.TrySetStyle(Theme, true);
 end;
 
 procedure ShowPasswords(Flag: Boolean);
@@ -754,10 +767,11 @@ var
   i: Integer;
   Frame: TFieldFrame;
 begin
+    Log('ShowPasswords:', Flag);
     for i := 0 to frmMain.fpMain.ControlCount - 1 do begin
         Frame:= TFieldFrame(frmMain.fpMain.Controls[i]);
-        LogNodeInfo(IXMLNode(Frame.Tag));
         if GetFieldFormat(IXMLNode(Frame.Tag)) = ffPass then begin
+            LogNodeInfo(IXMLNode(Frame.Tag), 'Found password field');
             Frame.textInfo.Visible:=False;
             if Flag then
                 Frame.textInfo.PasswordChar:=#0
@@ -767,6 +781,22 @@ begin
             Frame.textInfo.Visible:=True;
         end;
     end;
+end;
+
+procedure ClearClipboard;
+begin
+    Clipboard.Clear;
+    Log ('Clearing clipboard');
+end;
+
+procedure WindowsOnTop(Flag: Boolean; Form: TForm);
+var i: Integer;
+begin
+    Log('Form ' + Form.Name + ' topmost:', Flag);
+    if Flag then
+        SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW)
+    else
+        SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
 end;
 
 end.

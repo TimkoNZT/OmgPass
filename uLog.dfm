@@ -21,9 +21,11 @@ object frmLog: TfrmLog
     Left = 0
     Top = 0
     Width = 400
-    Height = 378
+    Height = 380
     Align = alClient
     Pen.Color = clBtnShadow
+    ExplicitLeft = 104
+    ExplicitTop = -120
     ExplicitHeight = 400
   end
   object lbLog: TListBox
@@ -31,7 +33,7 @@ object frmLog: TfrmLog
     Left = 3
     Top = 3
     Width = 394
-    Height = 372
+    Height = 374
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -43,14 +45,13 @@ object frmLog: TfrmLog
     TabOrder = 0
     StyleElements = [seFont, seClient]
     OnMouseDown = lbLogMouseDown
-    ExplicitHeight = 394
   end
   object StatusBar1: TStatusBar
     AlignWithMargins = True
     Left = 3
-    Top = 378
+    Top = 380
     Width = 394
-    Height = 19
+    Height = 17
     Margins.Top = 0
     Panels = <
       item
@@ -62,9 +63,6 @@ object frmLog: TfrmLog
         Text = 'Lines Count:'
         Width = 90
       end>
-    ExplicitLeft = 192
-    ExplicitTop = 400
-    ExplicitWidth = 0
   end
   object tmrLog: TTimer
     Enabled = False
