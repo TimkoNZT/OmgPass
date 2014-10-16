@@ -23,8 +23,8 @@ object frmEditItem: TfrmEditItem
   object btnClose: TButton
     Left = 148
     Top = 315
-    Width = 81
-    Height = 33
+    Width = 80
+    Height = 35
     Anchors = [akRight, akBottom]
     Caption = #1054#1090#1084#1077#1085#1072
     TabOrder = 0
@@ -33,8 +33,8 @@ object frmEditItem: TfrmEditItem
   object btnOK: TButton
     Left = 237
     Top = 315
-    Width = 81
-    Height = 33
+    Width = 80
+    Height = 35
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True

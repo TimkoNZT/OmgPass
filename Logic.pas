@@ -6,7 +6,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
-    XMLutils, uFieldFrame, uSmartMethods, uSettings,
+    XMLutils, uFieldFrame, uFolderFrame, uSmartMethods, uSettings, uStrings,
     {Themes}
     Styles, Themes
   	;
@@ -46,6 +46,7 @@ procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; isNew: Boolean = False) : TFieldFrame;
+procedure GenerateFolderPanel(nItem: IXMLNode; Panel: TWinControl);
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView; SearchStr: String = '');
@@ -67,6 +68,7 @@ procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 procedure CloneNode(treeNode: TTreeNode);
 procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
+function GetFolderInformation(Node: IXMLNode): String;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator;
@@ -132,7 +134,7 @@ function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = Fa
 //Внутрь надо подавать ноду формата ntItem c полями Field
 var i: Integer;
 begin
-//Проверяем корректность входящей ноды
+//Инфо
 	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
@@ -140,20 +142,21 @@ begin
     Panel.Visible:=False;
     //Чистим панельку
     CleaningPanel(Panel);
-    if GetNodeType(nItem) <> ntItem then begin
-    	result:=false;
-    	Log('Error: GeneratePanel: Входная нода не типа ntItem!');
-        Log('End: GeneratePanel(' + nItem.NodeName + ', ' + Panel.Name +') = ', result);
-        Panel.Visible:=True;
-        Exit;
-    end;
-	//И разбиваем ноду по полям
-    for i := nItem.ChildNodes.Count -1 downto 0 do
-    	GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
-    //Установка TabOrder
-    for i := Panel.ControlCount - 1 downto 0 do begin
-    	TFieldFrame(Panel.Controls[i]).TabOrder:= Panel.ControlCount - 1 - i;
-        log('TabOrder: ' + TFieldFrame(Panel.Controls[i]).lblTitle.Caption + ' set to ',  TFieldFrame(Panel.Controls[i]).TabOrder);
+    case GetNodeType(nItem) of
+        ntFolder, ntPage: begin
+            GenerateFolderPanel(nItem, Panel);
+        end;
+        ntItem: begin
+            //И разбиваем ноду по полям
+            for i := nItem.ChildNodes.Count -1 downto 0 do
+                GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
+            //Установка TabOrder
+            if isEdit then
+                for i := Panel.ControlCount - 1 downto 0 do begin
+                    TFieldFrame(Panel.Controls[i]).TabOrder:= Panel.ControlCount - 1 - i;
+                    log('TabOrder: ' + TFieldFrame(Panel.Controls[i]).lblTitle.Caption + ' set to ',  TFieldFrame(Panel.Controls[i]).TabOrder);
+                end;
+        end;
     end;
     Panel.Visible:=True;
     Result:=True;
@@ -240,6 +243,16 @@ begin
         end;
     end;
     //Log('--------------------GenerateField:End');
+end;
+
+procedure GenerateFolderPanel(nItem: IXMLNode; Panel: TWinControl);
+begin
+    with TFolderFrame.Create(Panel) do begin
+        Parent:=Panel;
+        Align:=alClient;
+        lblInfo.Caption:=GetFolderInformation(nItem);
+        grpDefault.Visible:= (GetNodeType(nItem) = ntPage);
+    end;
 end;
 
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
@@ -431,7 +444,7 @@ begin
         					#10#13 + 'Это приведет к удалению всех вложенных папок и записей!';
     ntPage: begin
     	if PageList.Count = 1 then begin
-        	MessageBox(Application.Handle, 'Нельзя удалить последнюю страницу!', 'Удаление записи', MB_ICONINFORMATION);
+        	MessageBox(Application.Handle, 'Нельзя удалить последнюю страницу!', 'Удаление записи', MB_ICONINFORMATION + MB_SYSTEMMODAL);
         	Exit;
         end;
     	msg:='ВНИМАНИЕ!' + #10#13 + 'Вы действительно хотите удалить страницу ' + AnsiQuotedStr(GetNodeTitle(Node), '"') + '?' +
@@ -441,7 +454,7 @@ begin
     end;
     if not withoutConfirm then
     if MessageBox(Application.Handle, PWideChar(Msg), 'Удаление записи',
-    	 MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2)	= ID_CANCEL then Exit;
+    	 MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL)	= ID_CANCEL then Exit;
     Log('Deleting confirmed...');
     Node.ParentNode.ChildNodes.Remove(Node);           //returns thmthng
     if GetNodeType(Node) = ntPage then begin
@@ -683,6 +696,8 @@ procedure LoadSettings;
 begin
     xmlCfg:=TSettings.Create('..\..\config.xml');
 
+    if xmlCfg.GetValue('Theme', 0) < frmMain.mnuThemes.Count  then
+        frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
     bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
     frmMain.mnuShowPass.Checked:= bShowPasswords;
@@ -705,9 +720,6 @@ begin
 
     if xmlCfg.GetValue('Selected', 0, 'Position') < frmMain.tvMain.Items.Count  then
         frmMain.tvMain.Items[xmlCfg.GetValue('Selected', 0, 'Position')].Selected:=True;
-
-    if xmlCfg.GetValue('Theme', 0) < frmMain.mnuThemes.Count  then
-        frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
 
 //    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
         frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100, 'Position');
@@ -796,6 +808,39 @@ begin
         SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW)
     else
         SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
+end;
+
+function GetFolderInformation(Node: IXMLNode): String;
+var
+    FoldersCount, ItemsCount: Integer;
+//Осторожно!Вложенные функции!
+function IterateFolders(Node: IXMLNode; Full: Boolean): Integer;
+var i: Integer;
+begin
+    for i:= 0 to Node.ChildNodes.Count - 1 do
+        if GetNodeType(Node.ChildNodes[i]) = ntFolder then begin
+            inc(result);
+            if Full then result:= result + IterateFolders(Node.ChildNodes[i], true);
+        end;
+end;
+
+function IterateItems(Node: IXMLNode; Full: Boolean): Integer;
+var i: Integer;
+begin
+    for i:= 0 to Node.ChildNodes.Count - 1 do begin
+        if GetNodeType(Node.ChildNodes[i]) = ntItem then
+            inc(result);
+        if (GetNodeType(Node.ChildNodes[i]) = ntFolder) and Full then
+            result:= result + IterateItems(Node.ChildNodes[i], true);
+    end;
+end;
+
+begin
+    result:= rsInfoTitle  + GetNodeTitle(Node) + #10#13 +
+            rsInfoSubfolders + IntToStr(IterateFolders(Node, False)) + #10#13 +
+            rsInfoTotalFolders + IntToStr(IterateFolders(Node, True)) + #10#13 +
+            rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  #10#13 +
+            rsInfoTotalItems + IntToStr(IterateItems(Node, True));
 end;
 
 end.

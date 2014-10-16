@@ -61,8 +61,8 @@ object frmEditField: TfrmEditField
   object btnOK: TButton
     Left = 190
     Top = 156
-    Width = 81
-    Height = 33
+    Width = 80
+    Height = 35
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
@@ -72,8 +72,8 @@ object frmEditField: TfrmEditField
   object btnClose: TButton
     Left = 101
     Top = 156
-    Width = 81
-    Height = 33
+    Width = 80
+    Height = 35
     Anchors = [akRight, akBottom]
     Caption = 'Cancel'
     TabOrder = 2
@@ -102,7 +102,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C010108001800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101080018003C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

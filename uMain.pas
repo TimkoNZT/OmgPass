@@ -231,7 +231,7 @@ end;
 procedure TfrmMain.tvMainDblClick(Sender: TObject);
 //Çהוסü ןנמסעמ
 begin
-	if not tvMain.Selected.HasChildren then
+	if not tvMain.Selected.HasChildren or tvMain.Selected.IsFirstNode then
 		EditNode(tvMain.Selected);
 end;
 procedure TfrmMain.mnuEditItemClick(Sender: TObject);

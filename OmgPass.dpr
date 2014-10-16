@@ -21,7 +21,8 @@ uses
   uEditField in 'uEditField.pas' {frmEditField},
   uCustomEdit in 'uCustomEdit.pas',
   uSettings in 'uSettings.pas',
-  uStrings in 'uStrings.pas';
+  uStrings in 'uStrings.pas',
+  uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame};
 
 {$R *.res}
 
