@@ -17,7 +17,7 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); overload;
+    constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); reintroduce;
     procedure StartEditField(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private

@@ -10,8 +10,8 @@ Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc;
 
 type TSettings = class(TPersistent)
 private
-    FXMLFilePath: string;
-    FVersion: byte;
+//    FXMLFilePath: string;
+//    FVersion: byte;
     sXML: IXMLDocument;
     RootNode: IXMLNode;
 protected

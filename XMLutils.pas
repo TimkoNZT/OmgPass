@@ -216,6 +216,7 @@ end;
 
 function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
 begin
+    result:=False;
 	case GetNodeType(Node) of
     ntNone:
     	Exit;

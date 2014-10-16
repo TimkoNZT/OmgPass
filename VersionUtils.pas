@@ -14,6 +14,7 @@ uses Logic;
 
 function CheckVersion(i: IXMLDocument): Boolean;
 begin
+    result:=False;
     if GetVersion(i) <> ACTUALVERSION then begin
         log('Версия устарела. Обновляем.');
 		if not UpgradeVersion(i) then begin

@@ -681,7 +681,7 @@ end;
 
 //Инициализация всего
 procedure TfrmMain.InitGlobal();
-var i: Integer;
+//var i: Integer;
 begin
     LoadThemes;
 	LogList:= TStringList.Create;
@@ -706,10 +706,9 @@ begin
 end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
-var i: Integer;
+//var i: Integer;
 begin
 frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);
-
 end;
 
 end.

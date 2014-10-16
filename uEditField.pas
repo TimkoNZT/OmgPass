@@ -21,7 +21,7 @@ type
     imlTypes: TImageList;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
-    constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); overload;
+    constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); reintroduce; overload;
     procedure FormShow(Sender: TObject);
   private
     { Private declarations }

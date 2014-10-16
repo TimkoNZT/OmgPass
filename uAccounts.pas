@@ -69,10 +69,10 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
 private
-    FShowHoriz: Boolean;
-    FShowVert: Boolean;
-    FListViewWndProc: TWndMethod;
-    procedure ListViewWndProc(var Msg: TMessage);
+//    FShowHoriz: Boolean;
+//    FShowVert: Boolean;
+//    FListViewWndProc: TWndMethod;
+//    procedure ListViewWndProc(var Msg: TMessage);
 
     { Private declarations }
 public
@@ -95,12 +95,12 @@ implementation
 
 uses uMain, uGenerator, Logic;
 
-procedure TfrmAccounts.ListViewWndProc(var Msg: TMessage);
-begin
-   ShowScrollBar(ListView1.Handle, SB_HORZ, False);
-   ShowScrollBar(ListView1.Handle, SB_VERT, True);
-   FListViewWndProc(Msg); // process message
-end;
+//procedure TfrmAccounts.ListViewWndProc(var Msg: TMessage);
+//begin
+//   ShowScrollBar(ListView1.Handle, SB_HORZ, False);
+//   ShowScrollBar(ListView1.Handle, SB_VERT, True);
+//   FListViewWndProc(Msg); // process message
+//end;
 
 procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

@@ -10,13 +10,13 @@ type
 private
 	FMultiline: Boolean;
     FEnabled: Boolean;
-    procedure SetEnabled(Value: Boolean);
+    procedure FSetEnabled(Value: Boolean);
 protected
     procedure CreateParams(var Params:TCreateParams);override;
 public
 published
   	property Multiline: Boolean read FMultiline write FMultiline;
-    property Enabled: Boolean read FEnabled write SetEnabled;
+    property Enabled: Boolean read FEnabled write FSetEnabled;
 end;
 
 implementation
@@ -31,7 +31,7 @@ if FMultiline then
 		or ES_MULTILINE {or WS_VSCROLL};
 end;
 
-procedure TEditMultiLine.SetEnabled(Value: Boolean);
+procedure TEditMultiLine.FSetEnabled(Value: Boolean);
 begin
     //inherited;
     if Value then

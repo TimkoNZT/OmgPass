@@ -790,7 +790,6 @@ begin
 end;
 
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
-var i: Integer;
 begin
     Log('Form ' + Form.Name + ' topmost:', Flag);
     if Flag then
