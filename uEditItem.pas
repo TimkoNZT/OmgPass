@@ -76,7 +76,8 @@ end;
 procedure TfrmEditItem.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
-TFieldFrame(fpEdit.Controls[fpEdit.ControlCount - 1]).textInfo.SetFocus;
+if fpEdit.ControlCount<>0 then
+    TFieldFrame(fpEdit.Controls[fpEdit.ControlCount - 1]).textInfo.SetFocus;
 end;
 
 procedure TfrmEditItem.StartEditField(Sender: TObject);

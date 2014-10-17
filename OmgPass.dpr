@@ -22,7 +22,8 @@ uses
   uCustomEdit in 'uCustomEdit.pas',
   uSettings in 'uSettings.pas',
   uStrings in 'uStrings.pas',
-  uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame};
+  uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame},
+  uFolderFrameInfo in 'uFolderFrameInfo.pas' {FolderFrameInfo: TFrame};
 
 {$R *.res}
 

@@ -1,12 +1,13 @@
 unit Logic;
 interface
 
-uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
+uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
   StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin, ClipBrd, Vcl.Buttons,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
-    XMLutils, uFieldFrame, uFolderFrame, uSmartMethods, uSettings, uStrings,
+    XMLutils, uFieldFrame, uFolderFrame, uFolderFrameInfo,
+    uSmartMethods, uSettings, uStrings,
     {Themes}
     Styles, Themes
   	;
@@ -26,7 +27,7 @@ var
     bSearchMode: Boolean;           //Режим поиска
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
-    strCurrentBase: String;
+//    strCurrentBase: String;
     bShowPasswords: Boolean;        //Загадочная переменная
     bWindowsOnTop: Boolean;          //Ещё одна
     intTickToExpand: Integer;       //  \
@@ -53,6 +54,7 @@ procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeVie
 procedure InsertFolder(treeNode: TTreeNode);
 procedure EditNode(treeNode: TTreeNode);
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+procedure EditDefaultItem;
 function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
@@ -81,7 +83,6 @@ begin
    Result:= frmGenerator.lblResult.Caption;
    FreeAndNil(frmGenerator);
 end;
-
 procedure Log(Text: String);
 begin
 	LogList.Add({TimeToStr(Now) +}'> '+ Text);
@@ -91,22 +92,18 @@ begin
         frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
     end;
 end;
-
 procedure Log(Val: Integer);
 begin
 	Log(IntToStr(Val));
 end;
-
 procedure Log(Flag: Boolean);
 begin
     if Flag then Log('True') else Log('False');
 end;
-
 procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
 end;
-
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 //Очистка панельки
 var
@@ -121,14 +118,12 @@ begin
     result:=true;
     Log('ClearPanel(' + Panel.Name + ') =', result);
 end;
-
 procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
 begin
     if Button is TSpeedButton then begin
         List.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
     end;
 end;
-
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 //Рисуем панельку с полями и всё такое, важное место!
 //Внутрь надо подавать ноду формата ntItem c полями Field
@@ -146,7 +141,7 @@ begin
         ntFolder, ntPage: begin
             GenerateFolderPanel(nItem, Panel);
         end;
-        ntItem: begin
+        ntItem, ntDefItem: begin
             //И разбиваем ноду по полям
             for i := nItem.ChildNodes.Count -1 downto 0 do
                 GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew);
@@ -161,7 +156,6 @@ begin
     Panel.Visible:=True;
     Result:=True;
 end;
-
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : TFieldFrame;
 //Рисуем отдельные поля в панельку,
 //У ноды должен быть формат поля (ntField)
@@ -171,12 +165,13 @@ begin
 	//Log('--------------------GenerateField:Start');
     LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
-    Result:= TFieldFrame.CreateParented(Panel.Handle);
+    Result:= TFieldFrame.CreateParented(Panel.Handle{, isEdit});
 	With Result do begin
 		Parent:=Panel;
         Align:=alTop;
         //Заполняем метку
         lblTitle.Caption:=GetNodeTitle(nField);
+//        chkTitle.Caption:=lblTitle.Caption;
         //Заполняем текст, в комментариях поле выше и требует обработки текста
         if fieldFormat = ffComment then begin
             textInfo.AutoSize:=False;
@@ -244,17 +239,20 @@ begin
     end;
     //Log('--------------------GenerateField:End');
 end;
-
 procedure GenerateFolderPanel(nItem: IXMLNode; Panel: TWinControl);
 begin
-    with TFolderFrame.Create(Panel) do begin
+if (GetNodeType(nItem) = ntPage) then
+    with TFolderFrame.CreateParented(Panel.Handle) do begin
         Parent:=Panel;
-        Align:=alClient;
+        Align:=alTop;
+        Tag:=NativeInt(nItem);
+    end;
+    with TFolderFrameInfo.CreateParented(Panel.Handle) do begin
+    Align:=alTop;
+        Parent:=Panel;
         lblInfo.Caption:=GetFolderInformation(nItem);
-        grpDefault.Visible:= (GetNodeType(nItem) = ntPage);
     end;
 end;
-
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
 var i: Integer;
 tabList: TStringList;
@@ -279,7 +277,6 @@ begin
     intExpandFlag:=0;
     Log('--------------------ParsePagesToTabs:End');
 end;
-
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
 var RootNode: TTreeNode;
 begin
@@ -300,7 +297,6 @@ begin
     intExpandFlag:=0;
     Log('--------------------ParsePageToTree:End-----------------------------');
 end;
-
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView; SearchStr: String = '');
 var
 	ChildTreeNode: TTreeNode;
@@ -338,7 +334,6 @@ begin
     end;
     Log('--------------------IterateNodesToTree:End');
 end;
-
 procedure EditNode(treeNode: TTreeNode);
 var
 	trgNode: IXMLNode;
@@ -366,7 +361,6 @@ begin
     	treeNode.EditText;
     end;
 end;
-
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 var
 	//trgNode: IXMLNode;
@@ -391,7 +385,6 @@ begin
     end;
     FreeAndNil(frmEditItem);
 end;
-
 function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 var
     tmpNode: IXMLNode;
@@ -415,7 +408,6 @@ begin
     end;
     FreeAndNil(frmEditField);
 end;
-
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
 begin
 	SetNodeTitle(Node, Title);
@@ -428,7 +420,6 @@ begin
         frmMain.tabMain.Tabs[intCurrentPage]:=Title;
     end;
 end;
-
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
 var
 	Msg: String;
@@ -462,7 +453,6 @@ begin
         frmMain.tabMainChange(nil);
     end else treeNode.Delete;
 end;
-
 procedure AddPage();
 begin
 	inc(intCurrentPage);
@@ -470,7 +460,6 @@ begin
     ParsePagesToTabs(xmlMain, frmMain.tabMain);
     frmMain.tabMainChange(nil);
 end;
-
 function CreateClearPage(): IXMLNode;
 var
 	newPageNode: IXMLNode; //okay?
@@ -500,7 +489,6 @@ begin
     result:=newPageNode;
     //i like spagetti
 end;
-
 procedure InsertFolder(treeNode: TTreeNode);
 var
 	newFolderNode: IXMLNode;
@@ -523,7 +511,6 @@ begin
 		EditText;
 	end;
 end;
-
 procedure InsertItem(treeNode: TTreeNode);
 var
 	i: integer;
@@ -560,7 +547,6 @@ begin
         //EditText;
     end else newItem._Release;
 end;
-
 procedure CloneNode(treeNode: TTreeNode);
 var
 	Node: IXMLNode;
@@ -594,7 +580,6 @@ begin
     end;
 
 end;
-
 procedure SetNodeExpanded(treeNode: TTreeNode);
 begin
 	if intExpandFlag <> 0 then Exit;
@@ -602,7 +587,6 @@ begin
 	SetAttribute(IXMLNode(treeNode.Data), 'expand',
                 BoolToStr(treeNode.Expanded, True));
 end;
-
 function GetNodeExpanded(Node: IXMLNode): Boolean;
 var
 	tmp: String;
@@ -613,7 +597,6 @@ begin
     else
     	result:=StrToBool(tmp);
 end;
-
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean=False);
 //Попой чую, здесь можно было проще, но проще глючило.
 var
@@ -655,7 +638,6 @@ begin
     while rootTreeNode.Parent<> nil do rootTreeNode:=rootTreeNode.Parent;
     IterateTree(rootTreeNode, Pointer(newNode));}
 end;
-
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 var
 //selNode: IXMLNode;
@@ -679,7 +661,6 @@ begin
     //Внимание! В призрак временно заносятся данные цели, а не источника!
     DragGhostNode.Data:=Pointer(trgNode);
 end;
-
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
 var
    	i: Integer;
@@ -691,7 +672,6 @@ begin
         else IterateTree(ParentNode.Item[i], Data);
     Log('IterateTree: End');
 end;
-
 procedure LoadSettings;
 begin
     xmlCfg:=TSettings.Create('..\..\config.xml');
@@ -721,10 +701,9 @@ begin
     if xmlCfg.GetValue('Selected', 0, 'Position') < frmMain.tvMain.Items.Count  then
         frmMain.tvMain.Items[xmlCfg.GetValue('Selected', 0, 'Position')].Selected:=True;
 
-//    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
+    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
         frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100, 'Position');
 end;
-
 procedure SaveSettings;
 begin
     if xmlCfg = nil then Exit;
@@ -748,7 +727,6 @@ begin
 
     xmlCfg.Save;
 end;
-
 procedure LoadThemes;
 var
   	i:Integer;
@@ -766,14 +744,12 @@ With TStyleManager.Create do begin
 end;
 finally end;
 end;
-
 procedure SetTheme(Theme: String);
 //Выбор стиля оформления
 begin
     if bSearchMode then frmMain.txtSearchRightButtonClick(nil);
     TStyleManager.TrySetStyle(Theme, true);
 end;
-
 procedure ShowPasswords(Flag: Boolean);
 var
   i: Integer;
@@ -794,13 +770,11 @@ begin
         end;
     end;
 end;
-
 procedure ClearClipboard;
 begin
     Clipboard.Clear;
     Log ('Clearing clipboard');
 end;
-
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 begin
     Log('Form ' + Form.Name + ' topmost:', Flag);
@@ -809,7 +783,6 @@ begin
     else
         SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
 end;
-
 function GetFolderInformation(Node: IXMLNode): String;
 var
     FoldersCount, ItemsCount: Integer;
@@ -841,6 +814,16 @@ begin
             rsInfoTotalFolders + IntToStr(IterateFolders(Node, True)) + #10#13 +
             rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  #10#13 +
             rsInfoTotalItems + IntToStr(IterateItems(Node, True));
+end;
+procedure EditDefaultItem;
+var
+    defItem: IXMLNode;
+begin
+    LogNodeInfo(PageList[intCurrentPage], 'EditDefaultItem, Page = ');
+    defItem:= PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
+    LogNodeInfo(defItem, 'EditDefaultItem, DefItem = ');
+    if EditItem(defItem) then
+        Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
 end;
 
 end.

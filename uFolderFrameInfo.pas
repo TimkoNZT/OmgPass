@@ -1,4 +1,4 @@
-unit uFolderFrame;
+unit uFolderFrameInfo;
 
 interface
 
@@ -8,12 +8,10 @@ uses
   Vcl.Imaging.pngimage, Vcl.ExtCtrls;
 
 type
-  TFolderFrame = class(TFrame)
-    grpDefault: TGroupBox;
-    lblInfoDef: TLabel;
-    btnSetDefItem: TButton;
+  TFolderFrameInfo = class(TFrame)
+    grpInfo: TGroupBox;
+    lblInfo: TLabel;
     Image1: TImage;
-    procedure btnSetDefItemClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -21,12 +19,7 @@ type
   end;
 
 implementation
-uses Logic;
-{$R *.dfm}
 
-procedure TFolderFrame.btnSetDefItemClick(Sender: TObject);
-begin
-    EditDefaultItem;
-end;
+{$R *.dfm}
 
 end.

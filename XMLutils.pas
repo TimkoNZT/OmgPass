@@ -365,15 +365,21 @@ Vl: String;
 begin
 isTVal:= Node.ChildNodes.FindNode('#text');
 if isTVal <> nil then Vl:=VarToStr(Node.ChildNodes['#text'].NodeValue);
-
-Log(Msg + ': NodeInfo: Title= ' + GetNodeTitle(Node) +
- 	', Value= ' +  Vl +
-   	', Type= ' + GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(Node))) +
-    ', @=' + IntToStr(NativeInt(Node)) +
-
-    ', BasicType=' + GetEnumName(TypeInfo(TNodeType), Ord(Node.NodeType)) +
-	', Childs= ' + IntToStr(Node.ChildNodes.Count) +
-    ', isTextElem= ' + BoolToStr(Node.IsTextElement, True));
+Log(Msg + ': NodeInfo: Title= ' + GetNodeTitle(Node) + ':');
+Log('       Value= ' +  Vl);
+Log('       Type= ' + GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(Node))));
+Log('       @=' + IntToStr(NativeInt(Node)));
+Log('       BasicType=' + GetEnumName(TypeInfo(TNodeType), Ord(Node.NodeType)));
+Log('       Childs= ' + IntToStr(Node.ChildNodes.Count));
+Log('       isTextElem= ' + BoolToStr(Node.IsTextElement, True));
+//Log(Msg + ': NodeInfo: Title= ' + GetNodeTitle(Node) + ':' +
+// 	', Value= ' +  Vl +
+//   	', Type= ' + GetEnumName(TypeInfo(eNodeType), Ord(GetNodeType(Node))) +
+//    ', @=' + IntToStr(NativeInt(Node)) +
+//
+//    ', BasicType=' + GetEnumName(TypeInfo(TNodeType), Ord(Node.NodeType)) +
+//	', Childs= ' + IntToStr(Node.ChildNodes.Count) +
+//    ', isTextElem= ' + BoolToStr(Node.IsTextElement, True));
 end;
 
 end.
