@@ -38,6 +38,8 @@ procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
+procedure Log(Strs: TStrings); overload;
+
 procedure LoadSettings;
 procedure SaveSettings;
 procedure LoadThemes;
@@ -100,6 +102,16 @@ procedure Log(Flag: Boolean);
 begin
     if Flag then Log('True') else Log('False');
 end;
+procedure Log(Strs: TStrings);
+begin
+    LogList.AddStrings(Strs);
+    if Assigned(frmLog) then begin
+	    frmLog.lbLog.Items.AddStrings(Strs);
+    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
+    end;
+end;
+
 procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
@@ -163,7 +175,7 @@ var
 	fieldFormat: eFieldFormat;
 begin
 	//Log('--------------------GenerateField:Start');
-    LogNodeInfo(nField, 'GenerateField');
+    //LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
     Result:= TFieldFrame.CreateParented(Panel.Handle{, isEdit});
 	With Result do begin

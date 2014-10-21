@@ -20,10 +20,7 @@ type
     tbtnDelField: TToolButton;
     tbtnFieldUp: TToolButton;
     tbtnFieldDown: TToolButton;
-    tbtnFieldUndo: TToolButton;
-    tbtnFieldRedo: TToolButton;
-    ToolButton7: TToolButton;
-    ToolButton8: TToolButton;
+    tbtnSplit1: TToolButton;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -31,8 +28,18 @@ type
     constructor Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False); reintroduce;
     procedure StartEditField(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure tbtnFieldUndoClick(Sender: TObject);
+    procedure tbtnFieldRedoClick(Sender: TObject);
+    procedure tbtnFieldDownClick(Sender: TObject);
+    procedure tbtnFieldUpClick(Sender: TObject);
   private
+    FItem: IXMLNode;
+    UndoList: IXMLNodeList;
+    UndoDoc: IXMLDocument;
+    intUndo: Integer;
     procedure SaveValues;
+    procedure MakeUndoPoint;
+    function GetActiveField(): IXMLNode;
     { Private declarations }
   public
     { Public declarations }
@@ -44,6 +51,23 @@ var
 implementation
 uses Logic, uFieldFrame, XMLUtils, uEditField;
 {$R *.dfm}
+
+constructor TfrmEditItem.Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False);
+begin
+    inherited Create(AOwner);
+    //Передаем управление временной нодой на локальную ссылку
+    fItem:=nItem;
+    //Рисуем
+    GeneratePanel(fItem, fpEdit, True, IsNew);
+    if isNew then self.Caption:= 'Новая запись'
+    else Self.Caption:='Редактирование записи';
+    //Ундо-лист
+    UndoDoc:=TXMLDocument.Create(nil);
+    UndoDoc.Active:=True;
+    UndoList:=UndoDoc.AddChild('Undo').ChildNodes;
+    //Запоминаем первоначальное состояние входящей ноды
+    MakeUndoPoint;
+end;
 
 procedure TfrmEditItem.btnCloseClick(Sender: TObject);
 begin
@@ -63,11 +87,15 @@ begin
     Log('frmEditItem: SaveValues');
     for i := 0 to fpEdit.ControlCount - 1 do begin
 		With (fpEdit.Controls[i] as TFieldFrame) do begin
-            SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+        //Log(GetNodeValue(IXMLNode(Tag)));
+        //Log(StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+            if GetNodeValue(IXMLNode(Tag)) <> StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]) then begin
+                //MakeUndoPoint;
+                SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+            end;
         end;
     end;
-    for i := 0 to Application.ComponentCount - 1 do
-        Log(Application.Components[i].ToString);
+   //После сохранения делаем копию
 end;
 
 procedure TfrmEditItem.fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -76,12 +104,9 @@ begin
 fpEdit.VertScrollBar.Position:= fpEdit.VertScrollBar.Position - WheelDelta div 5;
 end;
 
-constructor TfrmEditItem.Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False);
+function TfrmEditItem.GetActiveField(): IXMLNode;
 begin
-    inherited Create(AOwner);
-    GeneratePanel(nItem, fpEdit, True, IsNew);
-    if isNew then self.Caption:= 'Новая запись'
-    else Self.Caption:='Редактирование записи';
+    //
 end;
 
 procedure TfrmEditItem.FormShow(Sender: TObject);
@@ -97,10 +122,62 @@ var
 begin
     Node:= IXMLNode(TSpeedButton(Sender).Parent.Tag);
     frmEditItem.SaveValues;
-    if EditField(Node) then
-        GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True)
-    else Log('EditField: False');
+    if EditField(Node) then begin
+        GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True);
+    end else Log('EditField: False');
 end;
 
 
+{$REGION '#Ундо-редо'}
+procedure TfrmEditItem.MakeUndoPoint;
+var i: integer;
+begin
+    Log('Make undo point...');
+    //Чистим всё, что в ундо-листе после текущей позиции
+    for i := intUndo + 1 to UndoList.Count - 1 do
+        UndoList.Delete(i);
+    //Сохраняем новый вид записи
+    UndoList.Add(fItem.CloneNode(True));
+    //Ставим указатель списка ундо на последний элемент
+    intUndo:=UndoList.Count - 1;
+    Log('Make undo Ok. Undo count = ', UndoList.Count);
+end;
+
+procedure TfrmEditItem.tbtnFieldRedoClick(Sender: TObject);
+begin
+Log('btnRedo!');
+Log ('intUndo: ', intUndo);
+Log ('UndoCount = ', UndoList.Count);
+if intUndo <> UndoList.Count - 1 then begin;
+    Inc(intUndo);
+    fItem:= UndoList[intUndo];
+end;
+GeneratePanel(fItem, fpEdit, True);
+end;
+
+procedure TfrmEditItem.tbtnFieldUndoClick(Sender: TObject);
+begin
+Log ('btnUndo!');
+Log ('intUndo: ', intUndo);
+Log ('UndoCount = ', UndoList.Count);
+//if intUndo = UndoList.Count - 1 then
+//    SaveValues;
+if intUndo <> 0 then begin
+    Dec(intUndo);
+    fItem:= UndoList[intUndo];
+end;
+GeneratePanel(fItem, fpEdit, True);
+end;
+
+procedure TfrmEditItem.tbtnFieldUpClick(Sender: TObject);
+begin
+    Log(UndoDoc.XML);
+end;
+
+procedure TfrmEditItem.tbtnFieldDownClick(Sender: TObject);
+begin
+SaveValues;
+end;
+
+{$ENDREGION '#Ундо-редо'}
 end.

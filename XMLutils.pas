@@ -211,8 +211,18 @@ uses Logic;
 {$ENDREGION}
 function GetNodeValue(Node: IXMLNode): String;
 begin
-    //
+    result:='';
+	case GetNodeType(Node) of
+    ntNone:
+    	Exit;
+    ntField: begin
+		result:=Node.NodeValue;
+    	end;
+	else
+    	result:= GetNodeTitle(Node);
+    end;
 end;
+
 
 function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
 begin

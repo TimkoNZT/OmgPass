@@ -24,6 +24,7 @@ type
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); reintroduce; overload;
     procedure FormShow(Sender: TObject);
   private
+    fNode: IXMLNode;
     { Private declarations }
   public
     { Public declarations }
@@ -31,7 +32,7 @@ type
 
 var
   frmEditField: TfrmEditField;
-  fNode: IXMLNode;
+
 
 implementation
 uses Logic, XMLUtils, uStrings;

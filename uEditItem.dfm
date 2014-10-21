@@ -52,9 +52,11 @@ object frmEditItem: TfrmEditItem
     VertScrollBar.Tracking = True
     Align = alTop
     BorderStyle = bsNone
+    DoubleBuffered = True
     Padding.Left = 15
     Padding.Top = 10
     Padding.Right = 15
+    ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
     ExplicitWidth = 369
@@ -84,11 +86,11 @@ object frmEditItem: TfrmEditItem
       Caption = 'tbtnDelField'
       ImageIndex = 1
     end
-    object ToolButton8: TToolButton
+    object tbtnSplit1: TToolButton
       Left = 126
       Top = 0
       Width = 8
-      Caption = 'ToolButton8'
+      Caption = 'tbtnSplit1'
       ImageIndex = 6
       Style = tbsSeparator
     end
@@ -97,6 +99,7 @@ object frmEditItem: TfrmEditItem
       Top = 0
       Caption = 'tbtnFieldUp'
       ImageIndex = 2
+      OnClick = tbtnFieldUpClick
     end
     object tbtnFieldDown: TToolButton
       AlignWithMargins = True
@@ -106,27 +109,7 @@ object frmEditItem: TfrmEditItem
       Margins.Right = 20
       Caption = 'tbtnFieldDown'
       ImageIndex = 3
-    end
-    object ToolButton7: TToolButton
-      Left = 244
-      Top = 0
-      Width = 8
-      Caption = 'ToolButton7'
-      ImageIndex = 6
-      Style = tbsSeparator
-    end
-    object tbtnFieldUndo: TToolButton
-      Left = 252
-      Top = 0
-      Caption = 'tbtnFieldUndo'
-      ImageIndex = 4
-      Marked = True
-    end
-    object tbtnFieldRedo: TToolButton
-      Left = 307
-      Top = 0
-      Caption = 'tbtnFieldRedo'
-      ImageIndex = 5
+      OnClick = tbtnFieldDownClick
     end
   end
   object imlToolBarEdit: TImageList
