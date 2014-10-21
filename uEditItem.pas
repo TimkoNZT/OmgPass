@@ -6,13 +6,24 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons,
   {XML}
-  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ComCtrls;
+  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ComCtrls,
+  Vcl.ImgList, Vcl.ToolWin;
 
 type
   TfrmEditItem = class(TForm)
     btnClose: TButton;
     btnOK: TButton;
     fpEdit: TScrollBox;
+    ToolBarEdit: TToolBar;
+    tbtnAddField: TToolButton;
+    imlToolBarEdit: TImageList;
+    tbtnDelField: TToolButton;
+    tbtnFieldUp: TToolButton;
+    tbtnFieldDown: TToolButton;
+    tbtnFieldUndo: TToolButton;
+    tbtnFieldRedo: TToolButton;
+    ToolButton7: TToolButton;
+    ToolButton8: TToolButton;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
