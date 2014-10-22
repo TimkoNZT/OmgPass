@@ -65,7 +65,7 @@ function CreateClearPage(): IXMLNode;
 procedure InsertItem(treeNode: TTreeNode);
 procedure SetNodeExpanded(treeNode: TTreeNode);
 function GetNodeExpanded(Node: IXMLNode): Boolean;
-function GeneratePassword(Len: Integer): String;
+function GeneratePassword(Len: Integer = 8): String;
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean = False);
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
@@ -73,11 +73,12 @@ procedure CloneNode(treeNode: TTreeNode);
 procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
+function CreateNewField(fFmt: eFieldFormat = ffNone): IXMLNode;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator;
 
-function GeneratePassword(Len: Integer): String;
+function GeneratePassword(Len: Integer = 8): String;
 begin
    if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(nil);
    frmGenerator.UpDown.Position:=Len;
@@ -111,7 +112,6 @@ begin
         frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
     end;
 end;
-
 procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
@@ -145,8 +145,14 @@ begin
 	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
+
+
     //Против лагов в изображении
+    //Очень капризная функция
+    SendMessage(Panel.Handle, WM_SETREDRAW, Ord(False), 0);
     Panel.Visible:=False;
+    //LockWindowUpdate(Panel.Handle);
+
     //Чистим панельку
     CleaningPanel(Panel);
     case GetNodeType(nItem) of
@@ -165,7 +171,10 @@ begin
                 end;
         end;
     end;
+    //
     Panel.Visible:=True;
+    SendMessage(Panel.Handle, WM_SETREDRAW, Ord(True), 0);
+    //LockWindowUpdate(0);
     Result:=True;
 end;
 function GenerateField(nField: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : TFieldFrame;
@@ -240,7 +249,7 @@ begin
             		OnResize(nil);
                     btnAdditional.OnClick:= clsSmartMethods.Create.GeneratePass;
                     SetButtonImg(btnAdditional, frmMain.imlField, 5);
-                    if isNew then textInfo.Text:=GeneratePassword(10);
+                    if isNew then textInfo.Text:=GeneratePassword;
                 end;
             end;
         SetButtonImg(btnSmart, frmMain.imlField, 4);
@@ -837,5 +846,17 @@ begin
     if EditItem(defItem) then
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
 end;
+function CreateNewField(fFmt: eFieldFormat = ffNone): IXMLNode;
+begin
+    Result:=xmlMain.CreateNode('Field');
+    if fFmt = ffNone then begin
+        SetAttribute(Result, 'name', arrDefFieldNames[Ord(fFmt)]);
+        SetAttribute(Result, 'format', 'text');
+    end else begin
+        SetAttribute(Result, 'name', arrDefFieldNames[Ord(fFmt)]);
+        SetAttribute(Result, 'format', arrFieldFormats[Ord(fFmt)]);
+    end;
 
+    ;
+end;
 end.

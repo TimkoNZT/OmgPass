@@ -4,7 +4,7 @@ object frmEditItem: TfrmEditItem
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1077' '#1079#1072#1087#1080#1089#1080
-  ClientHeight = 403
+  ClientHeight = 408
   ClientWidth = 374
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,23 +17,23 @@ object frmEditItem: TfrmEditItem
   OnShow = FormShow
   DesignSize = (
     374
-    403)
+    408)
   PixelsPerInch = 96
   TextHeight = 13
   object btnClose: TButton
     Left = 185
-    Top = 359
+    Top = 364
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
     Caption = #1054#1090#1084#1077#1085#1072
     TabOrder = 0
     OnClick = btnCloseClick
-    ExplicitLeft = 180
+    ExplicitTop = 359
   end
   object btnOK: TButton
     Left = 274
-    Top = 359
+    Top = 364
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -41,13 +41,17 @@ object frmEditItem: TfrmEditItem
     Default = True
     TabOrder = 1
     OnClick = btnOKClick
-    ExplicitLeft = 269
+    ExplicitTop = 359
   end
   object fpEdit: TScrollBox
+    AlignWithMargins = True
     Left = 0
-    Top = 54
+    Top = 64
     Width = 374
-    Height = 295
+    Height = 287
+    Margins.Left = 0
+    Margins.Top = 10
+    Margins.Right = 0
     VertScrollBar.Increment = 26
     VertScrollBar.Tracking = True
     Align = alTop
@@ -59,7 +63,6 @@ object frmEditItem: TfrmEditItem
     ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
-    ExplicitWidth = 369
   end
   object ToolBarEdit: TToolBar
     Left = 0
@@ -72,19 +75,21 @@ object frmEditItem: TfrmEditItem
     Images = imlToolBarEdit
     Indent = 1
     TabOrder = 3
-    ExplicitWidth = 368
     object tbtnAddField: TToolButton
       Left = 1
       Top = 0
       Caption = 'tbtnAddField'
+      DropdownMenu = popupFastField
       ImageIndex = 0
       Style = tbsDropDown
+      OnClick = tbtnAddFieldClick
     end
     object tbtnDelField: TToolButton
       Left = 71
       Top = 0
       Caption = 'tbtnDelField'
       ImageIndex = 1
+      OnClick = tbtnDelFieldClick
     end
     object tbtnSplit1: TToolButton
       Left = 126
@@ -119,7 +124,7 @@ object frmEditItem: TfrmEditItem
     Left = 40
     Top = 360
     Bitmap = {
-      494C010106001800380030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101060018003C0030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C00000006000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2501,5 +2506,29 @@ object frmEditItem: TfrmEditItem
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object popupFastField: TPopupMenu
+    Left = 128
+    Top = 360
+    object mnuFastField0: TMenuItem
+      Caption = 'Login field'
+      GroupIndex = 1
+      OnClick = mnuFastFieldClick
+    end
+    object mnuFastField1: TMenuItem
+      Caption = 'Password field'
+      GroupIndex = 2
+      OnClick = mnuFastFieldClick
+    end
+    object mnuFastField2: TMenuItem
+      Caption = 'Link field'
+      GroupIndex = 3
+      OnClick = mnuFastFieldClick
+    end
+    object mnuFastField3: TMenuItem
+      Caption = 'Comment field'
+      GroupIndex = 4
+      OnClick = mnuFastFieldClick
+    end
   end
 end

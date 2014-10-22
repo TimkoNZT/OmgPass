@@ -3,31 +3,12 @@ unit XMLutils;
 interface
 
 uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, ComCtrls, TypInfo, StrUtils;
-
+  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, ComCtrls, TypInfo, StrUtils,
+  uStrings;
 type eNodeType = (ntRoot, ntHeader, ntData,
 					ntPage, ntFolder, ntDefFolder,
                     ntItem, ntDefItem, ntField, ntNone);
-type eFieldFormat = (ffTitle, ffText, ffPass, ffWeb, ffComment, ffDate, ffMail, ffFile);
-
-const arrNodeTypes: array[0..9] of String = ('root',
-											'header',
-                                            'data',
-                                            'page',
-                                            'folder',
-                                            'deffolder',
-                                            'item',
-                                            'defitem',
-                                            'field',
-                                            '');
-const arrFieldFormats: array[0..7] of String = ('title',
-                                                'text',
-                                                'pass',
-                                                'web',
-                                                'comment',
-                                                'date',
-                                                'mail',
-                                                'file');
+type eFieldFormat = (ffTitle, ffText, ffPass, ffWeb, ffComment, ffDate, ffMail, ffFile, ffNone);
 
 function GetBaseTitle(x:IXMLDocument): String;
 function NodeByPath(x:IXMLDocument; const fNodePath: String): IXMLNode;
@@ -216,7 +197,7 @@ begin
     ntNone:
     	Exit;
     ntField: begin
-		result:=Node.NodeValue;
+		result:=VarToStr(Node.NodeValue);
     	end;
 	else
     	result:= GetNodeTitle(Node);

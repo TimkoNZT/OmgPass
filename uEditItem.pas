@@ -7,7 +7,9 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons,
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ComCtrls,
-  Vcl.ImgList, Vcl.ToolWin;
+  Vcl.ImgList, Vcl.ToolWin,
+
+  uStrings, Vcl.Menus;
 
 type
   TfrmEditItem = class(TForm)
@@ -21,6 +23,11 @@ type
     tbtnFieldUp: TToolButton;
     tbtnFieldDown: TToolButton;
     tbtnSplit1: TToolButton;
+    popupFastField: TPopupMenu;
+    mnuFastField0: TMenuItem;
+    mnuFastField1: TMenuItem;
+    mnuFastField3: TMenuItem;
+    mnuFastField2: TMenuItem;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -32,10 +39,14 @@ type
     procedure tbtnFieldRedoClick(Sender: TObject);
     procedure tbtnFieldDownClick(Sender: TObject);
     procedure tbtnFieldUpClick(Sender: TObject);
+    procedure tbtnAddFieldClick(Sender: TObject);
+    procedure tbtnDelFieldClick(Sender: TObject);
+    procedure mnuFastFieldClick(Sender: TObject);
   private
     FItem: IXMLNode;
     UndoList: IXMLNodeList;
     UndoDoc: IXMLDocument;
+    intFocused: Integer;
     intUndo: Integer;
     procedure SaveValues;
     procedure MakeUndoPoint;
@@ -90,8 +101,8 @@ begin
         //Log(GetNodeValue(IXMLNode(Tag)));
         //Log(StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
             if GetNodeValue(IXMLNode(Tag)) <> StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]) then begin
-                //MakeUndoPoint;
                 SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+                //MakeUndoPoint;
             end;
         end;
     end;
@@ -105,8 +116,16 @@ fpEdit.VertScrollBar.Position:= fpEdit.VertScrollBar.Position - WheelDelta div 5
 end;
 
 function TfrmEditItem.GetActiveField(): IXMLNode;
+var i: Integer;
 begin
-    //
+    for i := 0 to fpEdit.ControlCount - 1 do begin
+		With (fpEdit.Controls[i] as TFieldFrame) do begin
+            if textInfo.Focused then begin
+                result:=IXMLNode(Tag);
+                intFocused:=i;
+            end;
+        end;
+    end;
 end;
 
 procedure TfrmEditItem.FormShow(Sender: TObject);
@@ -125,6 +144,92 @@ begin
     if EditField(Node) then begin
         GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True);
     end else Log('EditField: False');
+end;
+
+procedure TfrmEditItem.tbtnAddFieldClick(Sender: TObject);
+var
+    newField: IXMLNode;
+begin
+newField:=CreateNewField;
+if not EditField(newField, True) then Exit;
+fItem.ChildNodes.Add(newField);
+if GetFieldFormat(newField) = ffPass then
+    SetNodeValue(newField, GeneratePassword());
+GeneratePanel(fItem, fpEdit, True);
+
+end;
+
+procedure TfrmEditItem.tbtnDelFieldClick(Sender: TObject);
+var
+    delField: IXMLNode;
+begin
+    delField:=GetActiveField;
+    if delField = nil then begin
+        Log ('Deleting field: Field not selected');
+        Exit;
+    end;
+    if GetFieldFormat(delField) = ffTitle then begin
+        MessageBox(Self.Handle,
+        PWideChar(rsCantDelTitleField),
+        PWideChar(rsDelFieldConfirmationCaption),
+        MB_ICONEXCLAMATION + MB_OK + MB_APPLMODAL);
+        Exit;
+    end;
+    if MessageBox(Self.Handle,
+        PWideChar(rsDelFieldConfirmationText + GetNodeTitle(delField) + '?'),
+        PWideChar(rsDelFieldConfirmationCaption),
+        MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL)
+        = ID_CANCEL then Exit;
+    Log('Deleting field: Confirmed');
+    fItem.ChildNodes.Remove(delField);
+    GeneratePanel(fItem, fpEdit, True);
+end;
+
+procedure TfrmEditItem.mnuFastFieldClick(Sender: TObject);
+var
+    newField: IXMLNode;
+begin
+newField:=CreateNewField(eFieldFormat(TMenuItem(Sender).GroupIndex));
+fItem.ChildNodes.Add(newField);
+GeneratePanel(fItem, fpEdit, True);
+end;
+
+procedure TfrmEditItem.tbtnFieldUpClick(Sender: TObject);
+var
+    nField: IXMLNode;
+begin
+    nField:=GetActiveField;
+    if nField = nil then begin
+        Log ('Field up: Field not selected');
+        Exit;
+    end;
+    if intFocused = fpEdit.ControlCount - 1 then begin
+        Beep;
+        Exit;
+    end;
+    nField.ParentNode.ChildNodes.Insert(nField.ParentNode.ChildNodes.IndexOf(nField.PreviousSibling), nField.CloneNode(True));
+    nField.ParentNode.ChildNodes.Remove(nField);
+    GeneratePanel(fItem, fpEdit, True);
+    (fpEdit.Controls[intFocused + 1] as TFieldFrame).textInfo.SetFocus;
+end;
+
+procedure TfrmEditItem.tbtnFieldDownClick(Sender: TObject);
+var
+    nField: IXMLNode;
+begin
+    nField:=GetActiveField;
+    if nField = nil then begin
+        Log ('Field up: Field not selected');
+        Exit;
+    end;
+    if intFocused = 0 then begin
+        Beep;
+        Exit;
+    end;
+    nField.ParentNode.ChildNodes.Insert(nField.ParentNode.ChildNodes.IndexOf(nField.NextSibling) + 1, nField.CloneNode(True));
+    nField.ParentNode.ChildNodes.Remove(nField);
+    GeneratePanel(fItem, fpEdit, True);
+    (fpEdit.Controls[intFocused - 1] as TFieldFrame).textInfo.SetFocus;
 end;
 
 
@@ -167,16 +272,6 @@ if intUndo <> 0 then begin
     fItem:= UndoList[intUndo];
 end;
 GeneratePanel(fItem, fpEdit, True);
-end;
-
-procedure TfrmEditItem.tbtnFieldUpClick(Sender: TObject);
-begin
-    Log(UndoDoc.XML);
-end;
-
-procedure TfrmEditItem.tbtnFieldDownClick(Sender: TObject);
-begin
-SaveValues;
 end;
 
 {$ENDREGION '#Ундо-редо'}
