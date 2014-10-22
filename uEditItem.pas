@@ -176,7 +176,7 @@ begin
         Exit;
     end;
     if MessageBox(Self.Handle,
-        PWideChar(rsDelFieldConfirmationText + GetNodeTitle(delField) + '?'),
+        PWideChar(Format(rsDelFieldConfirmationText,[GetNodeTitle(delField)])),
         PWideChar(rsDelFieldConfirmationCaption),
         MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL)
         = ID_CANCEL then Exit;

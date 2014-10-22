@@ -73,7 +73,7 @@ procedure CloneNode(treeNode: TTreeNode);
 procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
-function CreateNewField(fFmt: eFieldFormat = ffNone): IXMLNode;
+function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator;
@@ -196,7 +196,9 @@ begin
         //Заполняем текст, в комментариях поле выше и требует обработки текста
         if fieldFormat = ffComment then begin
             textInfo.AutoSize:=False;
-            textInfo.Height:=70;
+            textInfo.Height:=62;
+            textInfo.BevelEdges:=[beTop];
+//            textInfo.BevelKind:= bkNone;
             textInfo.Multiline:=True;
 			textInfo{.Lines}.Text:=
                 StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
@@ -251,6 +253,7 @@ begin
                     SetButtonImg(btnAdditional, frmMain.imlField, 5);
                     if isNew then textInfo.Text:=GeneratePassword;
                 end;
+                ffTitle: lblTitle.Font.Style:=[fsBold];
             end;
         SetButtonImg(btnSmart, frmMain.imlField, 4);
         //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
@@ -488,25 +491,30 @@ var
     tField: IXMLNode;      //tempfield..okay?
 begin
     newPageNode:=xmlMain.CreateNode('Page');
-    newPageNode.Text:='Лист_' + DateToStr(now) + '_' + TimeToStr(now);
+    newPageNode.Text:=rsNewPageTitle +'_'+ DateToStr(now);
     newPageNode.SetAttributeNS('type', '', 'page');
     dItem:= newPageNode.AddChild('DefItem');
-    dItem.SetAttributeNS('type', '' , 'defitem');
-    dItem.SetAttributeNS('picture', '' , 'item');
-    tField:= dItem.AddChild('Field');
-    tField.SetAttributeNS('name', '', 'Название');
-    tField.SetAttributeNS('format', '', 'title');
+//    dItem.SetAttributeNS('type', '' , 'defitem');
+//    dItem.SetAttributeNS('picture', '' , 'item');
+//    tField:= dItem.AddChild('Field');
+//    tField.SetAttributeNS('name', '', 'Название');
+//    tField.SetAttributeNS('format', '', 'title');
     //tField.Text:='Новая запись';
-    tField:= dItem.AddChild('Field');
-    tField.SetAttributeNS('name', '', 'Логин');
-    tField.SetAttributeNS('format', '', 'text');
-    tField:= dItem.AddChild('Field');
-    tField.SetAttributeNS('name', '', 'Пароль');
-    tField.SetAttributeNS('format', '', 'pass');
-    tField:= dItem.AddChild('Field');
-    tField.SetAttributeNS('name', '', 'Комментарий');
-    tField.SetAttributeNS('format', '', 'comment');
-    SetNodeTitle(dItem, 'Новая запись');
+//    tField:= dItem.AddChild('Field');
+//    tField.SetAttributeNS('name', '', 'Логин');
+//    tField.SetAttributeNS('format', '', 'text');
+//    tField:= dItem.AddChild('Field');
+//    tField.SetAttributeNS('name', '', 'Пароль');
+//    tField.SetAttributeNS('format', '', 'pass');
+//    tField:= dItem.AddChild('Field');
+//    tField.SetAttributeNS('name', '', 'Комментарий');
+//    tField.SetAttributeNS('format', '', 'comment');
+//    SetNodeTitle(dItem, 'Новая запись');
+    dItem.ChildNodes.Add(CreateNewField(ffTitle, rsNewItemTitle));
+    dItem.ChildNodes.Add(CreateNewField(ffText));
+    dItem.ChildNodes.Add(CreateNewField(ffPass));
+    dItem.ChildNodes.Add(CreateNewField(ffWeb));
+    dItem.ChildNodes.Add(CreateNewField(ffComment));
     result:=newPageNode;
     //i like spagetti
 end;
@@ -519,11 +527,11 @@ begin
         treeNode:=treeNode.Parent;
     end;
     newFolderNode:= IXMLNode(treeNode.Data).AddChild('Folder');
-    newFolderNode.Text:='Новая папка';
+    newFolderNode.Text:= rsNewFolderTitle;
     newFolderNode.SetAttributeNS('type', '', 'folder');
     newFolderNode.SetAttributeNS('picture', '', 'folder');
     if (not treeNode.Expanded) then treeNode.Expand(False);
-	With TTreeView(treeNode.TreeView).Items.AddChild(treeNode, 'Новая папка') do begin
+	With TTreeView(treeNode.TreeView).Items.AddChild(treeNode, rsNewFolderTitle) do begin
 		Data:=Pointer(newFolderNode);
         ImageIndex:=0;
         SelectedIndex:=0;
@@ -777,7 +785,9 @@ var
   Frame: TFieldFrame;
 begin
     Log('ShowPasswords:', Flag);
+    Beep;
     for i := 0 to frmMain.fpMain.ControlCount - 1 do begin
+        if not (frmMain.fpMain.Controls[i] is TFieldFrame) then Continue;
         Frame:= TFieldFrame(frmMain.fpMain.Controls[i]);
         if GetFieldFormat(IXMLNode(Frame.Tag)) = ffPass then begin
             LogNodeInfo(IXMLNode(Frame.Tag), 'Found password field');
@@ -846,17 +856,16 @@ begin
     if EditItem(defItem) then
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
 end;
-function CreateNewField(fFmt: eFieldFormat = ffNone): IXMLNode;
+function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 begin
     Result:=xmlMain.CreateNode('Field');
     if fFmt = ffNone then begin
         SetAttribute(Result, 'name', arrDefFieldNames[Ord(fFmt)]);
-        SetAttribute(Result, 'format', 'text');
+        SetAttribute(Result, 'format', arrFieldFormats[Ord(ffText)]);
     end else begin
         SetAttribute(Result, 'name', arrDefFieldNames[Ord(fFmt)]);
         SetAttribute(Result, 'format', arrFieldFormats[Ord(fFmt)]);
     end;
-
-    ;
+    if Value <> '' then SetNodeValue(Result, Value);
 end;
 end.

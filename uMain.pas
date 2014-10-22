@@ -78,6 +78,7 @@ TfrmMain = class(TForm)
     txtSearch: TButtonedEdit;
     imlSearch: TImageList;
     tmrSearch: TTimer;
+    mnuInsertPage: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -139,6 +140,7 @@ TfrmMain = class(TForm)
     procedure mnuShowPassClick(Sender: TObject);
     procedure mnuClearClipClick(Sender: TObject);
     procedure mnuTopClick(Sender: TObject);
+    procedure mnuInsertPageClick(Sender: TObject);
 
 private
     procedure InitGlobal();
@@ -302,6 +304,11 @@ procedure TfrmMain.mnuInsertItemClick(Sender: TObject);
 begin
 	InsertItem(tvMain.Selected);
 end;
+procedure TfrmMain.mnuInsertPageClick(Sender: TObject);
+begin
+    AddPage();
+end;
+
 procedure TfrmMain.tbtnInsertItemClick(Sender: TObject);
 begin
 	InsertItem(tvMain.Selected);
@@ -684,6 +691,7 @@ procedure TfrmMain.InitGlobal();
 //var i: Integer;
 begin
     LoadThemes;
+    //InitBase;
 	LogList:= TStringList.Create;
 	Log('Инициализация...');
 	xmlMain:=TXMLDocument.Create(frmMain);

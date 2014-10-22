@@ -29,7 +29,6 @@ object frmEditItem: TfrmEditItem
     Caption = #1054#1090#1084#1077#1085#1072
     TabOrder = 0
     OnClick = btnCloseClick
-    ExplicitTop = 359
   end
   object btnOK: TButton
     Left = 274
@@ -41,7 +40,6 @@ object frmEditItem: TfrmEditItem
     Default = True
     TabOrder = 1
     OnClick = btnOKClick
-    ExplicitTop = 359
   end
   object fpEdit: TScrollBox
     AlignWithMargins = True
@@ -124,7 +122,7 @@ object frmEditItem: TfrmEditItem
     Left = 40
     Top = 360
     Bitmap = {
-      494C0101060018003C0030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106001800400030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C00000006000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

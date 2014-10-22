@@ -13,16 +13,20 @@ resourcestring
     rsDateDefName = 'Date';
     rsMailDefName = 'Mail';
     rsFileDefName = 'File';
+    //Название новой записи, папки, страницы
+    rsNewItemTitle = 'New item';
+    rsNewFolderTitle = 'New folder';
+    rsNewPageTitle = 'New Page';
     //Серый текст в поле поиска
     rsSearchText = 'Search';
-    //Инфо блок
+    //Инфо блок для папок
     rsInfoTitle =           'Title: ';
     rsInfoSubfolders =      'Subfolders:       ';
     rsInfoTotalFolders =    'Total folders:    ';
     rsInfoSubItems =        'Subitems:         ';
     rsInfoTotalItems =      'Total items:      ';
     //MessageBoxes
-    rsDelFieldConfirmationText = 'Confirm to delete field ';
+    rsDelFieldConfirmationText = 'Confirm to delete field "%s"?' + #10#13 + 'Value will be deleted too';
     rsDelFieldConfirmationCaption = 'Deleting field';
     rsCantDelTitleField = 'Can''t delete title of item';
     rsFieldNotSelected = 'Field not selected';
@@ -57,7 +61,7 @@ resourcestring
                                                     'Date',
                                                     'Mail',
                                                     'File',
-                                                    'Some Text or Login');
+                                                    'Text or Login');
 
 implementation
 end.
