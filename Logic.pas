@@ -39,7 +39,9 @@ procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
-
+function LoadBase: Boolean;
+function CheckVersion: Boolean;
+function CheckUpdates: Boolean;
 procedure LoadSettings;
 procedure SaveSettings;
 procedure LoadThemes;
@@ -730,8 +732,8 @@ begin
     if xmlCfg.GetValue('Selected', 0, 'Position') < frmMain.tvMain.Items.Count  then
         frmMain.tvMain.Items[xmlCfg.GetValue('Selected', 0, 'Position')].Selected:=True;
 
-    if xmlCfg.GetValue('TreeWidth', 0) <> 0 then
-        frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 100, 'Position');
+    //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
+        frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
 end;
 procedure SaveSettings;
 begin
@@ -749,7 +751,7 @@ begin
     end;
     xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
     xmlCfg.SetValue('Page', intCurrentPage, 'Position');
-    xmlCfg.SetValue('TreeWidth', frmMain.tvMain.Width, 'Position');
+    xmlCfg.SetValue('TreeWidth', frmMain.pnlTree.Width, 'Position');
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
@@ -867,5 +869,20 @@ begin
         SetAttribute(Result, 'format', arrFieldFormats[Ord(fFmt)]);
     end;
     if Value <> '' then SetNodeValue(Result, Value);
+end;
+function LoadBase: Boolean;
+begin
+    xmlMain:=TXMLDocument.Create(frmMain);
+	xmlMain.LoadFromFile('../../omgpass.xml');
+	xmlMain.Active:=True;
+    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+end;
+function CheckUpdates: Boolean;
+begin
+    result:=true;
+end;
+function CheckVersion: Boolean;
+begin
+    result:=true;
 end;
 end.

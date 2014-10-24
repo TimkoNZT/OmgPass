@@ -10,7 +10,7 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  XMLutils, VersionUtils, Logic, uCustomEdit;
+  Logic, uCustomEdit;
 type
 TfrmMain = class(TForm)
     menuMain: TMainMenu;
@@ -73,7 +73,7 @@ TfrmMain = class(TForm)
     mnuCloneItem: TMenuItem;
     btnTheme: TSpeedButton;
     Splitter: TSplitter;
-    Panel1: TPanel;
+    pnlTree: TPanel;
     tvMain: TTreeView;
     txtSearch: TButtonedEdit;
     imlSearch: TImageList;
@@ -690,27 +690,20 @@ end;
 procedure TfrmMain.InitGlobal();
 //var i: Integer;
 begin
-    LoadThemes;
-    //InitBase;
 	LogList:= TStringList.Create;
 	Log('Инициализация...');
-	xmlMain:=TXMLDocument.Create(frmMain);
-	xmlMain.LoadFromFile('../../omgpass.xml');
-	xmlMain.Active:=True;
-    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    LoadThemes;
+    LoadBase;
+    CheckVersion;
+    CheckUpdates;
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    LoadSettings;
 
     SetButtonImg(btnAddPage, imlField, 10);
     SetButtonImg(btnDeletePage, imlField, 12);
     SetButtonImg(btnTheme, imlTab, 41);
-    txtSearch.AutoSize:=False;
-    //txtSearch.Height:= txtSearch.Height + 3;
-    Log('Проверка версии');
-    if not CheckVersion(xmlMain) then Exit;
-	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
-    ParsePagesToTabs(xmlMain, tabMain);
 
-    LoadSettings;
-
+//	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
 end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
