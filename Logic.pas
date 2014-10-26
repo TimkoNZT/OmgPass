@@ -33,6 +33,7 @@ var
     intTickToExpand: Integer;       //  \
     oldNode: TTreeNode;             //  }Разворачивание узлов при перетаскивании
     nodeToExpand: TTreeNode;        // /
+    lsStoredDocs: TStringList;      //Список ранее открывавшихся файлов
 
 procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
@@ -78,6 +79,15 @@ procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
+function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+procedure CreateNewBase(x:IXMLDocument; fPath: String);
+function IsDocValidate: Boolean;
+function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
+function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
+function LoadStoredDocs(): TStringList;
+procedure ReloadStoredDocs(newFile: String = '');
+function SaveStoredDocs: Boolean;
+
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
@@ -291,7 +301,9 @@ begin
     intExpandFlag:=1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
-	PageList:= NodeByPath(x, 'Root/Data').ChildNodes;
+	PageList:= NodeByPath(x, 'Root|Data').ChildNodes;
+    tabControl.Visible:= (PageList.Count<>0);
+
     for i := 0 to PageList.Count - 1 do begin
 		LogNodeInfo(PageList[i]);
 		tabList.Add(GetNodeTitle(PageList[i]));
@@ -309,6 +321,10 @@ procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start---------------------------');
+    if PageList.Count = 0 then begin
+        Log('Warning! There is no pages in document');
+        Exit;
+    end;
     intExpandFlag:=1;
 	Tree.Items.Clear;
     RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
@@ -318,9 +334,7 @@ begin
     Tree.Items.BeginUpdate;
 	IterateNodesToTree(PageList[pageIndex], RootNode, Tree, SearchStr);
     Tree.Items.EndUpdate;
-    //RootNode.DropTarget:=True;
     RootNode.Expand(False);
-    //RootNode.Selected:=True;
     intCurrentPage:= pageIndex;
     intExpandFlag:=0;
     Log('--------------------ParsePageToTree:End-----------------------------');
@@ -473,7 +487,7 @@ begin
     end;
     if not withoutConfirm then
     if MessageBox(Application.Handle, PWideChar(Msg), 'Удаление записи',
-    	 MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL)	= ID_CANCEL then Exit;
+    	 MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL then Exit;
     Log('Deleting confirmed...');
     Node.ParentNode.ChildNodes.Remove(Node);           //returns thmthng
     if GetNodeType(Node) = ntPage then begin
@@ -727,19 +741,22 @@ begin
     //frmMain.tabMainChange(nil);
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
 
-    if xmlCfg.GetValue('Selected', 0, 'Position') < frmMain.tvMain.Items.Count  then
-        frmMain.tvMain.Items[xmlCfg.GetValue('Selected', 0, 'Position')].Selected:=True;
+    if GetDocProperty('Selected', 0) < frmMain.tvMain.Items.Count  then
+        frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;
 
     //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
         frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
 end;
 procedure SaveSettings;
+//Сохраняем всё в файл перед выходом из программы
 begin
+    //Номер выбранного элемента сохраняется в документ
     if xmlCfg = nil then Exit;
     if bSearchMode then
-        xmlCfg.SetValue('Selected', iSelected, 'Position')
+        SetDocProperty('Selected', iSelected)
     else if frmMain.tvMain.Selected<>nil then
-        xmlCfg.SetValue('Selected', frmMain.tvMain.Selected.AbsoluteIndex, 'Position');
+        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex);
+    //Прочие настройки сохраняются в файл настроек
     if frmMain.WindowState = wsNormal then begin
          xmlCfg.SetValue('Left', frmMain.Left, 'Position');
          xmlCfg.SetValue('Top', frmMain.Top, 'Position');
@@ -753,9 +770,7 @@ begin
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
-//    xmlCfg.SetValue('File_1', '..\..\omgpass.xml', 'Files');
-//    xmlCfg.SetValue('Count', 1, 'Files');
-
+    SaveStoredDocs;
     xmlCfg.Save;
 end;
 procedure LoadThemes;
@@ -882,12 +897,14 @@ function CheckVersion: Boolean;
 begin
     result:=true;
 end;
+
 function InitGlobal: Boolean;
 //var i: Integer;
 begin
 	LogList:= TStringList.Create;
     xmlCfg:=TSettings.Create('..\..\config.xml');
     xmlMain:=TXMLDocument.Create(frmMain);
+    lsStoredDocs:= LoadStoredDocs;
 
 	Log('Инициализация...');
     //LoadThemes;
@@ -895,6 +912,9 @@ begin
         Result:=False;
         Exit
     end;
+    if not IsDocValidate then Exit;
+    ReloadStoredDocs(xmlMain.FileName);
+
     CheckVersion;
     CheckUpdates;
     ParsePagesToTabs(xmlMain, frmMain.tabMain);
@@ -907,26 +927,118 @@ begin
 
 //	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
 end;
+
 function LoadBase: Boolean;
 begin
 //FreeAndNil(xmlMain);
+    xmlMain.Active:=True;
+    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    xmlMain.ParseOptions:=[poValidateOnParse];
 if 0=1 {опция на автооткрытие файла без пароля} then //
     else begin
         if (not Assigned(frmAccounts)) then
             frmAccounts:=  TfrmAccounts.Create(frmMain);
-        if frmAccounts.ShowModal = mrOK then begin
-            xmlMain.LoadFromFile(frmAccounts.FFileName);
-            Log ('frmAccounts: mrOK');
-            Result:=True;
-        end else begin
-            Log ('frmAccounts: mrCancel');
-            frmMain.WindowState:=wsMinimized;
-            Result:=False;
-            Exit;
+        try
+            if frmAccounts.ShowModal = mrOK then begin
+                Log ('frmAccounts: mrOK');
+                if FileExists(frmAccounts.FFileName) then
+                    xmlMain.LoadFromFile(frmAccounts.FFileName)
+                else CreateNewBase(xmlMain, frmAccounts.FFileName);
+                result:=True;
+            end else begin
+                Log ('frmAccounts: mrCancel');
+                frmMain.WindowState:=wsMinimized;
+                Result:=False;
+                Exit;
+            end;
+        except
+            on e: Exception do ErrorMsg(e, 'Load Document');
         end;
         FreeAndNil(frmAccounts);
-        xmlMain.Active:=True;
-        xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
     end;
 end;
+function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+begin
+    Log('Error : ' + e.ClassName);
+    if Method<>'' then Log('    Procedure: ' + Method);
+    Log('    Error Message: ' + e.Message);
+    Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
+    LogList.SaveToFile('log.txt');
+    if isFatal then Application.Terminate;
+end;
+procedure CreateNewBase(x:IXMLDocument; fPath: String);
+var
+    rootNode: IxmlNode;
+begin
+    Log('Create new base!');
+    x.FileName:=fPath;
+    x.Encoding := 'UTF-8';
+    x.Version := '1.0';
+    With x.AddChild('Root') do begin
+        AddChild('Header');
+        AddChild('Data');
+    end;
+    x.SaveToFile(fPath);
+end;
+function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
+begin
+if (xmlMain.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode) = nil)
+or (xmlMain.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(PropertyName) = nil)
+        then Result:=DefValue
+    else Result:=xmlMain.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildValues[PropertyName];;
+end;
+function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
+var hNode: IXMLNode;
+begin
+    hNode:= xmlMain.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode);
+    if hNode = nil then
+        hNode:=xmlMain.ChildNodes[strRootNode].AddChild(strHeaderNode);
+    if hNode.ChildNodes.FindNode(PropertyName) = nil then
+        hNode.AddChild(PropertyName);
+    hNode.ChildValues[PropertyName]:=Value;
+end;
+function IsDocValidate: Boolean;
+//Проверка на валидность базы, заодно проверка XML
+begin
+    try
+    if xmlMain.ChildNodes[strRootNode] <> nil then
+        if xmlMain.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
+            result:=True;
+    except
+        on e: Exception do ErrorMsg(e, 'Validate Document', True);
+    end;
+end;
+
+function LoadStoredDocs(): TStringList;
+//Загружаем список известных файлов из конфига в список
+var i: Integer;
+begin
+    Result:=TStringList.Create;
+    for i := 0 to Integer(xmlCfg.GetValue('Count', 0, 'Files')) - 1 do begin
+        Result.Add(xmlCfg.GetValue('File_' + IntToStr(i), '', 'Files'));
+    end;
+end;
+procedure ReloadStoredDocs(newFile: String);
+//Добавляем файл в начало списка известных
+//Поднимаем его из середины списка если он там уже был
+var i: Integer;
+begin
+    //Изящно ёпт!
+//    if lsStoredDocs.Find(newFile, i) then lsStoredDocs.Delete(i);
+    for i := lsStoredDocs.Count - 1 downto 0 do begin
+        if lsStoredDocs.Strings[i] = newFile then
+            lsStoredDocs.Delete(i);
+    end;
+    lsStoredDocs.Insert(0, newFile);
+end;
+function SaveStoredDocs: Boolean;
+//Сохраняем список файлов в конфиг
+var i: Integer;
+begin
+    xmlCfg.SetValue('Count', lsStoredDocs.Count, 'Files');
+    for i := 0 to lsStoredDocs.Count - 1 do begin
+        xmlCfg.SetValue('File_' + IntToStr(i), lsStoredDocs.Strings[i], 'Files');
+    end;
+end;
+
 end.

@@ -79,6 +79,7 @@ TfrmMain = class(TForm)
     imlSearch: TImageList;
     tmrSearch: TTimer;
     mnuInsertPage: TMenuItem;
+    Label1: TLabel;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -646,6 +647,7 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
     SaveSettings;
+    //DeleteFile(xmlMain.FileName);   //
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -691,7 +693,7 @@ end;
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 //var i: Integer;
 begin
-frmMain.tvMain.Width:= xmlCfg.GetValue('TreeWidth', 200);
+//
 end;
 
 end.

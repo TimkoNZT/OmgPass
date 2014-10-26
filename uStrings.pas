@@ -1,5 +1,16 @@
 unit uStrings;
 interface
+const
+    //xmlMain
+    strDefaultExt = 'xml';
+    strRootNode = 'Root';
+    strHeaderNode = 'Header';
+    strDataNode = 'Data';
+    strFolderNode = 'Folder';
+    strItemNode = 'Item';
+    //
+
+
 resourcestring
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
     rsTitleDefName = 'Title';
@@ -76,7 +87,10 @@ resourcestring
     rsOpen = 'Open';
 
     //frmAccounts
-
+    rsSaveDialogFilter = 'Omg!Pass bases|*.xml|XMLFiles|*.xml';
+    rsFileNotFoundMsg = 'File not found on the stored path!' +
+                         #10#13 + 'Would you like to create a new document' +
+                         #10#13 + '%s ?';
     //frmMain
 
     //
