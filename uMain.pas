@@ -84,7 +84,6 @@ TfrmMain = class(TForm)
     procedure mnuGeneratorClick(Sender: TObject);
     procedure mnuOptionsClick(Sender: TObject);
     procedure tbtnOptionsClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure fpMainMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure mnuBasePropertiesClick(Sender: TObject);
@@ -141,9 +140,9 @@ TfrmMain = class(TForm)
     procedure mnuClearClipClick(Sender: TObject);
     procedure mnuTopClick(Sender: TObject);
     procedure mnuInsertPageClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
 
 private
-    procedure InitGlobal();
 	{ Private declarations }
 public
 	{ Public declarations }
@@ -200,7 +199,7 @@ mnuAccounts.Click;
 end;
 procedure TfrmMain.mnuAccountsClick(Sender: TObject);
 begin
-if (not Assigned(frmAccounts)) then frmAccounts:=  TfrmAccounts.Create(Self);
+if (not Assigned(frmAccounts)) then frmAccounts:=  TfrmAccounts.Create(Self, True);
 frmAccounts.ShowModal;
 FreeAndNil(frmAccounts);
 end;
@@ -587,11 +586,12 @@ procedure TfrmMain.txtSearchEnter(Sender: TObject);
 begin
     bSearchMode:=True;
     with txtSearch do begin
-        if (Font.Color = clGrayText) then
+        if (Font.Color = clGrayText) then begin
             iSelected:=tvMain.Selected.AbsoluteIndex;
-        Text:= String.Empty;
-        Font.Color:=clWindowText;
-        Font.Style:= [];
+            Text:= String.Empty;
+            Font.Color:=clWindowText;
+            Font.Style:= [];
+        end;
     end;
 end;
 
@@ -650,7 +650,9 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-    InitGlobal;
+    if not InitGlobal then
+        //Self.Close;
+        Application.Terminate;
 end;
 
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);
@@ -685,26 +687,6 @@ begin
     ClearClipboard;
 end;
 {$ENDREGION}
-
-//Инициализация всего
-procedure TfrmMain.InitGlobal();
-//var i: Integer;
-begin
-	LogList:= TStringList.Create;
-	Log('Инициализация...');
-    LoadThemes;
-    LoadBase;
-    CheckVersion;
-    CheckUpdates;
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
-    LoadSettings;
-
-    SetButtonImg(btnAddPage, imlField, 10);
-    SetButtonImg(btnDeletePage, imlField, 12);
-    SetButtonImg(btnTheme, imlTab, 41);
-
-//	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
-end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 //var i: Integer;

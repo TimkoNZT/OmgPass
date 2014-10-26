@@ -70,8 +70,8 @@ begin
     fItem:=nItem;
     //Рисуем
     GeneratePanel(fItem, fpEdit, True, IsNew);
-    if isNew then self.Caption:= 'Новая запись'
-    else Self.Caption:='Редактирование записи';
+    if isNew then self.Caption:= rsFrmEditItemCaptionNew
+    else Self.Caption:=rsFrmEditItemCaption;
     //Ундо-лист
     UndoDoc:=TXMLDocument.Create(nil);
     UndoDoc.Active:=True;

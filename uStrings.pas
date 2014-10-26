@@ -1,9 +1,6 @@
 unit uStrings;
 interface
 resourcestring
-    //frmEditField
-    rsFrmEditFieldCaption = 'Edit field properties';
-    rsFrmEditFieldCaptionNew = 'New field...';
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
     rsTitleDefName = 'Title';
     rsTextDefName = 'Login';
@@ -28,7 +25,7 @@ resourcestring
     //MessageBoxes
     rsDelFieldConfirmationText = 'Confirm to delete field "%s"?' + #10#13 + 'Value will be deleted too';
     rsDelFieldConfirmationCaption = 'Deleting field';
-    rsCantDelTitleField = 'Can''t delete title of item';
+    rsCantDelTitleField = 'Can''t delete title of record';
     rsFieldNotSelected = 'Field not selected';
     //
     //
@@ -62,6 +59,26 @@ resourcestring
                                                     'Mail',
                                                     'File',
                                                     'Text or Login');
+    //Заголовки окошек
+    rsFrmAccountsCaption = 'Account manager';
+    rsFrmAccountsCaptionOpen = 'Open base';
+    rsFrmAccountsCaptionChange = 'Change base';
+    rsFrmEditItemCaption = 'Edit record';
+    rsFrmEditItemCaptionNew = 'New record';
+    rsFrmEditFieldCaption = 'Edit field properties';
+    rsFrmEditFieldCaptionNew = 'New field...';
 
+    //Модальные кнопочки
+    rsClose = 'Close';
+    rsCancel = 'Cancel';
+    rsOK = 'OK';
+    rsExit = 'Exit';
+    rsOpen = 'Open';
+
+    //frmAccounts
+
+    //frmMain
+
+    //
 implementation
 end.

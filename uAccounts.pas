@@ -11,25 +11,8 @@ uses
 
 type
   TfrmAccounts = class(TForm)
-    btnNext: TSpeedButton;
-    pcWizard: TPageControl;
-    TabSheet1: TTabSheet;
-    tabOpen: TTabSheet;
-    TabSheet3: TTabSheet;
-    btnCancel: TSpeedButton;
-    txtOpenBase: TRichEdit;
-    txtOpenPass: TRichEdit;
-    btnOpenBase: TSpeedButton;
-    Label3: TLabel;
-    SpeedButton4: TSpeedButton;
-    RadioButton4: TRadioButton;
-    radOpenDefault: TRadioButton;
-    lblDefaultExt: TLabel;
-    lblRecentFiles: TLabel;
-    lblRecentFile1: TLabel;
-    lblRecentFile2: TLabel;
-    lblRecentFile3: TLabel;
-    Label10: TLabel;
+    pcAccounts: TPageControl;
+    tsNew: TTabSheet;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     txtPassConfirm: TEdit;
@@ -40,131 +23,115 @@ type
     Label2: TLabel;
     chkShowPass: TCheckBox;
     CheckBox1: TCheckBox;
-    RichEdit6: TRichEdit;
-    TabSheet5: TTabSheet;
-    imlTab: TImageList;
-    ListView1: TListView;
+    tsOpen: TTabSheet;
+    imlAccounts: TImageList;
+    lvFiles: TListView;
     Label1: TLabel;
-    CheckBox2: TCheckBox;
+    chkShowMainPass: TCheckBox;
     Label6: TLabel;
-    SpeedButton1: TSpeedButton;
     btnGeneratePass: TSpeedButton;
     btnNewBase: TSpeedButton;
     Image1: TImage;
-    Edit1: TEdit;
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    txtPass: TEdit;
+    btnClose: TButton;
+    btnOK: TButton;
+    Memo1: TMemo;
+    lblNoFiles: TStaticText;
+    Image2: TImage;
+    constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure btnNextClick(Sender: TObject);
-    procedure radOpenBaseClick(Sender: TObject);
-    procedure radNewBaseClick(Sender: TObject);
-    procedure btnCancelClick(Sender: TObject);
-    procedure tabOpenShow(Sender: TObject);
-    procedure lblDefaultExtClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure chkShowPassClick(Sender: TObject);
-    procedure btnOpenBaseClick(Sender: TObject);
     procedure btnNewBaseClick(Sender: TObject);
     procedure btnGeneratePassClick(Sender: TObject);
-    procedure TabSheet5ContextPopup(Sender: TObject; MousePos: TPoint;
-      var Handled: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
+    procedure chkShowMainPassClick(Sender: TObject);
+    procedure lvFilesClick(Sender: TObject);
 private
+    fIsChange: Boolean;
+    procedure CleanFiles;
 //    FShowHoriz: Boolean;
 //    FShowVert: Boolean;
 //    FListViewWndProc: TWndMethod;
 //    procedure ListViewWndProc(var Msg: TMessage);
 
-    { Private declarations }
 public
-    { Public declarations }
-  end;
-
+    FFileName: String;
+    FPassword: String;
+end;
 var
-  intNextPage: Integer = 1;          //Номер страницы для кнопки Далее
-  frmAccounts: TfrmAccounts;
-  const infoText: array[0..4] of string =  ('Что вы хотите сделать?',
-                                            'Открытие файла базы паролей',
-                                            'Создание новой базы паролей',
-                                            'Работа в облаке',
-                                            'Резервные копии');
-  currentDatabase: String = 'Default.opwd';
+    frmAccounts: TfrmAccounts;
 
 implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator, Logic;
+uses uMain, uGenerator, Logic, uSettings, uStrings;
 
-//procedure TfrmAccounts.ListViewWndProc(var Msg: TMessage);
-//begin
-//   ShowScrollBar(ListView1.Handle, SB_HORZ, False);
-//   ShowScrollBar(ListView1.Handle, SB_VERT, True);
-//   FListViewWndProc(Msg); // process message
-//end;
-
-procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
+constructor TfrmAccounts.Create(AOwner: TComponent; isChange: Boolean = False);
 begin
-//Application.Terminate;
+inherited Create (AOwner);
+fIsChange :=IsChange;
+if isChange then begin
+    Self.Caption:= Application.Title + ' - '+ rsFrmAccountsCaption;
+    btnClose.Caption:=rsCancel;
+    btnOK.Caption:=rsOK;
+end else begin
+    Self.Caption:=Application.Title + ' - '+ rsFrmAccountsCaption;
+    btnClose.Caption:=rsExit;
+    btnOK.Caption:=rsOpen;
 end;
-
-procedure TfrmAccounts.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-//CanClose:=False;
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
+var i: Integer;
 begin
-//    FListViewWndProc := ListView1.WindowProc; // save old window proc
-//    ListView1.WindowProc := ListViewWndProc; // subclass
-if listview1.Items.Count>4 then
-    listview1.Column[0].Width:=(listview1.ClientRect.Width - 30);
-//SetWindowLongPtr(listview1.Handle, GWL_STYLE,
-//      GetWindowLongPtr(listview1.Handle, GWL_STYLE) or WS_VSCROLL);
-SetButtonImg(btnNewBase,imlTab, 38);
-SetButtonImg(btnGeneratePass, imlTab, 1);
+CleanFiles;
+for i := 1 to Integer(xmlCfg.GetValue('Count', '0', 'Files')) do begin
+       lvFiles.AddItem(xmlCfg.GetValue('File_' + IntToStr(i), '', 'Files'), nil);
+end;
+if lvFiles.Items.Count = 0 then begin
+    lblNoFiles.Visible:=True;
+    lblNoFiles.Alignment:=taCenter;
+end else lvFiles.Items[0].Selected:=True;
 
+if lvFiles.Items.Count > 5 then
+    lvFiles.Column[0].Width:=(lvFiles.ClientRect.Width - 20);
+
+Logic.SetButtonImg(btnNewBase, imlAccounts, 34);
+Logic.SetButtonImg(btnGeneratePass, imlAccounts, 1);
+
+end;
+
+procedure TfrmAccounts.CleanFiles;
+begin
+    lvFiles.Items.Clear;
+    lblNoFiles.Visible:=False;
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
+txtPass.SetFocus;
 end;
 
-procedure TfrmAccounts.lblDefaultExtClick(Sender: TObject);
+procedure TfrmAccounts.lvFilesClick(Sender: TObject);
 begin
-radOpenDefault.Checked:=True;
-end;
-
-//Радиокнопки через переменную указывают на выбираемую страницу
-procedure TfrmAccounts.radOpenBaseClick(Sender: TObject);
-begin
-    intNextPage:=1;
-end;
-
-procedure TfrmAccounts.radNewBaseClick(Sender: TObject);
-begin
-    intNextPage:=2;
-end;
-
-//Обработка страницы открытия базы tsOpen
-procedure TfrmAccounts.tabOpenShow(Sender: TObject);
-begin
-if not True then begin     // Посмотреть в настройках недавние файлы
-  lblRecentFiles.Visible:=True;
-  lblRecentFile1.Visible:=True;
-  lblRecentFile2.Visible:=True;
-  lblRecentFile3.Visible:=True;
-  end;
-
-end;
-
-procedure TfrmAccounts.TabSheet5ContextPopup(Sender: TObject; MousePos: TPoint;
-  var Handled: Boolean);
-begin
-
+if lvFiles.Items.Count <> 0 then
+    lvFiles.Items[0].Selected:=True;
 end;
 
 //Кнопка Далее, или ОК, возвращение модального результата
+procedure TfrmAccounts.btnCloseClick(Sender: TObject);
+begin
+if not fIsChange then begin
+    frmMain.WindowState:=wsMinimized;
+end;
+Self.ModalResult:=mrCancel;
+end;
+
 procedure TfrmAccounts.btnGeneratePassClick(Sender: TObject);
 begin
 if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(Self);
@@ -187,37 +154,32 @@ begin
   Self.Close;
 end;
 
-procedure TfrmAccounts.btnOpenBaseClick(Sender: TObject);
+procedure TfrmAccounts.btnOKClick(Sender: TObject);
 begin
-if not openDialog.Execute then Exit;
-txtOpenBase.Text:=OpenDialog.FileName;
+FFileName:=lvFiles.Selected.Caption;
+Self.ModalResult:=mrOK;
+end;
 
+procedure TfrmAccounts.chkShowMainPassClick(Sender: TObject);
+begin
+chkShowPass.Checked:= chkShowMainPass.Checked;
 end;
 
 procedure TfrmAccounts.chkShowPassClick(Sender: TObject);
 begin
+chkShowMainPass.Checked:= chkShowPass.Checked;
 txtPassConfirm.Visible:= not chkShowPass.Checked;
 lblPassConfirm.Visible:= not chkShowPass.Checked;
 if chkShowPass.Checked then begin
   txtPassConfirm.PasswordChar:= #0;
   txtNewPass.PasswordChar:= #0;
+  txtPass.PasswordChar:=#0;
 end else begin
-  txtPassConfirm.PasswordChar:= #35;
-  txtNewPass.PasswordChar:= #35;
+  txtPassConfirm.PasswordChar:= #149;
+  txtNewPass.PasswordChar:= #149;
+  txtPass.PasswordChar:=#149;
 end;
 
-end;
-
-// Кнопка назад, если назад некуда, то закрытие формы
-procedure TfrmAccounts.btnCancelClick(Sender: TObject);
-begin
-if pcWizard.ActivePageIndex = 0 then Close
-else begin
-//    lblInfo.Caption:=infoText[0];
-//    btnCancel.Caption:='Отмена';
-//    btnNext.Caption:='Далее';
-//    pcWizard.ActivePageIndex:=0;
-end;
 end;
 
 end.

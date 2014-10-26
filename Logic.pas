@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
     XMLutils, uFieldFrame, uFolderFrame, uFolderFrameInfo,
-    uSmartMethods, uSettings, uStrings,
+    uSmartMethods, uSettings,
     {Themes}
     Styles, Themes
   	;
@@ -39,6 +39,8 @@ procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
+
+function InitGlobal: Boolean;
 function LoadBase: Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
@@ -78,7 +80,7 @@ function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 
 implementation
-uses uMain, uLog, uEditItem, uEditField, uGenerator;
+uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
 
 function GeneratePassword(Len: Integer = 8): String;
 begin
@@ -705,10 +707,6 @@ begin
 end;
 procedure LoadSettings;
 begin
-    xmlCfg:=TSettings.Create('..\..\config.xml');
-
-    if xmlCfg.GetValue('Theme', 0) < frmMain.mnuThemes.Count  then
-        frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
     bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
     frmMain.mnuShowPass.Checked:= bShowPasswords;
@@ -755,6 +753,8 @@ begin
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
+//    xmlCfg.SetValue('File_1', '..\..\omgpass.xml', 'Files');
+//    xmlCfg.SetValue('Count', 1, 'Files');
 
     xmlCfg.Save;
 end;
@@ -772,14 +772,18 @@ With TStyleManager.Create do begin
         newMenuItem.OnClick:= frmMain.ThemeMenuClick;
         frmMain.mnuThemes.Insert(i, newMenuItem);
     end;
+    if xmlCfg.GetValue('Theme', 0) < frmMain.mnuThemes.Count  then
+        frmMain.mnuThemes.Items[xmlCfg.GetValue('Theme', 0)].Click;
 end;
 finally end;
 end;
 procedure SetTheme(Theme: String);
 //Выбор стиля оформления
 begin
+try
     if bSearchMode then frmMain.txtSearchRightButtonClick(nil);
-    TStyleManager.TrySetStyle(Theme, true);
+    TStyleManager.TrySetStyle(Theme, False);
+finally end;
 end;
 procedure ShowPasswords(Flag: Boolean);
 var
@@ -870,13 +874,6 @@ begin
     end;
     if Value <> '' then SetNodeValue(Result, Value);
 end;
-function LoadBase: Boolean;
-begin
-    xmlMain:=TXMLDocument.Create(frmMain);
-	xmlMain.LoadFromFile('../../omgpass.xml');
-	xmlMain.Active:=True;
-    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-end;
 function CheckUpdates: Boolean;
 begin
     result:=true;
@@ -884,5 +881,52 @@ end;
 function CheckVersion: Boolean;
 begin
     result:=true;
+end;
+function InitGlobal: Boolean;
+//var i: Integer;
+begin
+	LogList:= TStringList.Create;
+    xmlCfg:=TSettings.Create('..\..\config.xml');
+    xmlMain:=TXMLDocument.Create(frmMain);
+
+	Log('Инициализация...');
+    //LoadThemes;
+    if not LoadBase then begin
+        Result:=False;
+        Exit
+    end;
+    CheckVersion;
+    CheckUpdates;
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    LoadSettings;
+    Result:=True;
+
+//    SetButtonImg(btnAddPage, imlField, 10);
+//    SetButtonImg(btnDeletePage, imlField, 12);
+//    SetButtonImg(btnTheme, imlTab, 41);
+
+//	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
+end;
+function LoadBase: Boolean;
+begin
+//FreeAndNil(xmlMain);
+if 0=1 {опция на автооткрытие файла без пароля} then //
+    else begin
+        if (not Assigned(frmAccounts)) then
+            frmAccounts:=  TfrmAccounts.Create(frmMain);
+        if frmAccounts.ShowModal = mrOK then begin
+            xmlMain.LoadFromFile(frmAccounts.FFileName);
+            Log ('frmAccounts: mrOK');
+            Result:=True;
+        end else begin
+            Log ('frmAccounts: mrCancel');
+            frmMain.WindowState:=wsMinimized;
+            Result:=False;
+            Exit;
+        end;
+        FreeAndNil(frmAccounts);
+        xmlMain.Active:=True;
+        xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    end;
 end;
 end.
