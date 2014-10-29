@@ -10,7 +10,7 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  Logic, uCustomEdit;
+  Logic, uCustomEdit, Vcl.Dialogs;
 type
 TfrmMain = class(TForm)
     menuMain: TMainMenu;
@@ -79,7 +79,8 @@ TfrmMain = class(TForm)
     imlSearch: TImageList;
     tmrSearch: TTimer;
     mnuInsertPage: TMenuItem;
-    Label1: TLabel;
+    lblEmpty: TLabel;
+    TaskDialog1: TTaskDialog;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -142,6 +143,7 @@ TfrmMain = class(TForm)
     procedure mnuTopClick(Sender: TObject);
     procedure mnuInsertPageClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -172,9 +174,15 @@ begin
         end
     else begin
         frmLog:=  TfrmLog.Create(nil);
-        frmLog.Left:=frmMain.Left + frmMain.Width +3;
-        frmLog.Top:=frmMain.Top;
-        frmLog.Height:=frmMain.Height;
+                frmLog.SetBounds(
+        				frmMain.Left + frmMain.Width,
+        				frmMain.Top,
+						400,
+        				frmMain.Height);
+//        frmLog.Left:=frmMain.Left + frmMain.Width +3;
+//        frmLog.Top:=frmMain.Top;
+//        frmLog.Height:=frmMain.Height;
+
         frmLog.lbLog.Items:=LogList;
         frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
         frmLog.Show;
@@ -188,7 +196,7 @@ end;
 {$REGION '#Прилипание формы лога к краю основной'}
 procedure TfrmMain.OnMove(var Msg: TWMMove);
 begin
-    if Assigned(frmLog) and bLogDocked then
+    if Assigned(frmLog) {and bLogDocked} then
       frmLog.tmrLog.OnTimer(nil);
 end;
 {$ENDREGION}
@@ -306,7 +314,9 @@ begin
 end;
 procedure TfrmMain.mnuInsertPageClick(Sender: TObject);
 begin
-    AddPage();
+    AddNewPage();
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    frmMain.tabMainChange(nil);
 end;
 
 procedure TfrmMain.tbtnInsertItemClick(Sender: TObject);
@@ -315,7 +325,9 @@ begin
 end;
 procedure TfrmMain.btnAddPageClick(Sender: TObject);
 begin
-    AddPage();
+    AddNewPage();
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    frmMain.tabMainChange(nil);
 end;
 {$ENDREGION}
 
@@ -633,10 +645,19 @@ begin
 	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
     //tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;
+    lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
+                        (Height - lblEmpty.Height) div 2,
+                         lblEmpty.Width,
+                         lblEmpty.Height);
     //Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
 end;
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+    InitSecondary;
+end;
+
 procedure TfrmMain.fpMainMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 //Скролирование панели
@@ -646,6 +667,7 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+    SaveDocSettings;
     SaveSettings;
     //DeleteFile(xmlMain.FileName);   //
 end;

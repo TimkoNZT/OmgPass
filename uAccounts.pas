@@ -38,6 +38,10 @@ type
     Image2: TImage;
     txtNewBase: TEdit;
     SaveDialog: TSaveDialog;
+    btnRemove: TSpeedButton;
+    btnAdd: TSpeedButton;
+    btnNew: TSpeedButton;
+    btnCreateNewBase: TButton;
     constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure btnNextClick(Sender: TObject);
     procedure chkShowPassClick(Sender: TObject);
@@ -50,9 +54,13 @@ type
     procedure chkShowMainPassClick(Sender: TObject);
     procedure lvFilesClick(Sender: TObject);
     procedure lvFilesDblClick(Sender: TObject);
+    procedure btnNewClick(Sender: TObject);
+    procedure tsOpenShow(Sender: TObject);
+    procedure tsNewShow(Sender: TObject);
+    procedure btnCreateNewBaseClick(Sender: TObject);
 private
     fIsChange: Boolean;
-    procedure CleanFiles;
+    procedure LoadLvFiles;
 //    FShowHoriz: Boolean;
 //    FShowVert: Boolean;
 //    FListViewWndProc: TWndMethod;
@@ -61,6 +69,7 @@ private
 public
     FFileName: String;
     FPassword: String;
+    fNewFile: Boolean;
 end;
 var
     frmAccounts: TfrmAccounts;
@@ -87,12 +96,8 @@ end;
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
-var i, zero: Integer;
 begin
-CleanFiles;
-for i := 0 to lsStoredDocs.Count - 1 do begin
-    lvFiles.AddItem(lsStoredDocs[i], nil);
-end;
+LoadLvFiles;
 if lvFiles.Items.Count = 0 then begin
     lblNoFiles.Visible:=True;
     lblNoFiles.Alignment:=taCenter;
@@ -103,13 +108,19 @@ if lvFiles.Items.Count > 5 then
 
 Logic.SetButtonImg(btnNewBase, imlAccounts, 3);
 Logic.SetButtonImg(btnGeneratePass, imlAccounts, 1);
+Logic.SetButtonImg(btnAdd, imlAccounts, 5);
+Logic.SetButtonImg(btnRemove, imlAccounts, 6);
+Logic.SetButtonImg(btnNew, imlAccounts, 4);
 
 end;
 
-procedure TfrmAccounts.CleanFiles;
+procedure TfrmAccounts.LoadLvFiles;
+var i: Integer;
 begin
     lvFiles.Items.Clear;
     lblNoFiles.Visible:=False;
+    for i := 0 to lsStoredDocs.Count - 1 do
+    lvFiles.AddItem(lsStoredDocs[i], nil);
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
@@ -124,23 +135,50 @@ end;
 
 procedure TfrmAccounts.lvFilesClick(Sender: TObject);
 begin
-//if lvFiles.Items.Count <> 0 then
-//    if lvFiles.Selected = nil then lvFiles.Items[0].Selected:=True;
+if lvFiles.Items.Count <> 0 then
+    if lvFiles.Selected = nil then
+        lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
 end;
 
 procedure TfrmAccounts.lvFilesDblClick(Sender: TObject);
 begin
-//    if lvFiles.Items.Count <> 0 then
-//        if lvFiles.Selected = nil then lvFiles.Items[0].Selected:=True;
+if lvFiles.Items.Count <> 0 then
+    if lvFiles.Selected = nil then
+        lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
+    btnOk.Click;
 end;
 
-//Кнопка Далее, или ОК, возвращение модального результата
+procedure TfrmAccounts.tsNewShow(Sender: TObject);
+begin
+    //
+    btnCreateNewBase.Visible:=True;
+    btnOK.Visible:=False;
+end;
+
+procedure TfrmAccounts.tsOpenShow(Sender: TObject);
+begin
+    //
+    btnCreateNewBase.Visible:=False;
+    btnOK.Visible:=True;
+end;
+
 procedure TfrmAccounts.btnCloseClick(Sender: TObject);
 begin
 if not fIsChange then begin
     frmMain.WindowState:=wsMinimized;
 end;
 Self.ModalResult:=mrCancel;
+end;
+
+procedure TfrmAccounts.btnCreateNewBaseClick(Sender: TObject);
+var i: Integer;
+begin
+    if FileExists(txtNewBase.Text) then DeleteFile(txtNewBase.Text);
+    CreateNewBase(txtNewBase.Text);
+    ReloadStoredDocs(txtNewBase.Text);
+    LoadLvFiles;
+    lvFiles.Items[0].Selected:=True;
+    pcAccounts.Pages[tsOpen.PageIndex].Show;
 end;
 
 procedure TfrmAccounts.btnGeneratePassClick(Sender: TObject);
@@ -155,13 +193,31 @@ FreeAndNil(frmGenerator);
 end;
 
 procedure TfrmAccounts.btnNewBaseClick(Sender: TObject);
+var Accept: Boolean;
 begin
 With SaveDialog do begin
     DefaultExt:=strDefaultExt;
+    Title:= rsSaveDialogTitle;
     Filter:= rsSaveDialogFilter;
-    If not Execute then Exit;
+    while not Accept do begin
+        Execute;
+        if FileExists(FileName) then
+            case MessageBox(Application.Handle,
+                            PWideChar(Format(rsSaveDialogFileExists, [FileName])),
+                            PWideChar(Application.Title),
+                            MB_YESNOCANCEL + MB_DEFBUTTON3 + MB_APPLMODAL + MB_ICONWARNING) of
+            ID_YES: Accept:=True;
+            ID_CANCEL: Exit;
+            end
+        else Accept:=True;
+    end;
     txtNewBase.Text:=FileName;
 end;
+end;
+
+procedure TfrmAccounts.btnNewClick(Sender: TObject);
+begin
+    pcAccounts.Pages[tsNew.TabIndex].Show;
 end;
 
 procedure TfrmAccounts.btnNextClick(Sender: TObject);

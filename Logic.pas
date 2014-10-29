@@ -42,11 +42,14 @@ procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
 
 function InitGlobal: Boolean;
+function InitSecondary: Boolean;
 function LoadBase: Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
 procedure LoadSettings;
+procedure LoadDocSettings;
 procedure SaveSettings;
+procedure SaveDocSettings;
 procedure LoadThemes;
 procedure SetTheme(Theme: String);
 procedure ClearClipboard;
@@ -65,7 +68,7 @@ procedure EditDefaultItem;
 function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
-procedure AddPage();
+procedure AddNewPage();
 function CreateClearPage(): IXMLNode;
 procedure InsertItem(treeNode: TTreeNode);
 procedure SetNodeExpanded(treeNode: TTreeNode);
@@ -80,7 +83,7 @@ procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
-procedure CreateNewBase(x:IXMLDocument; fPath: String);
+procedure CreateNewBase(fPath: String);
 function IsDocValidate: Boolean;
 function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
@@ -159,16 +162,15 @@ begin
 	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
     LogNodeInfo(nItem, 'GeneratePanel');
-
-
     //Против лагов в изображении
     //Очень капризная функция
-    SendMessage(Panel.Handle, WM_SETREDRAW, Ord(False), 0);
+    //SendMessage(Panel.Handle, WM_SETREDRAW, Ord(False), 0);
     Panel.Visible:=False;
     //LockWindowUpdate(Panel.Handle);
 
     //Чистим панельку
     CleaningPanel(Panel);
+
     case GetNodeType(nItem) of
         ntFolder, ntPage: begin
             GenerateFolderPanel(nItem, Panel);
@@ -187,7 +189,7 @@ begin
     end;
     //
     Panel.Visible:=True;
-    SendMessage(Panel.Handle, WM_SETREDRAW, Ord(True), 0);
+    //SendMessage(Panel.Handle, WM_SETREDRAW, Ord(True), 0);
     //LockWindowUpdate(0);
     Result:=True;
 end;
@@ -303,7 +305,6 @@ begin
 	tabControl.Tabs.Clear;
 	PageList:= NodeByPath(x, 'Root|Data').ChildNodes;
     tabControl.Visible:= (PageList.Count<>0);
-
     for i := 0 to PageList.Count - 1 do begin
 		LogNodeInfo(PageList[i]);
 		tabList.Add(GetNodeTitle(PageList[i]));
@@ -495,12 +496,12 @@ begin
         frmMain.tabMainChange(nil);
     end else treeNode.Delete;
 end;
-procedure AddPage();
+procedure AddNewPage();
 begin
 	inc(intCurrentPage);
     PageList.Insert(intCurrentPage, CreateClearPage);
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
-    frmMain.tabMainChange(nil);
+//    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+//    frmMain.tabMainChange(nil);
 end;
 function CreateClearPage(): IXMLNode;
 var
@@ -730,32 +731,36 @@ begin
     frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
     if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
     if frmMain.WindowState = wsNormal then begin
+        //Принудительно показываем форму
+        //frmMain.Show;
+        //И задаем положение
         frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
             xmlCfg.GetValue('Top', 0, 'Position'),
             xmlCfg.GetValue('Width', 0, 'Position'),
             xmlCfg.GetValue('Height', 0, 'Position'));
+        //bLogDocked:= Boolean(xmlCfg.GetValue('DockLog', True));
         if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
     end;
-    if xmlCfg.GetValue('Page', 0, 'Position') < PageList.Count then
-        frmMain.tabMain.TabIndex := xmlCfg.GetValue('Page', 0, 'Position');
+
+
+    //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
+        frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
+end;
+procedure LoadDocSettings;
+begin
+ if GetDocProperty('SelectedPage', 0) < PageList.Count then
+        frmMain.tabMain.TabIndex := GetDocProperty('SelectedPage', 0);
+
     //frmMain.tabMainChange(nil);
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
 
     if GetDocProperty('Selected', 0) < frmMain.tvMain.Items.Count  then
         frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;
-
-    //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
-        frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
 end;
 procedure SaveSettings;
 //Сохраняем всё в файл перед выходом из программы
 begin
-    //Номер выбранного элемента сохраняется в документ
     if xmlCfg = nil then Exit;
-    if bSearchMode then
-        SetDocProperty('Selected', iSelected)
-    else if frmMain.tvMain.Selected<>nil then
-        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex);
     //Прочие настройки сохраняются в файл настроек
     if frmMain.WindowState = wsNormal then begin
          xmlCfg.SetValue('Left', frmMain.Left, 'Position');
@@ -765,13 +770,22 @@ begin
          xmlCfg.SetValue('ShowLog', BoolToStr(Assigned(frmLog), True));
     end;
     xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
-    xmlCfg.SetValue('Page', intCurrentPage, 'Position');
+    //xmlCfg.SetValue('Page', intCurrentPage, 'Position');
     xmlCfg.SetValue('TreeWidth', frmMain.pnlTree.Width, 'Position');
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
     SaveStoredDocs;
     xmlCfg.Save;
+end;
+procedure SaveDocSettings;
+begin
+    //Номер выбранного элемента и страницы сохраняется в документ
+    if bSearchMode then
+        SetDocProperty('Selected', iSelected)
+    else if frmMain.tvMain.Selected<>nil then
+        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex);
+    SetDocProperty('SelectedPage', intCurrentPage);
 end;
 procedure LoadThemes;
 var
@@ -917,8 +931,20 @@ begin
 
     CheckVersion;
     CheckUpdates;
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
     LoadSettings;
+
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    if PageList.Count = 0 then begin
+        frmMain.Show;
+        if (MessageBox(Application.Handle, PWideChar(rsDocumentIsEmpty), PWideChar(Application.Title), MB_YESNO + MB_APPLMODAL) = ID_YES)  then begin
+            AddNewPage;
+            ParsePagesToTabs(xmlMain, frmMain.tabMain);
+        end;
+    end;
+
+
+    LoadDocSettings;
+
     Result:=True;
 
 //    SetButtonImg(btnAddPage, imlField, 10);
@@ -926,6 +952,10 @@ begin
 //    SetButtonImg(btnTheme, imlTab, 41);
 
 //	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
+end;
+function InitSecondary: Boolean;
+begin
+    //
 end;
 
 function LoadBase: Boolean;
@@ -941,9 +971,9 @@ if 0=1 {опция на автооткрытие файла без пароля} then //
         try
             if frmAccounts.ShowModal = mrOK then begin
                 Log ('frmAccounts: mrOK');
-                if FileExists(frmAccounts.FFileName) then
-                    xmlMain.LoadFromFile(frmAccounts.FFileName)
-                else CreateNewBase(xmlMain, frmAccounts.FFileName);
+                //if FileExists(frmAccounts.FFileName) then
+                    xmlMain.LoadFromFile(frmAccounts.FFileName);
+                //else CreateNewBase(frmAccounts.FFileName);
                 result:=True;
             end else begin
                 Log ('frmAccounts: mrCancel');
@@ -966,19 +996,24 @@ begin
     LogList.SaveToFile('log.txt');
     if isFatal then Application.Terminate;
 end;
-procedure CreateNewBase(x:IXMLDocument; fPath: String);
+procedure CreateNewBase(fPath: String);
 var
-    rootNode: IxmlNode;
+    rootNode: IXMLNode;
+    xmlTemp: TXMLDocument;
 begin
-    Log('Create new base!');
-    x.FileName:=fPath;
-    x.Encoding := 'UTF-8';
-    x.Version := '1.0';
-    With x.AddChild('Root') do begin
-        AddChild('Header');
-        AddChild('Data');
-    end;
-    x.SaveToFile(fPath);
+        xmlTemp:=TXMLDocument.Create(nil);
+        xmlTemp.Active:=True;
+//        xmlTemp.LoadFromXML('<?xml version="1.0" encoding="UTF-8"?>' + #10#10 + '<Root><Header/><Data/></Root>');
+        Log('Create new base!');
+        xmlTemp.FileName:=fPath;
+        xmlTemp.Encoding := 'UTF-8';
+        xmlTemp.Version := '1.0';
+        With xmlTemp.AddChild('Root') do begin
+            AddChild('Header');
+            AddChild('Data');
+        end;
+        xmlTemp.SaveToFile(fPath);
+//        FreeAndNil(xmlTemp);
 end;
 function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 begin
@@ -1008,7 +1043,6 @@ begin
         on e: Exception do ErrorMsg(e, 'Validate Document', True);
     end;
 end;
-
 function LoadStoredDocs(): TStringList;
 //Загружаем список известных файлов из конфига в список
 var i: Integer;

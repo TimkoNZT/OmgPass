@@ -38,6 +38,7 @@ resourcestring
     rsDelFieldConfirmationCaption = 'Deleting field';
     rsCantDelTitleField = 'Can''t delete title of record';
     rsFieldNotSelected = 'Field not selected';
+    rsDocumentIsEmpty = 'Hmm... It looks like your document is empty!' + #10#13 + 'Would you like add new page?';
     //
     //
     const arrFieldFormats: array[0..8] of String = ('title',
@@ -71,7 +72,7 @@ resourcestring
                                                     'File',
                                                     'Text or Login');
     //Заголовки окошек
-    rsFrmAccountsCaption = 'Account manager';
+    rsFrmAccountsCaption = 'Document manager';
     rsFrmAccountsCaptionOpen = 'Open base';
     rsFrmAccountsCaptionChange = 'Change base';
     rsFrmEditItemCaption = 'Edit record';
@@ -91,6 +92,9 @@ resourcestring
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          #10#13 + 'Would you like to create a new document' +
                          #10#13 + '%s ?';
+    rsSaveDialogFileExists = 'You have selected an existing file:' + #10#13 + '%s' + #10#13+ 'Overwrite it?';
+    rsSaveDialogTitle = 'Save new database as...';
+    rsOpenDialogTitle = 'Open database...';
     //frmMain
 
     //
