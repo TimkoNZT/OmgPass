@@ -21,9 +21,11 @@ private
 protected
     //
 public
-    constructor Create(const XMLFilePath: string; RootNodeName: string = 'Config');
+    constructor Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
     function GetValue(OptionName: String; Default: Variant; Section: String = strDefConfigSection): Variant;
     procedure SetValue(OptionName: String; Value: Variant; Section: String = strDefConfigSection);
+    function HasOption(OptionName: String; Section: String = 'Main'): Boolean;
+    function HasSection(Section: String): Boolean;
     procedure Save;
 end;
 
@@ -31,7 +33,7 @@ implementation
 
 uses Logic;
 
-constructor TSettings.Create(const XMLFilePath: string; RootNodeName: string = 'Config');
+constructor TSettings.Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
 begin
     sXML:=TXMLDocument.Create(nil);
     sXML.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
@@ -68,6 +70,19 @@ begin
         SectionNode.AddChild(OptionName);
     RootNode.ChildNodes[Section].ChildValues[OptionName]:=Value;
 end;
+
+function TSettings.HasSection(Section: String): Boolean;
+begin
+    Result:= (RootNode.ChildNodes.FindNode(Section) <> nil);
+end;
+
+
+function TSettings.HasOption(OptionName: String; Section: String = 'Main'): Boolean;
+begin
+    Result:= (RootNode.ChildNodes.FindNode(Section) <> nil) and
+    (RootNode.ChildNodes[Section].ChildNodes.FindNode(OptionName) <> nil);
+end;
+
 
 procedure TSettings.Save;
 begin

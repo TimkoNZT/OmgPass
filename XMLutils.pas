@@ -52,145 +52,149 @@ function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
 
 implementation
 uses Logic;
+{$REGION 'Неиспользуемые классы - удалить позже'}
 
-{$REGION 'TTreeToXML'}
-    { TTreeToXML }
+    {$REGION 'TTreeToXML'}
+        { TTreeToXML }
 
-        constructor TTreeToXML.Create(Tree: TTreeView);
-           begin
-             FTree := Tree;
-             FDOC := TXMLDocument.Create(nil);
-             FDOC.Options := FDOC.Options + [doNodeAutoIndent];
-             FDOC.Active := true;
-             FDOC.Encoding := 'UTF-8';
-             FRootNode := FDOC.CreateElement('Treeview', '');
-             FDOC.DocumentElement := FRootNode;
-             IterateRoot;
-           end;
+            constructor TTreeToXML.Create(Tree: TTreeView);
+               begin
+                 FTree := Tree;
+                 FDOC := TXMLDocument.Create(nil);
+                 FDOC.Options := FDOC.Options + [doNodeAutoIndent];
+                 FDOC.Active := true;
+                 FDOC.Encoding := 'UTF-8';
+                 FRootNode := FDOC.CreateElement('Treeview', '');
+                 FDOC.DocumentElement := FRootNode;
+                 IterateRoot;
+               end;
 
-           Procedure TTreeToXML.WriteNode(N: TTreeNode; ParentXN: IXMLNode);
-           var
-             CurrNode: IXMLNode;
-             Child: TTreeNode;
-           begin
-             CurrNode := ParentXN.AddChild(N.Text);
-             CurrNode.Attributes['NodeLevel'] := N.Level;
-             CurrNode.Attributes['Index'] := N.Index;
-             Child := N.getFirstChild;
-             while Assigned(Child) do
-             begin
-               WriteNode(Child, CurrNode);
-               Child := Child.getNextSibling;
-             end;
-           end;
+               Procedure TTreeToXML.WriteNode(N: TTreeNode; ParentXN: IXMLNode);
+               var
+                 CurrNode: IXMLNode;
+                 Child: TTreeNode;
+               begin
+                 CurrNode := ParentXN.AddChild(N.Text);
+                 CurrNode.Attributes['NodeLevel'] := N.Level;
+                 CurrNode.Attributes['Index'] := N.Index;
+                 Child := N.getFirstChild;
+                 while Assigned(Child) do
+                 begin
+                   WriteNode(Child, CurrNode);
+                   Child := Child.getNextSibling;
+                 end;
+               end;
 
-           Procedure TTreeToXML.IterateRoot;
-           var
-             N: TTreeNode;
-           begin
-             N := FTree.Items[0];
-             while Assigned(N) do
-             begin
-               WriteNode(N, FRootNode);
-               N := N.getNextSibling;
-             end;
-           end;
+               Procedure TTreeToXML.IterateRoot;
+               var
+                 N: TTreeNode;
+               begin
+                 N := FTree.Items[0];
+                 while Assigned(N) do
+                 begin
+                   WriteNode(N, FRootNode);
+                   N := N.getNextSibling;
+                 end;
+               end;
 
-           procedure TTreeToXML.SaveToFile(const fn: String);
-           begin
-             FDOC.SaveToFile(fn);
-           end;
+               procedure TTreeToXML.SaveToFile(const fn: String);
+               begin
+                 FDOC.SaveToFile(fn);
+               end;
 
-           destructor TTreeToXML.Destroy;
-           begin
-             if Assigned(FDOC) then
-               FDOC.Free;
+               destructor TTreeToXML.Destroy;
+               begin
+                 if Assigned(FDOC) then
+                   FDOC.Free;
 
-             inherited;
-           end;
+                 inherited;
+               end;
 
-{$ENDREGION}
+    {$ENDREGION}
 
-{$REGION 'TXMLToTree'}
-    { TXMLToFree }
+    {$REGION 'TXMLToTree'}
+        { TXMLToFree }
 
 
-        Procedure TXMLToTree.XMLFileToTree(Tree: TTreeView; const FileName: String);
-            var
-                FileStream : TFileStream;
-            begin
-                try
-                    FileStream := TFileStream.Create(FileName, fmOpenReadWrite);
-                except
-                    FileStream := TFileStream.Create(FileName, fmOpenRead);
-                end;
-                try
-                    XMLStreamToTree(Tree, FileStream);
-                finally
-                    FileStream.Free;
-                end;
-            end;
-
-            Procedure TXMLToTree.XMLToTree(Tree: TTreeView; Const Doc: IXMLDocument);
-            begin
-              FTree:= Tree;
-              try IterateNodes(Doc.DocumentElement, FTree.Items.AddFirst(nil, Doc.DocumentElement.NodeName));
-              finally end;
-            end;
-
-            Procedure TXMLToTree.XMLStreamToTree(Tree: TTreeView; Const FileStream: TStream);
-            var
-                Doc: TXMLDocument;
-            begin
-                Doc := TXMLDocument.Create(Application);
-                try
-                    Doc.LoadFromStream(FileStream, xetUTF_8);
-                    Doc.Active := true;
-                    XMLToTree(Tree, Doc);
-                finally
-                    Doc.Free;
-                end;
-            end;
-
-            Procedure TXMLToTree.IterateNodes(xn: IXMLNode; ParentNode: TTreeNode);
-            var
-              ChildTreeNode: TTreeNode;
-              i: Integer;
-            begin
-                For i := 0 to xn.ChildNodes.Count - 1 do
+            Procedure TXMLToTree.XMLFileToTree(Tree: TTreeView; const FileName: String);
+                var
+                    FileStream : TFileStream;
                 begin
-                    ChildTreeNode := FTree.Items.AddChild(ParentNode, xn.ChildNodes[i].NodeName);
-                    if xn.IsTextElement then ChildTreeNode.Text:=xn.Text;
-
-                    IterateNodes(xn.ChildNodes[i], ChildTreeNode);
+                    try
+                        FileStream := TFileStream.Create(FileName, fmOpenReadWrite);
+                    except
+                        FileStream := TFileStream.Create(FileName, fmOpenRead);
+                    end;
+                    try
+                        XMLStreamToTree(Tree, FileStream);
+                    finally
+                        FileStream.Free;
+                    end;
                 end;
-                for i := 0 to xn.AttributeNodes.Count - 1 do
+
+                Procedure TXMLToTree.XMLToTree(Tree: TTreeView; Const Doc: IXMLDocument);
                 begin
-                    ChildTreeNode := FTree.Items.AddChild(ParentNode, xn.AttributeNodes[i].NodeName);
-                    ChildTreeNode.ImageIndex:=1;
-                    ChildTreeNode.SelectedIndex:=1;
+                  FTree:= Tree;
+                  try IterateNodes(Doc.DocumentElement, FTree.Items.AddFirst(nil, Doc.DocumentElement.NodeName));
+                  finally end;
                 end;
-            end;
+
+                Procedure TXMLToTree.XMLStreamToTree(Tree: TTreeView; Const FileStream: TStream);
+                var
+                    Doc: TXMLDocument;
+                begin
+                    Doc := TXMLDocument.Create(Application);
+                    try
+                        Doc.LoadFromStream(FileStream, xetUTF_8);
+                        Doc.Active := true;
+                        XMLToTree(Tree, Doc);
+                    finally
+                        Doc.Free;
+                    end;
+                end;
+
+                Procedure TXMLToTree.IterateNodes(xn: IXMLNode; ParentNode: TTreeNode);
+                var
+                  ChildTreeNode: TTreeNode;
+                  i: Integer;
+                begin
+                    For i := 0 to xn.ChildNodes.Count - 1 do
+                    begin
+                        ChildTreeNode := FTree.Items.AddChild(ParentNode, xn.ChildNodes[i].NodeName);
+                        if xn.IsTextElement then ChildTreeNode.Text:=xn.Text;
+
+                        IterateNodes(xn.ChildNodes[i], ChildTreeNode);
+                    end;
+                    for i := 0 to xn.AttributeNodes.Count - 1 do
+                    begin
+                        ChildTreeNode := FTree.Items.AddChild(ParentNode, xn.AttributeNodes[i].NodeName);
+                        ChildTreeNode.ImageIndex:=1;
+                        ChildTreeNode.SelectedIndex:=1;
+                    end;
+                end;
 
 
-    //function TXMLToTree.XMLNodeFromTreeText(const cText: string): IXMLNode;
-    //var LCount: Integer;
-    //    LList: TPointerList;
-    //    i:integer;
-    //begin
-    //  LCount:= FNodeList.Count;
-    //  LList :=FNodeList.List;
-    //  for i := 0 to LCount - 1 do
-    //    begin
-    //      if PNodeRecord(LList[i])^.TrNode.Text=cText then
-    //        begin
-    //          Result:=PNodeRecord(LList[i])^.XMLNode;
-    //          break;
-    //        end;
-    //    end;
-    //end;
+        //function TXMLToTree.XMLNodeFromTreeText(const cText: string): IXMLNode;
+        //var LCount: Integer;
+        //    LList: TPointerList;
+        //    i:integer;
+        //begin
+        //  LCount:= FNodeList.Count;
+        //  LList :=FNodeList.List;
+        //  for i := 0 to LCount - 1 do
+        //    begin
+        //      if PNodeRecord(LList[i])^.TrNode.Text=cText then
+        //        begin
+        //          Result:=PNodeRecord(LList[i])^.XMLNode;
+        //          break;
+        //        end;
+        //    end;
+        //end;
+    {$ENDREGION}
+
 {$ENDREGION}
 function GetNodeValue(Node: IXMLNode): String;
+//Чтение значения узла
 begin
     result:='';
 	case GetNodeType(Node) of
@@ -204,8 +208,8 @@ begin
     end;
 end;
 
-
 function SetNodeValue(Node: IXMLNode; Value: String): Boolean;
+//Установка значения узла
 begin
     result:=False;
 	case GetNodeType(Node) of
@@ -221,13 +225,14 @@ begin
 end;
 
 function GetBaseTitle(x:IXMLDocument): String;
+//Deprecated
 begin
 	result:= NodeByPath(x, 'Root\Header\Title').Text;
 end;
 
 function GetNodeTitle(Node:IXMLNode): String;
 //Возвращает строковое имя ноды
-//Использовать для ntPage, ntFolder, ntItem
+//Можно использовать для ntPage, ntFolder, ntItem, ntField
 var i: Integer;
 begin
 	case GetNodeType(Node) of
@@ -254,6 +259,7 @@ begin
 end;
 
 function SetNodeTitle(Node:IXMLNode; Title: String): Boolean;
+//Установка заголовка узла
 var i: Integer;
 begin
 	Log('SetNodeTitle');
@@ -295,8 +301,6 @@ var
 	pth: TStringList;
 begin
 	pth:= TStringList.Create();
-    //  -Зачем тебе гроб 2х2?
-    //  -А захочу так лягу, или вот так лягу..
     pth.AddStrings(fNodePath.Split(['\', '/', '|', '.']));
     fNode:= x.Node;
     while pth.Count<>0 do begin
@@ -317,13 +321,15 @@ begin
 end;
 
 function GetFieldFormat(Field: IXMLNode): eFieldFormat;
-//Возвращает формат поля в виде перечисления eFieldFormat (Заголовок, Текст, Пароль и т.д.)
+//Возвращает формат поля в виде перечисления
+//eFieldFormat (Заголовок, Текст, Пароль и т.д.)
 begin
 	result:=eFieldFormat(AnsiIndexStr(GetAttribute(Field, 'format'), arrFieldFormats));
     //Log('GetFieldFormat(' + Field.NodeName +') = ', GetEnumName(TypeInfo(eFieldFormat), Ord(result)));
 end;
 
 function GetAttribute(Node: IXMLNode; attrName: String): String;
+//Чтение атрибута в узле
 begin
 	//Log('GetAttribute('+ Node.NodeName + ',' + attrName + ')');
 	//Log(Node.NodeName + ' всего атрибутов:' , Node.AttributeNodes.Count);
@@ -334,12 +340,14 @@ begin
 end;
 
 function SetAttribute(Node: IXMLNode; attrName: String; attrValue: String): Boolean;
+//Установка-добавление атрибута в узле
 begin
     	Node.Attributes[attrName]:=attrValue;
         result:=True;
 end;
 
 function RemoveAttribute(Node: IXMLNode; attrName: String) : Boolean;
+//Удаление атрибута у узла
 var
     attr: iXMLNode;
 begin
@@ -351,6 +359,7 @@ begin
 end;
 
 procedure LogNodeInfo(Node: IXMLNode; Msg: String='');
+//Подробная информация об узле
 var isTVal: iXMLnode;
 Vl: String;
 begin

@@ -97,6 +97,8 @@ implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
 
 function GeneratePassword(Len: Integer = 8): String;
+//Генерация пароля в строку нужной длины
+//через вызов формы генератора
 begin
    if (not Assigned(frmGenerator)) then frmGenerator:=  TfrmGenerator.Create(nil);
    frmGenerator.UpDown.Position:=Len;
@@ -104,6 +106,7 @@ begin
    Result:= frmGenerator.lblResult.Caption;
    FreeAndNil(frmGenerator);
 end;
+{$REGION 'Логирование'}
 procedure Log(Text: String);
 begin
 	LogList.Add({TimeToStr(Now) +}'> '+ Text);
@@ -134,8 +137,10 @@ procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
 end;
+{$ENDREGION}
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
-//Очистка панельки
+//Очистка панельки (TScrollBox)
+//Используется в основной форме и форме редактирования
 var
 	i: Integer;
 begin
@@ -149,6 +154,7 @@ begin
     Log('ClearPanel(' + Panel.Name + ') =', result);
 end;
 procedure SetButtonImg(Button: TSpeedButton; List: TImageList; ImgIndex: Integer);
+//Назначение картинки в TSpeedButton из TImageList
 begin
     if Button is TSpeedButton then begin
         List.GetBitmap(ImgIndex, TSpeedButton(Button).Glyph);
@@ -156,7 +162,7 @@ begin
 end;
 function GeneratePanel(nItem: IXMLNode; Panel: TWinControl; IsEdit: Boolean = False; IsNew: Boolean = False) : Boolean;
 //Рисуем панельку с полями и всё такое, важное место!
-//Внутрь надо подавать ноду формата ntItem c полями Field
+//Внутрь надо подавать ноду формата ntItem или ntDefItem c полями Field
 var i: Integer;
 begin
 //Инфо
@@ -281,6 +287,7 @@ begin
     //Log('--------------------GenerateField:End');
 end;
 procedure GenerateFolderPanel(nItem: IXMLNode; Panel: TWinControl);
+//Рисование TFolderFrame c выбором записи по умолчанию
 begin
 if (GetNodeType(nItem) = ntPage) then
     with TFolderFrame.CreateParented(Panel.Handle) do begin
@@ -295,6 +302,7 @@ if (GetNodeType(nItem) = ntPage) then
     end;
 end;
 function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeList;
+//Рисование страниц из документа в TtabControl
 var i: Integer;
 tabList: TStringList;
 begin
@@ -320,6 +328,7 @@ begin
     Log('--------------------ParsePagesToTabs:End');
 end;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
+//Рисование папок из страницы в дерево
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start---------------------------');
@@ -342,6 +351,7 @@ begin
     Log('--------------------ParsePageToTree:End-----------------------------');
 end;
 procedure IterateNodesToTree(xn: IXMLNode; ParentNode: TTreeNode; Tree: TTreeView; SearchStr: String = '');
+//Рекурсивная доп.функция к ParsePageToTree
 var
 	ChildTreeNode: TTreeNode;
    	i: Integer;
@@ -379,6 +389,7 @@ begin
     Log('--------------------IterateNodesToTree:End');
 end;
 procedure EditNode(treeNode: TTreeNode);
+//Запуск редактирования узла (ntItem)
 var
 	trgNode: IXMLNode;
     //tmpNode: IXMLNode;
@@ -406,6 +417,7 @@ begin
     end;
 end;
 function EditItem(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+//Редактирование записи через вызов формы редактирования
 var
 	//trgNode: IXMLNode;
     tmpNode: IXMLNode;
@@ -430,6 +442,7 @@ begin
     FreeAndNil(frmEditItem);
 end;
 function EditField(var Node: IXMLNode; isNew: Boolean = False): Boolean;
+//Редактирование отдельного поля
 var
     tmpNode: IXMLNode;
 begin
@@ -453,6 +466,8 @@ begin
     FreeAndNil(frmEditField);
 end;
 procedure EditNodeTitle(Node: IXMLNode; Title: String);
+//Редактирование заголовка записи или папки
+//Вызывается при редатировании TTreeView
 begin
 	SetNodeTitle(Node, Title);
     case GetNodeType(Node) of
@@ -465,6 +480,8 @@ begin
     end;
 end;
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
+//Удаление любого узла
+//Избавиться от хардкода
 var
 	Msg: String;
     Node: IXMLNode;
@@ -498,6 +515,7 @@ begin
     end else treeNode.Delete;
 end;
 procedure AddNewPage();
+//Новая страничка
 begin
 	inc(intCurrentPage);
     PageList.Insert(intCurrentPage, CreateClearPage);
@@ -505,6 +523,7 @@ begin
 //    frmMain.tabMainChange(nil);
 end;
 function CreateClearPage(): IXMLNode;
+//Непосредственно генератор чистой странички
 var
 	newPageNode: IXMLNode; //okay?
     dItem: IXMLNode;       //defitem
@@ -539,6 +558,8 @@ begin
     //i like spagetti
 end;
 procedure InsertFolder(treeNode: TTreeNode);
+//Добавление новой папки
+//В параметре - родитель
 var
 	newFolderNode: IXMLNode;
 	//newTreeNode: TTreeNode;
@@ -561,6 +582,8 @@ begin
 	end;
 end;
 procedure InsertItem(treeNode: TTreeNode);
+//Добавление новой записи
+//Вызывается форма редактирования
 var
 	i: integer;
 	defItem: IXMLNode;
@@ -568,19 +591,19 @@ var
     destNode: IXMLNode;     //ntFolder;
     newTreeNode: TTreeNode;
 
-function IterateItems(Node: IXMLNode; Full: Boolean): Integer;
+function LimitItems(Node: IXMLNode; Full: Boolean): Integer;
 var i: Integer;
 begin
     for i:= 0 to Node.ChildNodes.Count - 1 do begin
         if GetNodeType(Node.ChildNodes[i]) = ntItem then
             inc(result);
         if ((GetNodeType(Node.ChildNodes[i]) = ntFolder) or (GetNodeType(Node.ChildNodes[i]) = ntPage)) and Full then
-            result:= result + IterateItems(Node.ChildNodes[i], true);
+            result:= result + LimitItems(Node.ChildNodes[i], true);
     end;
 end;
 
 begin
-    if IterateItems(NodeByPath(xmlMain, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
+    if LimitItems(NodeByPath(xmlMain, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
         MessageBox(Application.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR);
         Exit;
     end;
@@ -614,6 +637,7 @@ begin
     end else newItem._Release;
 end;
 procedure CloneNode(treeNode: TTreeNode);
+//Клонирование овечек
 var
 	Node: IXMLNode;
 begin
@@ -647,6 +671,7 @@ begin
 
 end;
 procedure SetNodeExpanded(treeNode: TTreeNode);
+//Запись состояния папок в дереве
 begin
 	if intExpandFlag <> 0 then Exit;
     if treeNode.IsFirstNode then Exit;
@@ -654,6 +679,7 @@ begin
                 BoolToStr(treeNode.Expanded, True));
 end;
 function GetNodeExpanded(Node: IXMLNode): Boolean;
+//Чтение состояния папок в дереве
 var
 	tmp: String;
 begin
@@ -664,7 +690,7 @@ begin
     	result:=StrToBool(tmp);
 end;
 procedure DragAndDrop(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode; isCopy: Boolean=False);
-//Попой чую, здесь можно было проще, но проще глючило.
+//Перетаскивание мышкой в дереве
 var
 	selNode, trgNode, newNode: IXMLNode;
 begin
@@ -705,6 +731,7 @@ begin
     IterateTree(rootTreeNode, Pointer(newNode));}
 end;
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
+//Визуальное представление перетаскивания мышкой
 var
 //selNode: IXMLNode;
 trgNode: IXMLNode;
@@ -728,6 +755,7 @@ begin
     DragGhostNode.Data:=Pointer(trgNode);
 end;
 procedure IterateTree(ParentNode: TTreeNode; Data: Pointer);
+//Функция ищет в дереве узел соответствующий ссылке на ноду и выделяет его
 var
    	i: Integer;
 begin
@@ -738,33 +766,35 @@ begin
         else IterateTree(ParentNode.Item[i], Data);
     Log('IterateTree: End');
 end;
+{$REGION 'Настройки'}
 procedure LoadSettings;
+//Загрузка настроек программы
 begin
     bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
     frmMain.mnuShowPass.Checked:= bShowPasswords;
     frmMain.mnuTop.Checked:= bWindowsOnTop;
     WindowsOnTop(bWindowsOnTop, frmMain);
-
-    frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
-    if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
-    if frmMain.WindowState = wsNormal then begin
-        //Принудительно показываем форму
-        //frmMain.Show;
-        //И задаем положение
-        frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
-            xmlCfg.GetValue('Top', 0, 'Position'),
-            xmlCfg.GetValue('Width', 0, 'Position'),
-            xmlCfg.GetValue('Height', 0, 'Position'));
-        //bLogDocked:= Boolean(xmlCfg.GetValue('DockLog', True));
-        if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
-    end;
-
-
-    //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
+    if xmlCfg.HasSection('Position') then begin
+        frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
+        if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
+        if frmMain.WindowState = wsNormal then begin
+            //Принудительно показываем форму
+            //frmMain.Show;
+            //И задаем положение
+            frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
+                xmlCfg.GetValue('Top', 0, 'Position'),
+                xmlCfg.GetValue('Width', 0, 'Position'),
+                xmlCfg.GetValue('Height', 0, 'Position'));
+            //bLogDocked:= Boolean(xmlCfg.GetValue('DockLog', True));
+            if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
+        end;
+        //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
         frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
+    end;
 end;
 procedure LoadDocSettings;
+//А здесь настрояки документа
 begin
  if GetDocProperty('SelectedPage', 0) < PageList.Count then
         frmMain.tabMain.TabIndex := GetDocProperty('SelectedPage', 0);
@@ -797,6 +827,7 @@ begin
     xmlCfg.Save;
 end;
 procedure SaveDocSettings;
+{$ENDREGION 'Настройки'}
 begin
     //Номер выбранного элемента и страницы сохраняется в документ
     if bSearchMode then
@@ -833,6 +864,7 @@ try
 finally end;
 end;
 procedure ShowPasswords(Flag: Boolean);
+//Переключение показа паролей по F5
 var
   i: Integer;
   Frame: TFieldFrame;
@@ -860,6 +892,7 @@ begin
     Log ('Clearing clipboard');
 end;
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
+//Поверх всех окон
 begin
     Log('Form ' + Form.Name + ' topmost:', Flag);
     if Flag then
@@ -868,6 +901,7 @@ begin
         SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
 end;
 function GetFolderInformation(Node: IXMLNode): String;
+//Формирование строки информации о папке или странице
 var
     FoldersCount, ItemsCount: Integer;
 //Осторожно!Вложенные функции!
@@ -900,6 +934,7 @@ begin
             rsInfoTotalItems + IntToStr(IterateItems(Node, True));
 end;
 procedure EditDefaultItem;
+//Вызов формы редактирования для записи по умолчанию
 var
     defItem: IXMLNode;
 begin
@@ -910,6 +945,7 @@ begin
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
 end;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
+//Функция возвращает новое поле
 begin
     Result:=xmlMain.CreateNode('Field');
     if fFmt = ffNone then begin
@@ -931,10 +967,10 @@ begin
 end;
 
 function InitGlobal: Boolean;
-//var i: Integer;
+//Запуск программы
 begin
 	LogList:= TStringList.Create;
-    xmlCfg:=TSettings.Create('..\..\config.xml');
+    xmlCfg:=TSettings.Create();
     xmlMain:=TXMLDocument.Create(frmMain);
     lsStoredDocs:= LoadStoredDocs;
 
@@ -974,8 +1010,9 @@ function InitSecondary: Boolean;
 begin
     //
 end;
-
 function LoadBase: Boolean;
+//Загрузка документа
+//Вызывается менеджер документов
 begin
 //FreeAndNil(xmlMain);
     xmlMain.Active:=True;
@@ -1004,16 +1041,9 @@ if 0=1 {опция на автооткрытие файла без пароля} then //
         FreeAndNil(frmAccounts);
     end;
 end;
-function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
-begin
-    Log('Error : ' + e.ClassName);
-    if Method<>'' then Log('    Procedure: ' + Method);
-    Log('    Error Message: ' + e.Message);
-    Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
-    LogList.SaveToFile('log.txt');
-    if isFatal then Application.Terminate;
-end;
 procedure CreateNewBase(fPath: String);
+//Новый документ с нуля
+//Формируется файл по заданому пути
 var
     rootNode: IXMLNode;
     xmlTemp: TXMLDocument;
@@ -1032,7 +1062,35 @@ begin
         xmlTemp.SaveToFile(fPath);
 //        FreeAndNil(xmlTemp);
 end;
+function IsDocValidate: Boolean;
+//Проверка на валидность базы, сейчас просто проверка XML
+//При ошибке выходит и сохраняет лог на диск
+begin
+    try
+    if xmlMain.ChildNodes[strRootNode] <> nil then
+        if xmlMain.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
+            result:=True;
+    except
+        on e: Exception do ErrorMsg(e, 'Validate Document', True);
+    end;
+end;
+
+function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+//Логирование ошибок
+//Параметр isFatal немедленно завершает программу
+begin
+    Log('Error : ' + e.ClassName);
+    if Method<>'' then Log('    Procedure: ' + Method);
+    Log('    Error Message: ' + e.Message);
+    Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
+    LogList.SaveToFile('log.txt');
+    if isFatal then Application.Terminate;
+end;
+
 function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
+//Установка и чтение свойств документа
+//Все свойства хранятся в ntHeader
+//Функции удаления нет.. нужна
 begin
 if (xmlMain.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode) = nil)
 or (xmlMain.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(PropertyName) = nil)
@@ -1049,17 +1107,7 @@ begin
         hNode.AddChild(PropertyName);
     hNode.ChildValues[PropertyName]:=Value;
 end;
-function IsDocValidate: Boolean;
-//Проверка на валидность базы, заодно проверка XML
-begin
-    try
-    if xmlMain.ChildNodes[strRootNode] <> nil then
-        if xmlMain.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
-            result:=True;
-    except
-        on e: Exception do ErrorMsg(e, 'Validate Document', True);
-    end;
-end;
+
 function LoadStoredDocs(): TStringList;
 //Загружаем список известных файлов из конфига в список
 var i: Integer;
@@ -1095,6 +1143,7 @@ begin
 //    xmlCfg.Save;
 end;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
+//Удаление файла из списка сохраненных по индексу или имени
 begin
     if Index = -1 then
         //Find - Только для сортированных списков
@@ -1109,6 +1158,6 @@ end;
 
 procedure DocumentClose;
 begin
-    SaveDocSettings;       //Перенести в процедуру закрытия документа
+    SaveDocSettings;       //Перенести в процедуру закрытия документа  ОК
 end;
 end.

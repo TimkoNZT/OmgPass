@@ -8,8 +8,8 @@ const
     strDataNode = 'Data';
     strFolderNode = 'Folder';
     strItemNode = 'Item';
-    //
-
+    strConfigFile = 'config.xml';
+    strLink = 'https://cloud.mail.ru/public/86079c1768cf/OmgPass/';
 
 resourcestring
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';

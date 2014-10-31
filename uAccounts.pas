@@ -120,10 +120,12 @@ procedure TfrmAccounts.LoadLvFiles;
 var i: Integer;
 begin
     lvFiles.Items.Clear;
-    for i := 0 to lsStoredDocs.Count - 1 do
-    lvFiles.AddItem(lsStoredDocs[i], nil);
-    lvFiles.ItemIndex:=0;
     lblNoFiles.Visible:=(lsStoredDocs.Count = 0);
+    if lsStoredDocs.Count = 0 then Exit;
+    for i := 0 to lsStoredDocs.Count - 1 do
+        lvFiles.AddItem(lsStoredDocs[i], nil);
+    lvFiles.ItemIndex:=0;
+
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
@@ -189,11 +191,11 @@ end;
 procedure TfrmAccounts.btnCreateNewBaseClick(Sender: TObject);
 var i: Integer;
 begin
+    if txtNewBase.Text = '' then Exit;
     if FileExists(txtNewBase.Text) then DeleteFile(txtNewBase.Text);
     CreateNewBase(txtNewBase.Text);
     ReloadStoredDocs(txtNewBase.Text);
     LoadLvFiles;
-    lvFiles.Items[0].Selected:=True;
     pcAccounts.Pages[tsOpen.PageIndex].Show;
 end;
 
@@ -215,8 +217,9 @@ With SaveDialog do begin
     DefaultExt:=strDefaultExt;
     Title:= rsSaveDialogTitle;
     Filter:= rsSaveDialogFilter;
+    Accept:=False;
     while not Accept do begin
-        Execute;
+        SaveDialog.Execute;
         if FileExists(FileName) then
             case MessageBox(Application.Handle,
                             PWideChar(Format(rsSaveDialogFileExists, [FileName])),

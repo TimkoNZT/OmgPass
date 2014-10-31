@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
   StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin,
-  Vcl.DBCtrls, Vcl.Mask, Vcl.Samples.Spin,
+  Vcl.DBCtrls, Vcl.Mask, Vcl.Samples.Spin, ShellApi,
   Vcl.ButtonGroup, Vcl.Buttons,
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
@@ -144,6 +144,7 @@ TfrmMain = class(TForm)
     procedure mnuInsertPageClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure N12Click(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -707,6 +708,11 @@ begin
     //Для формы лога не работает
     //if Assigned(frmLog) then WindowsOnTop(bWindowsOnTop, frmLog);
 end;
+procedure TfrmMain.N12Click(Sender: TObject);
+begin
+    ShellExecute(frmMain.Handle, 'open', PwideChar(strLink), nil, nil, SW_SHOW);
+end;
+
 //Очистка буфера
 procedure TfrmMain.mnuClearClipClick(Sender: TObject);
 begin

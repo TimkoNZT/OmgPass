@@ -29,14 +29,14 @@ begin
 	Clipboard.Clear;
 	Clipboard.AsText:=GetEditFromTag(Sender);
     log(Clipboard.AsText, (Sender as TSpeedButton).Tag);
-	sndPlaySound('..\..\Sounds\Zoom2.wav', SND_ASYNC or SND_NODEFAULT);
+	sndPlaySound('Sounds\Zoom.wav', SND_ASYNC or SND_NODEFAULT);
 end;
 procedure clsSmartMethods.OpenURL(Sender: TObject);
 begin
 log(GetEditFromTag(Sender));
 	try
     ShellExecute(frmMain.Handle, 'open', PwideChar(GetEditFromTag(Sender)), nil, nil, SW_SHOW);
-    sndPlaySound('..\..\Sounds\Link2.wav', SND_ASYNC or SND_NODEFAULT );
+    sndPlaySound('Sounds\Link.wav', SND_ASYNC or SND_NODEFAULT );
     except
     on E : Exception do
     MessageBox(frmMain.Handle, PWideChar(E.ClassName+' поднята ошибка, с сообщением : '+E.Message), 'Ошибка выполнения', MB_ICONERROR);

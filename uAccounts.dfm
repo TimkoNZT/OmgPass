@@ -38,8 +38,6 @@ object frmAccounts: TfrmAccounts
       Caption = 'Open document'
       ImageIndex = 7
       OnShow = tsOpenShow
-      ExplicitTop = 32
-      ExplicitHeight = 264
       DesignSize = (
         332
         265)
@@ -259,6 +257,7 @@ object frmAccounts: TfrmAccounts
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Password:'
+        Enabled = False
       end
       object Label6: TLabel
         Left = 12
@@ -319,7 +318,6 @@ object frmAccounts: TfrmAccounts
         ViewStyle = vsReport
         OnClick = lvFilesClick
         OnDblClick = lvFilesDblClick
-        ExplicitHeight = 117
       end
       object chkShowMainPass: TCheckBox
         Left = 11
@@ -328,9 +326,9 @@ object frmAccounts: TfrmAccounts
         Height = 16
         Anchors = [akLeft, akBottom]
         Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1089#1080#1084#1074#1086#1083#1099
+        Enabled = False
         TabOrder = 1
         OnClick = chkShowMainPassClick
-        ExplicitTop = 236
       end
       object txtPass: TEdit
         Left = 11
@@ -341,6 +339,7 @@ object frmAccounts: TfrmAccounts
         BevelInner = bvSpace
         BevelKind = bkSoft
         BevelOuter = bvSpace
+        Enabled = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -349,7 +348,6 @@ object frmAccounts: TfrmAccounts
         ParentFont = False
         PasswordChar = #8226
         TabOrder = 2
-        ExplicitTop = 201
       end
       object lblNoFiles: TStaticText
         Left = 22
@@ -376,8 +374,6 @@ object frmAccounts: TfrmAccounts
       Caption = 'Create new document'
       ImageIndex = 4
       OnShow = tsNewShow
-      ExplicitTop = 32
-      ExplicitHeight = 264
       DesignSize = (
         332
         265)
@@ -387,6 +383,7 @@ object frmAccounts: TfrmAccounts
         Width = 87
         Height = 13
         Caption = #1055#1086#1076#1090#1074#1077#1088#1078#1076#1077#1085#1080#1077':'
+        Enabled = False
       end
       object Label4: TLabel
         Left = 12
@@ -401,6 +398,7 @@ object frmAccounts: TfrmAccounts
         Width = 41
         Height = 13
         Caption = #1055#1072#1088#1086#1083#1100':'
+        Enabled = False
       end
       object btnGeneratePass: TSpeedButton
         Left = 295
@@ -428,6 +426,7 @@ object frmAccounts: TfrmAccounts
         Width = 282
         Height = 21
         Anchors = [akLeft, akTop, akRight]
+        Enabled = False
         PasswordChar = '#'
         TabOrder = 0
       end
@@ -438,6 +437,7 @@ object frmAccounts: TfrmAccounts
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         Ctl3D = True
+        Enabled = False
         ParentCtl3D = False
         PasswordChar = '#'
         TabOrder = 1
@@ -462,7 +462,6 @@ object frmAccounts: TfrmAccounts
         Caption = #1055#1086#1076#1089#1082#1072#1079#1082#1072' '#1076#1083#1103' '#1087#1072#1088#1086#1083#1103
         Enabled = False
         TabOrder = 3
-        ExplicitTop = 138
       end
       object Memo1: TMemo
         Left = 11
@@ -474,7 +473,6 @@ object frmAccounts: TfrmAccounts
         Lines.Strings = (
           'Not realized yet')
         TabOrder = 4
-        ExplicitTop = 156
       end
       object txtNewBase: TEdit
         Left = 11
@@ -483,7 +481,6 @@ object frmAccounts: TfrmAccounts
         Height = 21
         ReadOnly = True
         TabOrder = 5
-        Text = 'D:\Documents\GitHub\OmgPass\test.xml'
       end
     end
   end
@@ -522,8 +519,8 @@ object frmAccounts: TfrmAccounts
   end
   object OpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
-    Left = 100
-    Top = 304
+    Left = 52
+    Top = 312
   end
   object imlAccounts: TImageList
     ColorDepth = cd32Bit
@@ -531,10 +528,10 @@ object frmAccounts: TfrmAccounts
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 147
-    Top = 304
+    Left = 91
+    Top = 312
     Bitmap = {
-      494C010108001C037C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001C03940316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1292,7 +1289,7 @@ object frmAccounts: TfrmAccounts
       000000000000000000000000000000000000000000000000000000000000}
   end
   object SaveDialog: TSaveDialog
-    Left = 64
-    Top = 304
+    Left = 16
+    Top = 312
   end
 end
