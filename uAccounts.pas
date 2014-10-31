@@ -58,6 +58,8 @@ type
     procedure tsOpenShow(Sender: TObject);
     procedure tsNewShow(Sender: TObject);
     procedure btnCreateNewBaseClick(Sender: TObject);
+    procedure btnRemoveClick(Sender: TObject);
+    procedure btnAddClick(Sender: TObject);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
@@ -98,10 +100,10 @@ end;
 procedure TfrmAccounts.FormCreate(Sender: TObject);
 begin
 LoadLvFiles;
-if lvFiles.Items.Count = 0 then begin
-    lblNoFiles.Visible:=True;
-    lblNoFiles.Alignment:=taCenter;
-end else lvFiles.Items[0].Selected:=True;
+//if lvFiles.Items.Count = 0 then begin
+//    lblNoFiles.Visible:=True;
+//    lblNoFiles.Alignment:=taCenter;
+//end else lvFiles.Items[0].Selected:=True;
 
 if lvFiles.Items.Count > 5 then
     lvFiles.Column[0].Width:=(lvFiles.ClientRect.Width - 20);
@@ -118,9 +120,10 @@ procedure TfrmAccounts.LoadLvFiles;
 var i: Integer;
 begin
     lvFiles.Items.Clear;
-    lblNoFiles.Visible:=False;
     for i := 0 to lsStoredDocs.Count - 1 do
     lvFiles.AddItem(lsStoredDocs[i], nil);
+    lvFiles.ItemIndex:=0;
+    lblNoFiles.Visible:=(lsStoredDocs.Count = 0);
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
@@ -142,9 +145,9 @@ end;
 
 procedure TfrmAccounts.lvFilesDblClick(Sender: TObject);
 begin
-if lvFiles.Items.Count <> 0 then
-    if lvFiles.Selected = nil then
-        lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
+if lvFiles.Items.Count = 0 then Exit;
+if lvFiles.Selected = nil then
+    lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
     btnOk.Click;
 end;
 
@@ -160,6 +163,19 @@ begin
     //
     btnCreateNewBase.Visible:=False;
     btnOK.Visible:=True;
+end;
+
+procedure TfrmAccounts.btnAddClick(Sender: TObject);
+begin
+    With OpenDialog do begin
+        DefaultExt:=strDefaultExt;
+        Title:=rsOpenDialogTitle;
+        Filter:=rsOpenDialogFilter;
+        if Execute then begin;
+            ReloadStoredDocs(FileName);
+            LoadLvFiles;
+        end;
+    end;
 end;
 
 procedure TfrmAccounts.btnCloseClick(Sender: TObject);
@@ -249,22 +265,24 @@ end;
 
 procedure TfrmAccounts.btnOKClick(Sender: TObject);
 begin
-case pcAccounts.TabIndex of
-//0: do //
-0: begin
-        FFileName:=lvFiles.Selected.Caption;
-        if not FileExists(FFileName) then
-            if MessageBox(Application.Handle,
+    if lvFiles.Selected = nil then Exit;
+    FFileName:=lvFiles.Selected.Caption;
+    if not FileExists(FFileName) then
+        if MessageBox(Application.Handle,
             PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
             'Title',
-            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL then
-                Exit;
-    end;
-1:  begin
-        FFileName:= txtNewBase.Text;
-    end;
+            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
+            then Exit
+            else CreateNewBase(FFileName);
+    ReloadStoredDocs(FFileName);
+    Self.ModalResult:=mrOK;
 end;
-Self.ModalResult:=mrOK;
+
+procedure TfrmAccounts.btnRemoveClick(Sender: TObject);
+begin
+    if lvFiles.Selected = nil then Exit;
+    RemoveStoredDocs(lvFiles.Selected.Caption);
+    LoadLvFiles;
 end;
 
 end.

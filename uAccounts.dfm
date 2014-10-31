@@ -32,22 +32,20 @@ object frmAccounts: TfrmAccounts
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = imlAccounts
     MultiLine = True
-    TabHeight = 26
+    TabHeight = 25
     TabOrder = 0
-    ExplicitHeight = 301
     object tsOpen: TTabSheet
       Caption = 'Open document'
       ImageIndex = 7
       OnShow = tsOpenShow
-      ExplicitLeft = 0
-      ExplicitTop = 35
-      ExplicitHeight = 266
+      ExplicitTop = 32
+      ExplicitHeight = 264
       DesignSize = (
         332
-        264)
+        265)
       object Image1: TImage
         Left = 283
-        Top = 199
+        Top = 200
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -154,7 +152,7 @@ object frmAccounts: TfrmAccounts
       end
       object Image2: TImage
         Left = 283
-        Top = 199
+        Top = 200
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -256,12 +254,11 @@ object frmAccounts: TfrmAccounts
       end
       object Label1: TLabel
         Left = 12
-        Top = 185
+        Top = 186
         Width = 50
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Password:'
-        ExplicitTop = 186
       end
       object Label6: TLabel
         Left = 12
@@ -274,38 +271,37 @@ object frmAccounts: TfrmAccounts
         Left = 218
         Top = 144
         Width = 100
-        Height = 31
+        Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'Remove'
         Flat = True
-        ExplicitTop = 145
+        OnClick = btnRemoveClick
       end
       object btnAdd: TSpeedButton
         Left = 116
         Top = 144
         Width = 100
-        Height = 31
+        Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'Add'
         Flat = True
-        ExplicitTop = 145
+        OnClick = btnAddClick
       end
       object btnNew: TSpeedButton
         Left = 11
         Top = 144
         Width = 100
-        Height = 31
+        Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'New'
         Flat = True
         OnClick = btnNewClick
-        ExplicitTop = 145
       end
       object lvFiles: TListView
         Left = 11
         Top = 24
         Width = 307
-        Height = 117
+        Height = 118
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -323,22 +319,22 @@ object frmAccounts: TfrmAccounts
         ViewStyle = vsReport
         OnClick = lvFilesClick
         OnDblClick = lvFilesDblClick
-        ExplicitHeight = 119
+        ExplicitHeight = 117
       end
       object chkShowMainPass: TCheckBox
         Left = 11
-        Top = 236
+        Top = 237
         Width = 158
         Height = 16
         Anchors = [akLeft, akBottom]
         Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1089#1080#1084#1074#1086#1083#1099
         TabOrder = 1
         OnClick = chkShowMainPassClick
-        ExplicitTop = 215
+        ExplicitTop = 236
       end
       object txtPass: TEdit
         Left = 11
-        Top = 201
+        Top = 202
         Width = 266
         Height = 27
         Anchors = [akLeft, akRight, akBottom]
@@ -353,22 +349,22 @@ object frmAccounts: TfrmAccounts
         ParentFont = False
         PasswordChar = #8226
         TabOrder = 2
-        ExplicitTop = 180
+        ExplicitTop = 201
       end
       object lblNoFiles: TStaticText
         Left = 22
-        Top = 72
+        Top = 74
         Width = 283
-        Height = 26
+        Height = 17
         Alignment = taCenter
         AutoSize = False
         Caption = 'No files found'
         Color = clBtnHighlight
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clGrayText
-        Font.Height = -16
+        Font.Height = -11
         Font.Name = 'Tahoma'
-        Font.Style = [fsItalic]
+        Font.Style = []
         ParentColor = False
         ParentFont = False
         TabOrder = 3
@@ -380,11 +376,11 @@ object frmAccounts: TfrmAccounts
       Caption = 'Create new document'
       ImageIndex = 4
       OnShow = tsNewShow
-      ExplicitTop = 26
-      ExplicitHeight = 243
+      ExplicitTop = 32
+      ExplicitHeight = 264
       DesignSize = (
         332
-        264)
+        265)
       object lblPassConfirm: TLabel
         Left = 12
         Top = 95
@@ -459,18 +455,18 @@ object frmAccounts: TfrmAccounts
       end
       object CheckBox1: TCheckBox
         Left = 11
-        Top = 138
+        Top = 139
         Width = 134
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = #1055#1086#1076#1089#1082#1072#1079#1082#1072' '#1076#1083#1103' '#1087#1072#1088#1086#1083#1103
         Enabled = False
         TabOrder = 3
-        ExplicitTop = 140
+        ExplicitTop = 138
       end
       object Memo1: TMemo
         Left = 11
-        Top = 156
+        Top = 157
         Width = 310
         Height = 45
         Anchors = [akLeft, akRight, akBottom]
@@ -478,7 +474,7 @@ object frmAccounts: TfrmAccounts
         Lines.Strings = (
           'Not realized yet')
         TabOrder = 4
-        ExplicitTop = 158
+        ExplicitTop = 156
       end
       object txtNewBase: TEdit
         Left = 11
@@ -511,7 +507,6 @@ object frmAccounts: TfrmAccounts
     Default = True
     TabOrder = 2
     OnClick = btnOKClick
-    ExplicitTop = 315
   end
   object btnCreateNewBase: TButton
     Left = 252
@@ -524,9 +519,9 @@ object frmAccounts: TfrmAccounts
     TabOrder = 3
     Visible = False
     OnClick = btnCreateNewBaseClick
-    ExplicitTop = 315
   end
   object OpenDialog: TOpenDialog
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 100
     Top = 304
   end
@@ -539,7 +534,7 @@ object frmAccounts: TfrmAccounts
     Left = 147
     Top = 304
     Bitmap = {
-      494C010108001C03780316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001C037C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

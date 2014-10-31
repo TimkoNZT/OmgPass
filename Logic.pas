@@ -88,9 +88,10 @@ function IsDocValidate: Boolean;
 function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
 function LoadStoredDocs(): TStringList;
-procedure ReloadStoredDocs(newFile: String = '');
+procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
-
+function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
+procedure DocumentClose;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
@@ -566,7 +567,24 @@ var
 	newItem: IXMLNode;
     destNode: IXMLNode;     //ntFolder;
     newTreeNode: TTreeNode;
+
+function IterateItems(Node: IXMLNode; Full: Boolean): Integer;
+var i: Integer;
 begin
+    for i:= 0 to Node.ChildNodes.Count - 1 do begin
+        if GetNodeType(Node.ChildNodes[i]) = ntItem then
+            inc(result);
+        if ((GetNodeType(Node.ChildNodes[i]) = ntFolder) or (GetNodeType(Node.ChildNodes[i]) = ntPage)) and Full then
+            result:= result + IterateItems(Node.ChildNodes[i], true);
+    end;
+end;
+
+begin
+    if IterateItems(NodeByPath(xmlMain, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
+        MessageBox(Application.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR);
+        Exit;
+    end;
+
 	destNode:=IXMLNode(treeNode.Data);
 	LogNodeInfo(destNode, 'InsertItem');
 	if GetNodeType(destNode) = ntItem then begin
@@ -775,7 +793,7 @@ begin
     xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
-    SaveStoredDocs;
+    //SaveStoredDocs;
     xmlCfg.Save;
 end;
 procedure SaveDocSettings;
@@ -927,7 +945,6 @@ begin
         Exit
     end;
     if not IsDocValidate then Exit;
-    ReloadStoredDocs(xmlMain.FileName);
 
     CheckVersion;
     CheckUpdates;
@@ -1050,6 +1067,7 @@ begin
     Result:=TStringList.Create;
     for i := 0 to Integer(xmlCfg.GetValue('Count', 0, 'Files')) - 1 do begin
         Result.Add(xmlCfg.GetValue('File_' + IntToStr(i), '', 'Files'));
+        Log(Format('Stored Documents: Index %d = %s ', [i, Result[i]]));
     end;
 end;
 procedure ReloadStoredDocs(newFile: String);
@@ -1057,13 +1075,14 @@ procedure ReloadStoredDocs(newFile: String);
 //Поднимаем его из середины списка если он там уже был
 var i: Integer;
 begin
-    //Изящно ёпт!
-//    if lsStoredDocs.Find(newFile, i) then lsStoredDocs.Delete(i);
+    //Изящно ёпт! Но не работает для несортированого списка.
+    //if lsStoredDocs.Find(newFile, i) then lsStoredDocs.Delete(i);
     for i := lsStoredDocs.Count - 1 downto 0 do begin
         if lsStoredDocs.Strings[i] = newFile then
             lsStoredDocs.Delete(i);
     end;
     lsStoredDocs.Insert(0, newFile);
+    SaveStoredDocs;
 end;
 function SaveStoredDocs: Boolean;
 //Сохраняем список файлов в конфиг
@@ -1073,6 +1092,23 @@ begin
     for i := 0 to lsStoredDocs.Count - 1 do begin
         xmlCfg.SetValue('File_' + IntToStr(i), lsStoredDocs.Strings[i], 'Files');
     end;
+//    xmlCfg.Save;
+end;
+function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
+begin
+    if Index = -1 then
+        //Find - Только для сортированных списков
+        //if lsStoredDocs.Find(DocPath, Index) then
+        Index := lsStoredDocs.IndexOf(DocPath);
+    if (Index > -1) and (Index < lsStoredDocs.Count) then begin
+        lsStoredDocs.Delete(Index);
+        Result:= not (Index = -1);
+    end;
+    SaveStoredDocs;
 end;
 
+procedure DocumentClose;
+begin
+    SaveDocSettings;       //Перенести в процедуру закрытия документа
+end;
 end.

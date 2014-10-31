@@ -38,6 +38,7 @@ resourcestring
     rsDelFieldConfirmationCaption = 'Deleting field';
     rsCantDelTitleField = 'Can''t delete title of record';
     rsFieldNotSelected = 'Field not selected';
+    rsDemo = 'Sorry, you''ve reached the limit of the records count for the test version of program';
     rsDocumentIsEmpty = 'Hmm... It looks like your document is empty!' + #10#13 + 'Would you like add new page?';
     //
     //
@@ -88,7 +89,8 @@ resourcestring
     rsOpen = 'Open';
 
     //frmAccounts
-    rsSaveDialogFilter = 'Omg!Pass bases|*.xml|XMLFiles|*.xml';
+    rsSaveDialogFilter = 'Omg!Pass XML|*.xml|Omg!Pass Crypted|*.opwd';
+    rsOpenDialogFilter = 'Omg!Pass XML|*.xml|Omg!Pass Crypted|*.opwd|All files|*.*';
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          #10#13 + 'Would you like to create a new document' +
                          #10#13 + '%s ?';

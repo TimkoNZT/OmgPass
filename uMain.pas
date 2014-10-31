@@ -667,16 +667,18 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-    SaveDocSettings;
+//Action:=caFree;
+    if XMLMain.FileName<>'' then DocumentClose;
     SaveSettings;
     //DeleteFile(xmlMain.FileName);   //
+    Application.Terminate;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
     if not InitGlobal then
-        //Self.Close;
-        Application.Terminate;
+        frmMain.Close;
+//        Application.Terminate;
 end;
 
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);
