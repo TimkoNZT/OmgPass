@@ -19,10 +19,12 @@ type
     chkShowButton: TCheckBox;
     CheckBox1: TCheckBox;
     imlTypes: TImageList;
+    lblTitleWarningInfo: TLabel;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); reintroduce; overload;
     procedure FormShow(Sender: TObject);
+    procedure cmbFieldTypeChange(Sender: TObject);
   private
     fNode: IXMLNode;
     { Private declarations }
@@ -53,6 +55,11 @@ begin
         setAttribute(fNode, 'button', 'false');
 
     Self.ModalResult:=mrOk;
+end;
+
+procedure TfrmEditField.cmbFieldTypeChange(Sender: TObject);
+begin
+    //
 end;
 
 constructor TfrmEditField.Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False);

@@ -22,7 +22,7 @@ TfrmMain = class(TForm)
     mnuDelete: TMenuItem;
     mnuInsertFolder: TMenuItem;
     mnuEditItem: TMenuItem;
-    N9: TMenuItem;
+    mnuService: TMenuItem;
     N11: TMenuItem;
     N12: TMenuItem;
     mnuOptions: TMenuItem;
@@ -145,6 +145,7 @@ TfrmMain = class(TForm)
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure N12Click(Sender: TObject);
+    procedure mnuServiceClick(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -711,6 +712,12 @@ end;
 procedure TfrmMain.N12Click(Sender: TObject);
 begin
     ShellExecute(frmMain.Handle, 'open', PwideChar(strLink), nil, nil, SW_SHOW);
+end;
+
+procedure TfrmMain.mnuServiceClick(Sender: TObject);
+begin
+Log('MenuDraw');
+mnuClearClip.Enabled:= IsntClipboardEmpty;
 end;
 
 //Очистка буфера

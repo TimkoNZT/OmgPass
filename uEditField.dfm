@@ -33,6 +33,14 @@ object frmEditField: TfrmEditField
     Height = 13
     Caption = 'Field type:'
   end
+  object lblTitleWarningInfo: TLabel
+    Left = 16
+    Top = 122
+    Width = 202
+    Height = 13
+    Caption = '*Can'#39't change type for only title of record'
+    Visible = False
+  end
   object txtFieldTitle: TEdit
     Left = 16
     Top = 33
@@ -56,6 +64,7 @@ object frmEditField: TfrmEditField
     Anchors = [akLeft, akTop, akRight]
     Color = clBtnFace
     TabOrder = 1
+    OnChange = cmbFieldTypeChange
     Images = imlTypes
   end
   object btnOK: TButton
@@ -84,15 +93,15 @@ object frmEditField: TfrmEditField
     Top = 82
     Width = 117
     Height = 18
-    Caption = 'Show button'
+    Caption = 'Show action button'
     TabOrder = 4
   end
   object CheckBox1: TCheckBox
-    Left = 24
-    Top = 120
-    Width = 217
+    Left = 154
+    Top = 98
+    Width = 97
     Height = 18
-    Caption = 'Anything else'
+    Caption = 'Record title'
     TabOrder = 5
     Visible = False
   end
@@ -102,7 +111,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C0101080018003C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800440010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

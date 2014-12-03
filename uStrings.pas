@@ -36,7 +36,9 @@ resourcestring
     //MessageBoxes
     rsDelFieldConfirmationText = 'Confirm to delete field "%s"?' + #10#13 + 'Value will be deleted too';
     rsDelFieldConfirmationCaption = 'Deleting field';
-    rsCantDelTitleField = 'Can''t delete title of record';
+    rsCantDelTitleField = 'Can''t delete unique title of record';
+//    rsChangeTitleWarningCaption = 'Deleting field';
+//    rsChangeTitleWarning = 'Can''t change format for only title of record';
     rsFieldNotSelected = 'Field not selected';
     rsDemo = 'Sorry, you''ve reached the limit of the records count for the test version of program';
     rsDocumentIsEmpty = 'Hmm... It looks like your document is empty!' + #10#13 + 'Would you like add new page?';

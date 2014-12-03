@@ -243,9 +243,10 @@ begin
 	ntItem,
     ntDefItem:
         for i := 0 to Node.ChildNodes.Count - 1 do begin
-        	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then
+        	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then begin
             	result:=Node.ChildNodes[i].Text;
                 Exit;
+            end;
     	end;
     ntPage,
     ntFolder,
@@ -269,10 +270,11 @@ begin
     ntItem,
     ntDefItem:
         for i := 0 to Node.ChildNodes.Count - 1 do begin
-        	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then
-            Node.ChildNodes[i].Text:=Title;
-            Result:=True;
-            Exit;
+        	if GetFieldFormat(Node.ChildNodes[i]) = ffTitle then begin
+                Node.ChildNodes[i].Text:=Title;
+                Result:=True;
+                Exit;
+            end;
     	end;
     ntFolder,
     ntDefFolder,
