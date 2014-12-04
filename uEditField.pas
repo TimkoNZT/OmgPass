@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   {XML}
-  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ImgList;
+  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ImgList,
+  Vcl.ExtCtrls;
 
 type
   TfrmEditField = class(TForm)
@@ -20,6 +21,7 @@ type
     CheckBox1: TCheckBox;
     imlTypes: TImageList;
     lblTitleWarningInfo: TLabel;
+    pnlLine: TPanel;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); reintroduce; overload;
@@ -53,7 +55,6 @@ begin
         Log(RemoveAttribute(fNode, 'button'))
     else
         setAttribute(fNode, 'button', 'false');
-
     Self.ModalResult:=mrOk;
 end;
 

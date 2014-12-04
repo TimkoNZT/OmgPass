@@ -43,30 +43,35 @@ object frmEditItem: TfrmEditItem
   end
   object fpEdit: TScrollBox
     AlignWithMargins = True
-    Left = 0
-    Top = 64
-    Width = 374
-    Height = 287
-    Margins.Left = 0
-    Margins.Top = 10
-    Margins.Right = 0
+    Left = 3
+    Top = 67
+    Width = 368
+    Height = 281
+    Margins.Bottom = 60
     VertScrollBar.Increment = 26
     VertScrollBar.Tracking = True
-    Align = alTop
+    Align = alClient
     BorderStyle = bsNone
     DoubleBuffered = True
+    Color = clBtnFace
     Padding.Left = 15
     Padding.Top = 10
     Padding.Right = 15
+    ParentColor = False
     ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
   end
   object ToolBarEdit: TToolBar
+    AlignWithMargins = True
     Left = 0
     Top = 0
     Width = 374
     Height = 54
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 10
     ButtonHeight = 54
     ButtonWidth = 55
     Caption = 'tool'
@@ -128,8 +133,19 @@ object frmEditItem: TfrmEditItem
       Caption = 'tbtnAdvanced'
       ImageIndex = 4
       Style = tbsCheck
+      Visible = False
       OnClick = tbtnAdvancedClick
     end
+  end
+  object pnlLine: TPanel
+    Left = 8
+    Top = 356
+    Width = 358
+    Height = 2
+    BevelOuter = bvLowered
+    Ctl3D = True
+    ParentCtl3D = False
+    TabOrder = 4
   end
   object imlToolBarEdit: TImageList
     ColorDepth = cd32Bit
@@ -138,7 +154,7 @@ object frmEditItem: TfrmEditItem
     Left = 40
     Top = 360
     Bitmap = {
-      494C010107001800600030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101070018006C0030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C00000006000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

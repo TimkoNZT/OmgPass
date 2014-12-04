@@ -9,7 +9,7 @@ uses
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ComCtrls,
   Vcl.ImgList, Vcl.ToolWin,
 
-  uStrings, Vcl.Menus;
+  uStrings, Vcl.Menus, Vcl.ExtCtrls;
 
 type
   TfrmEditItem = class(TForm)
@@ -30,6 +30,7 @@ type
     mnuFastField2: TMenuItem;
     ToolButton1: TToolButton;
     tbtnAdvanced: TToolButton;
+    pnlLine: TPanel;
     procedure btnCloseClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure fpEditMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -149,6 +150,9 @@ begin
     Node:= IXMLNode(TSpeedButton(Sender).Parent.Tag);
     frmEditItem.SaveValues;
     if EditField(Node) then begin
+        LogNodeInfo(Node, 'Поле');
+        LogNodeInfo(fItem, 'Родитель2');
+        LogNodeInfo(Node.ParentNode, 'Родитель');
         GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True, False, bAdvancedEdit);
     end else Log('EditField: False');
 end;

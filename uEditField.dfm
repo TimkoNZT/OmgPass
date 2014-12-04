@@ -39,6 +39,14 @@ object frmEditField: TfrmEditField
     Width = 202
     Height = 13
     Caption = '*Can'#39't change type for only title of record'
+    Color = clBtnText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clHotLight
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
     Visible = False
   end
   object txtFieldTitle: TEdit
@@ -105,13 +113,23 @@ object frmEditField: TfrmEditField
     TabOrder = 5
     Visible = False
   end
+  object pnlLine: TPanel
+    Left = 8
+    Top = 147
+    Width = 275
+    Height = 2
+    BevelOuter = bvLowered
+    Ctl3D = True
+    ParentCtl3D = False
+    TabOrder = 6
+  end
   object imlTypes: TImageList
     ColorDepth = cd32Bit
     DrawingStyle = dsTransparent
     Left = 16
     Top = 176
     Bitmap = {
-      494C010108001800440010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001800480010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

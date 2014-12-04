@@ -281,17 +281,18 @@ begin
                 end;
                 ffTitle: lblTitle.Font.Color:=clHotLight;
             end;
-            if isAdvanced then begin
+            //
+//            if True{isAdvanced} then begin
                 SetButtonImg(btnSmart, frmMain.imlField, 4);
                 //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
                 //Загадочное сука место
                 btnSmart.OnClick:= frmEditItem.StartEditField;
-            end else begin
-                SetButtonImg(btnSmart, frmMain.imlField, 0);
-                //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
-                //Загадочное сука место
-                btnSmart.OnClick:= frmEditItem.ClipboardToEdit;
-            end;
+//            end else begin
+//                SetButtonImg(btnSmart, frmMain.imlField, 0);
+//                //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+//                //Загадочное сука место
+//                btnSmart.OnClick:= frmEditItem.ClipboardToEdit;
+//            end;
         end;
     end;
     //Log('--------------------GenerateField:End');
