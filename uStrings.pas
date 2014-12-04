@@ -22,7 +22,7 @@ resourcestring
     rsMailDefName = 'Mail';
     rsFileDefName = 'File';
     //Название новой записи, папки, страницы
-    rsNewItemTitle = 'New item';
+    rsNewItemTitle = 'New record';
     rsNewFolderTitle = 'New folder';
     rsNewPageTitle = 'New Page';
     //Серый текст в поле поиска
@@ -41,7 +41,8 @@ resourcestring
 //    rsChangeTitleWarning = 'Can''t change format for only title of record';
     rsFieldNotSelected = 'Field not selected';
     rsDemo = 'Sorry, you''ve reached the limit of the records count for the test version of program';
-    rsDocumentIsEmpty = 'Hmm... It looks like your document is empty!' + #10#13 + 'Would you like add new page?';
+    rsDocumentIsEmpty = 'Hmm, it looks like your document is empty!' + #10#13 + 'Would you like add new page?';
+    rsDocumentIsEmptyTitle = 'Ooops!';
     //
     //
     const arrFieldFormats: array[0..8] of String = ('title',
@@ -99,6 +100,8 @@ resourcestring
     rsSaveDialogFileExists = 'You have selected an existing file:' + #10#13 + '%s' + #10#13+ 'Overwrite it?';
     rsSaveDialogTitle = 'Save new database as...';
     rsOpenDialogTitle = 'Open database...';
+    rsOpenDocumentError = 'Can''t open %s.' + #10#13 + 'Is this a right file?';
+    rsOpenDocumentErrorTitle = 'Open document error';
     //frmMain
 
     //

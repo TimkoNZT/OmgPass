@@ -2,11 +2,12 @@ object frmEditItem: TfrmEditItem
   Left = 530
   Top = 326
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsDialog
   Caption = 'frmEditItem'
-  ClientHeight = 408
+  ClientHeight = 382
   ClientWidth = 374
   Color = clBtnFace
+  Constraints.MinHeight = 420
+  Constraints.MinWidth = 390
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -17,22 +18,22 @@ object frmEditItem: TfrmEditItem
   OnShow = FormShow
   DesignSize = (
     374
-    408)
+    382)
   PixelsPerInch = 96
   TextHeight = 13
   object btnClose: TButton
     Left = 185
-    Top = 364
+    Top = 338
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
-    Caption = #1054#1090#1084#1077#1085#1072
+    Caption = 'Cancel'
     TabOrder = 0
     OnClick = btnCloseClick
   end
   object btnOK: TButton
     Left = 274
-    Top = 364
+    Top = 338
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -44,9 +45,9 @@ object frmEditItem: TfrmEditItem
   object fpEdit: TScrollBox
     AlignWithMargins = True
     Left = 3
-    Top = 67
+    Top = 62
     Width = 368
-    Height = 281
+    Height = 260
     Margins.Bottom = 60
     VertScrollBar.Increment = 26
     VertScrollBar.Tracking = True
@@ -55,7 +56,6 @@ object frmEditItem: TfrmEditItem
     DoubleBuffered = True
     Color = clBtnFace
     Padding.Left = 15
-    Padding.Top = 10
     Padding.Right = 15
     ParentColor = False
     ParentDoubleBuffered = False
@@ -71,7 +71,7 @@ object frmEditItem: TfrmEditItem
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
-    Margins.Bottom = 10
+    Margins.Bottom = 5
     ButtonHeight = 54
     ButtonWidth = 55
     Caption = 'tool'
@@ -130,18 +130,21 @@ object frmEditItem: TfrmEditItem
     object tbtnAdvanced: TToolButton
       Left = 252
       Top = 0
+      Hint = 'Advanced mode'
       Caption = 'tbtnAdvanced'
       ImageIndex = 4
+      ParentShowHint = False
+      ShowHint = True
       Style = tbsCheck
-      Visible = False
       OnClick = tbtnAdvancedClick
     end
   end
   object pnlLine: TPanel
     Left = 8
-    Top = 356
-    Width = 358
+    Top = 327
+    Width = 361
     Height = 2
+    Anchors = [akLeft, akRight, akBottom]
     BevelOuter = bvLowered
     Ctl3D = True
     ParentCtl3D = False
@@ -152,9 +155,9 @@ object frmEditItem: TfrmEditItem
     Height = 48
     Width = 48
     Left = 40
-    Top = 360
+    Top = 336
     Bitmap = {
-      494C0101070018006C0030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107001800740030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C00000006000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2538,8 +2541,8 @@ object frmEditItem: TfrmEditItem
       000000000000}
   end
   object popupFastField: TPopupMenu
-    Left = 128
-    Top = 360
+    Left = 112
+    Top = 344
     object mnuFastField0: TMenuItem
       Caption = 'Login field'
       GroupIndex = 1

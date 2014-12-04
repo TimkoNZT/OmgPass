@@ -14,7 +14,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 const
 	bShowLogAtStart: Boolean = True;
 var
-	xmlMain: IXMLDocument;          //Основной наш документ
+	xmlMain: TXMLDocument;          //Основной наш документ
     xmlCfg: TSettings;
     LogList: TStringList;           //Переменная для логирования
 	PageList: IXMLNodeList;      	//Список страниц
@@ -94,7 +94,9 @@ function LoadStoredDocs(): TStringList;
 procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
+function DocumentOpen(Path: String; isReOpen: Boolean = False): Boolean;
 procedure DocumentClose;
+procedure MessageIfEmptyDoc;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
@@ -282,17 +284,17 @@ begin
                 ffTitle: lblTitle.Font.Color:=clHotLight;
             end;
             //
-//            if True{isAdvanced} then begin
+            if isAdvanced then begin
                 SetButtonImg(btnSmart, frmMain.imlField, 4);
                 //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
                 //Загадочное сука место
                 btnSmart.OnClick:= frmEditItem.StartEditField;
-//            end else begin
-//                SetButtonImg(btnSmart, frmMain.imlField, 0);
-//                //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
-//                //Загадочное сука место
-//                btnSmart.OnClick:= frmEditItem.ClipboardToEdit;
-//            end;
+            end else begin
+                SetButtonImg(btnSmart, frmMain.imlField, 0);
+                //btnSmart.OnClick:= clsSmartMethods.Create.EditField;
+                //Загадочное сука место
+                btnSmart.OnClick:= frmEditItem.ClipboardToEdit;
+            end;
         end;
     end;
     //Log('--------------------GenerateField:End');
@@ -321,6 +323,7 @@ begin
     xmlMain.Active:=False;
 	xmlMain.Active:=True;
     intExpandFlag:=1;
+    //intCurrentPage:=-1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
 	PageList:= NodeByPath(x, 'Root|Data').ChildNodes;
@@ -533,7 +536,7 @@ end;
 procedure AddNewPage();
 //Новая страничка
 begin
-	inc(intCurrentPage);
+    inc(intCurrentPage);
     PageList.Insert(intCurrentPage, CreateClearPage);
 //    ParsePagesToTabs(xmlMain, frmMain.tabMain);
 //    frmMain.tabMainChange(nil);
@@ -808,7 +811,7 @@ begin
         if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
         if frmMain.WindowState = wsNormal then begin
             //Принудительно показываем форму
-            //frmMain.Show;
+            frmMain.Show;
             //И задаем положение
             frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
                 xmlCfg.GetValue('Top', 0, 'Position'),
@@ -822,14 +825,13 @@ begin
     end;
 end;
 procedure LoadDocSettings;
-//А здесь настрояки документа
+//А здесь грузятся настройки документа и заодно документ выводится в форму
 begin
- if GetDocProperty('SelectedPage', 0) < PageList.Count then
+    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    if GetDocProperty('SelectedPage', 0) < PageList.Count then
         frmMain.tabMain.TabIndex := GetDocProperty('SelectedPage', 0);
-
-    //frmMain.tabMainChange(nil);
+    //Эта строчка необходима тУт!
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
-
     if GetDocProperty('Selected', 0) < frmMain.tvMain.Items.Count  then
         frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;
 end;
@@ -858,10 +860,15 @@ procedure SaveDocSettings;
 {$ENDREGION 'Настройки'}
 begin
     //Номер выбранного элемента и страницы сохраняется в документ
+    //Если вдруг режим поиска, то записываем сохраненное значение
     if bSearchMode then
         SetDocProperty('Selected', iSelected)
+    //Иначе если нормальный режим, то записываем номер выделенного узла
+    //Если узла нет, то записывается ноль
     else if frmMain.tvMain.Selected<>nil then
-        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex);
+        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex)
+    else
+        SetDocProperty('Selected', 0);
     SetDocProperty('SelectedPage', intCurrentPage);
 end;
 procedure LoadThemes;
@@ -1004,75 +1011,32 @@ function InitGlobal: Boolean;
 begin
 	LogList:= TStringList.Create;
     xmlCfg:=TSettings.Create();
-    xmlMain:=TXMLDocument.Create(frmMain);
     lsStoredDocs:= LoadStoredDocs;
-
 	Log('Инициализация...');
     //LoadThemes;
+    //intCurrentPage:=0;
     if not LoadBase then begin
         Result:=False;
         Exit
     end;
-    if not IsDocValidate then Exit;
+    //if not IsDocValidate then Exit;
 
     CheckVersion;
     CheckUpdates;
     LoadSettings;
-
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
-    if PageList.Count = 0 then begin
-        frmMain.Show;
-        if (MessageBox(Application.Handle, PWideChar(rsDocumentIsEmpty), PWideChar(Application.Title), MB_YESNO + MB_APPLMODAL) = ID_YES)  then begin
-            AddNewPage;
-            ParsePagesToTabs(xmlMain, frmMain.tabMain);
-        end;
-    end;
-
-
-    LoadDocSettings;
-
     Result:=True;
 
+//    with frmMain do begin
 //    SetButtonImg(btnAddPage, imlField, 10);
 //    SetButtonImg(btnDeletePage, imlField, 12);
 //    SetButtonImg(btnTheme, imlTab, 41);
+//    end;
 
 //	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
 end;
 function InitSecondary: Boolean;
 begin
     //
-end;
-function LoadBase: Boolean;
-//Загрузка документа
-//Вызывается менеджер документов
-begin
-//FreeAndNil(xmlMain);
-    xmlMain.Active:=True;
-    xmlMain.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-    xmlMain.ParseOptions:=[poValidateOnParse];
-if 0=1 {опция на автооткрытие файла без пароля} then //
-    else begin
-        if (not Assigned(frmAccounts)) then
-            frmAccounts:=  TfrmAccounts.Create(frmMain);
-        try
-            if frmAccounts.ShowModal = mrOK then begin
-                Log ('frmAccounts: mrOK');
-                //if FileExists(frmAccounts.FFileName) then
-                    xmlMain.LoadFromFile(frmAccounts.FFileName);
-                //else CreateNewBase(frmAccounts.FFileName);
-                result:=True;
-            end else begin
-                Log ('frmAccounts: mrCancel');
-                frmMain.WindowState:=wsMinimized;
-                Result:=False;
-                Exit;
-            end;
-        except
-            on e: Exception do ErrorMsg(e, 'Load Document');
-        end;
-        FreeAndNil(frmAccounts);
-    end;
 end;
 procedure CreateNewBase(fPath: String);
 //Новый документ с нуля
@@ -1107,7 +1071,6 @@ begin
         on e: Exception do ErrorMsg(e, 'Validate Document', True);
     end;
 end;
-
 function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
 //Логирование ошибок
 //Параметр isFatal немедленно завершает программу
@@ -1119,7 +1082,7 @@ begin
     LogList.SaveToFile('log.txt');
     if isFatal then Application.Terminate;
 end;
-
+{$REGION '#DocProperty'}
 function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 //Установка и чтение свойств документа
 //Все свойства хранятся в ntHeader
@@ -1140,7 +1103,8 @@ begin
         hNode.AddChild(PropertyName);
     hNode.ChildValues[PropertyName]:=Value;
 end;
-
+{$ENDREGION}
+{$REGION '#StoredDocs'}
 function LoadStoredDocs(): TStringList;
 //Загружаем список известных файлов из конфига в список
 var i: Integer;
@@ -1188,9 +1152,86 @@ begin
     end;
     SaveStoredDocs;
 end;
-
+{$ENDREGION}
+procedure MessageIfEmptyDoc;
+begin
+    if PageList.Count = 0 then begin
+        frmMain.Show;
+        if (MessageBox(Application.Handle,
+                PWideChar(rsDocumentIsEmpty),
+                PWideChar(rsDocumentIsEmptyTitle),
+                MB_YESNO + MB_APPLMODAL + MB_ICONINFORMATION)
+                = ID_YES)
+                then begin
+                    AddNewPage;
+                    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+                    ParsePageToTree(0, frmMain.tvMain);
+        end;
+    end;
+end;
+function LoadBase: Boolean;
+var Accept: Boolean;
+//Загрузка документа
+//Вызывается менеджер документов
+begin
+    if (not Assigned(frmAccounts)) then
+        frmAccounts:=  TfrmAccounts.Create(frmMain);
+    while not Accept do begin
+        if frmAccounts.ShowModal = mrOK then begin
+            Log ('frmAccounts: mrOK');
+            //if FileExists(frmAccounts.FFileName) then
+            if DocumentOpen(frmAccounts.FFileName) then begin
+                Accept:=True;
+                Result:=True;
+            end;
+        end else begin
+            Log ('frmAccounts: mrCancel');
+            frmMain.WindowState:=wsMinimized;
+            Accept:=True;
+            Result:=False;
+        end;
+    end;
+    FreeAndNil(frmAccounts);
+end;
+function DocumentOpen(Path: String; isReOpen: Boolean = False): Boolean;
+//функция ддолжна попытаться открыть файл всеми возможными способами
+//и проверить его на валидность
+var
+    xmlTemp: TXMLDocument;
+begin
+try
+    xmlTemp:=TXMLDocument.Create(Application);
+    xmlTemp.LoadFromFile(Path);
+    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    xmlTemp.ParseOptions:=[poValidateOnParse];
+    xmlTemp.Active:=True;
+    //Если дожили досюда и не скатились в ексцепшен, значит XML годный
+    //Закрываем старый документ
+    if isReOpen then DocumentClose;
+    //Переназначаем документ на рабочую переменную
+    xmlMain:=xmlTemp;
+except
+    on e: Exception do begin
+        ErrorMsg(e, 'DocumentOpen');
+        MessageBox(Application.Handle,
+            PWideChar(Format(rsOpenDocumentError {+ #10#13 + e.Message}, [frmAccounts.FFileName])),
+            PWideChar(rsOpenDocumentErrorTitle),
+            MB_APPLMODAL + MB_ICONWARNING);
+        Result:=False;
+        Exit;
+    end;
+end;
+    xmlTemp:=nil;
+    LoadDocSettings;
+    MessageIfEmptyDoc;
+    Result:=True;
+end;
 procedure DocumentClose;
 begin
-    SaveDocSettings;       //Перенести в процедуру закрытия документа  ОК
+    if xmlMain.IsEmptyDoc then Exit;
+    SaveDocSettings;
+    xmlMain.Active:=False;
+    FreeAndNil(xmlMain);
 end;
+
 end.

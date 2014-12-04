@@ -670,7 +670,8 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 //Action:=caFree;
-    if XMLMain.FileName<>'' then DocumentClose;
+    //if not XMLMain.IsEmptyDoc then
+    DocumentClose;
     SaveSettings;
     //DeleteFile(xmlMain.FileName);   //
     Application.Terminate;

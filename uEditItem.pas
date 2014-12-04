@@ -150,10 +150,7 @@ begin
     Node:= IXMLNode(TSpeedButton(Sender).Parent.Tag);
     frmEditItem.SaveValues;
     if EditField(Node) then begin
-        LogNodeInfo(Node, 'Поле');
-        LogNodeInfo(fItem, 'Родитель2');
-        LogNodeInfo(Node.ParentNode, 'Родитель');
-        GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True, False, bAdvancedEdit);
+        GeneratePanel(Node.ParentNode, frmEditItem.fpEdit, True, False, frmEditItem.bAdvancedEdit);
     end else Log('EditField: False');
 end;
 
@@ -172,7 +169,7 @@ begin
     fItem.ChildNodes.Add(newField);
     if GetFieldFormat(newField) = ffPass then
         SetNodeValue(newField, GeneratePassword());
-    GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
+    GeneratePanel(fItem, frmEditItem.fpEdit, True, False, frmEditItem.bAdvancedEdit);
 end;
 
 procedure TfrmEditItem.tbtnAdvancedClick(Sender: TObject);
