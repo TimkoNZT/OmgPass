@@ -145,7 +145,6 @@ TfrmMain = class(TForm)
     procedure mnuTopClick(Sender: TObject);
     procedure mnuInsertPageClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure N12Click(Sender: TObject);
     procedure mnuServiceClick(Sender: TObject);
     procedure mnuEditDefaultClick(Sender: TObject);
@@ -660,10 +659,6 @@ begin
     //Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
-end;
-procedure TfrmMain.FormShow(Sender: TObject);
-begin
-    InitSecondary;
 end;
 
 procedure TfrmMain.fpMainMouseWheel(Sender: TObject; Shift: TShiftState;

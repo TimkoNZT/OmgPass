@@ -61,6 +61,7 @@ type
     procedure btnRemoveClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
@@ -100,7 +101,13 @@ end;
 
 procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-    btnClose.Click;
+    if Self.ModalResult <> mrOK then
+        btnClose.Click;
+end;
+
+procedure TfrmAccounts.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+    //
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
