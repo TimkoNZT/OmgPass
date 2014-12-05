@@ -44,7 +44,7 @@ procedure Log(Strs: TStrings); overload;
 
 function InitGlobal: Boolean;
 function InitSecondary: Boolean;
-function LoadBase: Boolean;
+function DocManager(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
 procedure LoadSettings;
@@ -94,7 +94,7 @@ function LoadStoredDocs(): TStringList;
 procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
-function DocumentOpen(Path: String; isReOpen: Boolean = False): Boolean;
+function DocumentOpen(Path: String): Boolean;
 procedure DocumentClose;
 procedure MessageIfEmptyDoc;
 
@@ -1005,7 +1005,6 @@ function CheckVersion: Boolean;
 begin
     result:=true;
 end;
-
 function InitGlobal: Boolean;
 //Запуск программы
 begin
@@ -1015,7 +1014,7 @@ begin
 	Log('Инициализация...');
     //LoadThemes;
     //intCurrentPage:=0;
-    if not LoadBase then begin
+    if not DocManager then begin
         Result:=False;
         Exit
     end;
@@ -1032,7 +1031,6 @@ begin
 //    SetButtonImg(btnTheme, imlTab, 41);
 //    end;
 
-//	frmMain.Caption:= frmMain.Caption +' ['+ GetBaseTitle(xmlMain)+']';
 end;
 function InitSecondary: Boolean;
 begin
@@ -1169,31 +1167,31 @@ begin
         end;
     end;
 end;
-function LoadBase: Boolean;
+function DocManager(Reopen: Boolean = False): Boolean;
 var Accept: Boolean;
 //Загрузка документа
 //Вызывается менеджер документов
 begin
+    Accept:=False;
     if (not Assigned(frmAccounts)) then
-        frmAccounts:=  TfrmAccounts.Create(frmMain);
+        frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
     while not Accept do begin
         if frmAccounts.ShowModal = mrOK then begin
             Log ('frmAccounts: mrOK');
-            //if FileExists(frmAccounts.FFileName) then
             if DocumentOpen(frmAccounts.FFileName) then begin
                 Accept:=True;
                 Result:=True;
             end;
         end else begin
             Log ('frmAccounts: mrCancel');
-            frmMain.WindowState:=wsMinimized;
+            //frmMain.WindowState:=wsMinimized;
             Accept:=True;
             Result:=False;
         end;
     end;
     FreeAndNil(frmAccounts);
 end;
-function DocumentOpen(Path: String; isReOpen: Boolean = False): Boolean;
+function DocumentOpen(Path: String{; isReOpen: Boolean = False}): Boolean;
 //функция ддолжна попытаться открыть файл всеми возможными способами
 //и проверить его на валидность
 var
@@ -1207,7 +1205,7 @@ try
     xmlTemp.Active:=True;
     //Если дожили досюда и не скатились в ексцепшен, значит XML годный
     //Закрываем старый документ
-    if isReOpen then DocumentClose;
+    {if isReOpen then }DocumentClose;
     //Переназначаем документ на рабочую переменную
     xmlMain:=xmlTemp;
 except
@@ -1224,10 +1222,12 @@ end;
     xmlTemp:=nil;
     LoadDocSettings;
     MessageIfEmptyDoc;
+    frmMain.Caption:= Application.Title +' ['+ Path +']';
     Result:=True;
 end;
 procedure DocumentClose;
 begin
+    if xmlMain = nil then Exit;
     if xmlMain.IsEmptyDoc then Exit;
     SaveDocSettings;
     xmlMain.Active:=False;

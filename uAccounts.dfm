@@ -3,7 +3,7 @@ object frmAccounts: TfrmAccounts
   Top = 269
   BorderStyle = bsDialog
   Caption = 'frmAccounts'
-  ClientHeight = 364
+  ClientHeight = 366
   ClientWidth = 356
   Color = clBtnFace
   DoubleBuffered = True
@@ -15,18 +15,19 @@ object frmAccounts: TfrmAccounts
   GlassFrame.Bottom = 60
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     356
-    364)
+    366)
   PixelsPerInch = 96
   TextHeight = 13
   object pcAccounts: TPageControl
     Left = 8
     Top = 8
     Width = 340
-    Height = 300
+    Height = 302
     ActivePage = tsOpen
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = imlAccounts
@@ -39,10 +40,10 @@ object frmAccounts: TfrmAccounts
       OnShow = tsOpenShow
       DesignSize = (
         332
-        265)
+        267)
       object Image1: TImage
         Left = 283
-        Top = 200
+        Top = 202
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -149,7 +150,7 @@ object frmAccounts: TfrmAccounts
       end
       object Image2: TImage
         Left = 283
-        Top = 200
+        Top = 202
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -251,12 +252,13 @@ object frmAccounts: TfrmAccounts
       end
       object Label1: TLabel
         Left = 12
-        Top = 186
+        Top = 188
         Width = 50
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Password:'
         Enabled = False
+        ExplicitTop = 186
       end
       object Label6: TLabel
         Left = 12
@@ -267,39 +269,42 @@ object frmAccounts: TfrmAccounts
       end
       object btnRemove: TSpeedButton
         Left = 218
-        Top = 144
+        Top = 146
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'Remove'
         Flat = True
         OnClick = btnRemoveClick
+        ExplicitTop = 144
       end
       object btnAdd: TSpeedButton
         Left = 116
-        Top = 144
+        Top = 146
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'Add'
         Flat = True
         OnClick = btnAddClick
+        ExplicitTop = 144
       end
       object btnNew: TSpeedButton
         Left = 11
-        Top = 144
+        Top = 146
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
         Caption = 'New'
         Flat = True
         OnClick = btnNewClick
+        ExplicitTop = 144
       end
       object lvFiles: TListView
         Left = 11
         Top = 24
         Width = 307
-        Height = 118
+        Height = 120
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -320,7 +325,7 @@ object frmAccounts: TfrmAccounts
       end
       object chkShowMainPass: TCheckBox
         Left = 11
-        Top = 237
+        Top = 239
         Width = 158
         Height = 16
         Anchors = [akLeft, akBottom]
@@ -331,7 +336,7 @@ object frmAccounts: TfrmAccounts
       end
       object txtPass: TEdit
         Left = 11
-        Top = 202
+        Top = 204
         Width = 266
         Height = 27
         Anchors = [akLeft, akRight, akBottom]
@@ -375,7 +380,7 @@ object frmAccounts: TfrmAccounts
       OnShow = tsNewShow
       DesignSize = (
         332
-        265)
+        267)
       object lblPassConfirm: TLabel
         Left = 12
         Top = 95
@@ -454,7 +459,7 @@ object frmAccounts: TfrmAccounts
       end
       object CheckBox1: TCheckBox
         Left = 11
-        Top = 139
+        Top = 141
         Width = 134
         Height = 13
         Anchors = [akLeft, akBottom]
@@ -464,7 +469,7 @@ object frmAccounts: TfrmAccounts
       end
       object Memo1: TMemo
         Left = 11
-        Top = 157
+        Top = 159
         Width = 310
         Height = 45
         Anchors = [akLeft, akRight, akBottom]
@@ -485,7 +490,7 @@ object frmAccounts: TfrmAccounts
   end
   object btnClose: TButton
     Left = 162
-    Top = 319
+    Top = 321
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -495,7 +500,7 @@ object frmAccounts: TfrmAccounts
   end
   object btnOK: TButton
     Left = 252
-    Top = 319
+    Top = 321
     Width = 81
     Height = 35
     Anchors = [akRight, akBottom]
@@ -506,7 +511,7 @@ object frmAccounts: TfrmAccounts
   end
   object btnCreateNewBase: TButton
     Left = 252
-    Top = 319
+    Top = 321
     Width = 81
     Height = 35
     Anchors = [akRight, akBottom]
@@ -530,7 +535,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 312
     Bitmap = {
-      494C010108001C03980316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001C03A00316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

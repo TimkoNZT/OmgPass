@@ -36,7 +36,6 @@ TfrmMain = class(TForm)
     mnuClearClip: TMenuItem;
     N21: TMenuItem;
     mnuTop: TMenuItem;
-    N24: TMenuItem;
     ToolBarMain: TToolBar;
     imlToolBar: TImageList;
     tbtnAccounts: TToolButton;
@@ -81,6 +80,9 @@ TfrmMain = class(TForm)
     mnuInsertPage: TMenuItem;
     lblEmpty: TLabel;
     TaskDialog1: TTaskDialog;
+    mnuEditDefault: TMenuItem;
+    Advancedmode1: TMenuItem;
+    N2: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -146,6 +148,7 @@ TfrmMain = class(TForm)
     procedure FormShow(Sender: TObject);
     procedure N12Click(Sender: TObject);
     procedure mnuServiceClick(Sender: TObject);
+    procedure mnuEditDefaultClick(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -210,9 +213,7 @@ mnuAccounts.Click;
 end;
 procedure TfrmMain.mnuAccountsClick(Sender: TObject);
 begin
-if (not Assigned(frmAccounts)) then frmAccounts:=  TfrmAccounts.Create(Self, True);
-frmAccounts.ShowModal;
-FreeAndNil(frmAccounts);
+    DocManager(True);
 end;
 procedure TfrmMain.mnuBasePropertiesClick(Sender: TObject);
 begin
@@ -246,6 +247,11 @@ begin
 	if not tvMain.Selected.HasChildren or tvMain.Selected.IsFirstNode then
 		EditNode(tvMain.Selected);
 end;
+procedure TfrmMain.mnuEditDefaultClick(Sender: TObject);
+begin
+    EditDefaultItem;
+end;
+
 procedure TfrmMain.mnuEditItemClick(Sender: TObject);
 begin
 	EditNode(tvMain.Selected);

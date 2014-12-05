@@ -76,9 +76,9 @@ resourcestring
                                                     'File',
                                                     'Text or Login');
     //Заголовки окошек
-    rsFrmAccountsCaption = 'Document manager';
+    rsFrmAccountsCaption = ' welcomes you!';
     rsFrmAccountsCaptionOpen = 'Open base';
-    rsFrmAccountsCaptionChange = 'Change base';
+    rsFrmAccountsCaptionChange = ' - Document manager';
     rsFrmEditItemCaption = 'Edit record';
     rsFrmEditItemCaptionNew = 'New record';
     rsFrmEditFieldCaption = 'Edit field properties';

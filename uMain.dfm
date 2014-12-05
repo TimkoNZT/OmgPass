@@ -326,17 +326,17 @@ object frmMain: TfrmMain
       SubMenuImages = imlTab
       ImageIndex = 0
       object mnuAccounts: TMenuItem
-        Caption = #1057#1084#1077#1085#1080#1090#1100
+        Caption = 'Change'
         Default = True
         ImageIndex = 5
         ShortCut = 16466
         OnClick = mnuAccountsClick
       end
       object mnuPass: TMenuItem
-        Caption = #1055#1072#1088#1086#1083#1100'...'
+        Caption = 'Password...'
       end
       object mnuBaseProperties: TMenuItem
-        Caption = #1057#1074#1086#1081#1089#1090#1074#1072
+        Caption = 'Properties'
         OnClick = mnuBasePropertiesClick
       end
     end
@@ -344,28 +344,28 @@ object frmMain: TfrmMain
       Caption = 'Record'
       SubMenuImages = imlTab
       object mnuInsertItem: TMenuItem
-        Caption = 'Add new record...'
+        Caption = 'Add new record'
         ImageIndex = 1
         ShortCut = 45
         OnClick = mnuInsertItemClick
       end
       object mnuInsertFolder: TMenuItem
-        Caption = 'Add new folder...'
+        Caption = 'Add new folder'
         ImageIndex = 2
         OnClick = mnuInsertFolderClick
       end
       object mnuInsertPage: TMenuItem
-        Caption = 'Add new page...'
+        Caption = 'Add new page'
         OnClick = mnuInsertPageClick
       end
       object mnuEditItem: TMenuItem
-        Caption = 'Change'
+        Caption = 'Edit'
         ImageIndex = 3
         ShortCut = 13
         OnClick = mnuEditItemClick
       end
       object mnuCloneItem: TMenuItem
-        Caption = #1044#1091#1073#1083#1080#1088#1086#1074#1072#1090#1100
+        Caption = 'Clone record'
         ImageIndex = 4
         ShortCut = 16452
         OnClick = mnuCloneItemClick
@@ -375,10 +375,14 @@ object frmMain: TfrmMain
       end
       object mnuDelete: TMenuItem
         AutoHotkeys = maManual
-        Caption = #1059#1076#1072#1083#1080#1090#1100
+        Caption = 'Delete'
         ImageIndex = 4
         ShortCut = 46
         OnClick = mnuDeleteClick
+      end
+      object mnuEditDefault: TMenuItem
+        Caption = 'Edit default record'
+        OnClick = mnuEditDefaultClick
       end
     end
     object mnuService: TMenuItem
@@ -387,17 +391,17 @@ object frmMain: TfrmMain
       ImageIndex = 5
       OnClick = mnuServiceClick
       object mnuShowPass: TMenuItem
-        Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1087#1072#1088#1086#1083#1080
+        Caption = 'Show passwords'
         ShortCut = 116
         OnClick = mnuShowPassClick
       end
       object mnuClearClip: TMenuItem
-        Caption = #1054#1095#1080#1089#1090#1080#1090#1100' '#1073#1091#1092#1077#1088
+        Caption = 'Clear clipboard'
         ShortCut = 119
         OnClick = mnuClearClipClick
       end
       object mnuTop: TMenuItem
-        Caption = #1055#1086#1074#1077#1088#1093' '#1074#1089#1077#1093' '#1086#1082#1086#1085
+        Caption = 'Stay on top'
         ShortCut = 122
         OnClick = mnuTopClick
       end
@@ -405,32 +409,31 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object mnuGenerator: TMenuItem
-        Caption = #1043#1077#1085#1077#1088#1072#1090#1086#1088' '#1087#1072#1088#1086#1083#1077#1081
+        Caption = 'Password generator'
         ImageIndex = 1
         ShortCut = 120
         OnClick = mnuGeneratorClick
       end
       object mnuExport: TMenuItem
-        Caption = #1069#1082#1089#1087#1086#1088#1090
+        Caption = 'Export...'
         ShortCut = 16468
       end
       object mnuPrint: TMenuItem
-        Caption = #1055#1077#1095#1072#1090#1100'...'
+        Caption = 'Print...'
         ShortCut = 16464
       end
       object N14: TMenuItem
         Caption = '-'
       end
-      object N24: TMenuItem
-        Caption = #1057#1090#1088#1072#1085#1080#1094#1099'...'
-        ShortCut = 16453
-      end
       object mnuThemes: TMenuItem
         AutoHotkeys = maManual
-        Caption = #1058#1077#1084#1099
+        Caption = 'Themes'
+      end
+      object Advancedmode1: TMenuItem
+        Caption = 'Advanced mode!'
       end
       object mnuOptions: TMenuItem
-        Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080'...'
+        Caption = 'Preferences...'
         ImageIndex = 15
         ShortCut = 121
         OnClick = mnuOptionsClick
@@ -441,15 +444,18 @@ object frmMain: TfrmMain
       SubMenuImages = imlTab
       ImageIndex = 6
       object N17: TMenuItem
-        Caption = #1055#1086#1084#1086#1097#1100
+        Caption = 'Help'
         ShortCut = 112
       end
       object N18: TMenuItem
-        Caption = #1053#1072#1096#1072' '#1089#1090#1088#1072#1085#1080#1095#1082#1072
+        Caption = 'Our homepage'
         Visible = False
       end
+      object N2: TMenuItem
+        Caption = '-'
+      end
       object N12: TMenuItem
-        Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
+        Caption = 'About'
         Default = True
         ShortCut = 32880
         OnClick = N12Click
@@ -465,7 +471,7 @@ object frmMain: TfrmMain
     Left = 203
     Top = 96
     Bitmap = {
-      494C010108001800140230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101080018001C0230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4045,7 +4051,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 144
     Bitmap = {
-      494C01010D002401140317001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D0024011C0317001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5154,7 +5160,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 96
     Bitmap = {
-      494C010104003400540116001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C0101040034005C0116001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5651,7 +5657,7 @@ object frmMain: TfrmMain
     Left = 203
     Top = 144
     Bitmap = {
-      494C01013800CC01040316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01013800CC010C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000004A0100000100200000000000C0C5
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9454,7 +9460,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 96
     Bitmap = {
-      494C01010500F001440316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010500F0014C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -9981,7 +9987,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 142
     Bitmap = {
-      494C010103000800BC0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103000800C40010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000E00121B78002B

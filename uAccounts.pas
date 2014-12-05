@@ -60,6 +60,7 @@ type
     procedure btnCreateNewBaseClick(Sender: TObject);
     procedure btnRemoveClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
@@ -87,14 +88,19 @@ begin
 inherited Create (AOwner);
 fIsChange :=IsChange;
 if isChange then begin
-    Self.Caption:= Application.Title + ' - '+ rsFrmAccountsCaption;
+    Self.Caption:= Application.Title + rsFrmAccountsCaptionChange;
     btnClose.Caption:=rsCancel;
     btnOK.Caption:=rsOK;
 end else begin
-    Self.Caption:=Application.Title + ' - '+ rsFrmAccountsCaption;
+    Self.Caption:=Application.Title + rsFrmAccountsCaption;
     btnClose.Caption:=rsExit;
     btnOK.Caption:=rsOpen;
 end;
+end;
+
+procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    btnClose.Click;
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
