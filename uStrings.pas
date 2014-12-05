@@ -37,6 +37,15 @@ resourcestring
     rsDelFieldConfirmationText = 'Confirm to delete field "%s"?' + #10#13 + 'Value will be deleted too';
     rsDelFieldConfirmationCaption = 'Deleting field';
     rsCantDelTitleField = 'Can''t delete unique title of record';
+    //DeleteNode
+    rsDelNodeTitle = 'Deleting';
+    rsDelItem = 'Warning!' + #10#13 + 'Are you sure you want to delete the record %s?';
+    rsDelFolder ='Warning!' + #10#13 + 'Are you sure you want to delete the folder %s?' +
+                               #10#13 + 'This will delete all subfolders and records!';
+    rsDelPage = 'WARNING!' + #10#13 + 'Are you sure you want to delete the page %s?' +
+                                #10#13 + 'This will delete all subfolders and records!!!' +
+                                #10#13 + 'CONFIRM DELETING?';
+    rsCantDelPage =  'Sorry! Can''t delete unique page.';
 //    rsChangeTitleWarningCaption = 'Deleting field';
 //    rsChangeTitleWarning = 'Can''t change format for only title of record';
     rsFieldNotSelected = 'Field not selected';
@@ -100,7 +109,7 @@ resourcestring
     rsSaveDialogFileExists = 'You have selected an existing file:' + #10#13 + '%s' + #10#13+ 'Overwrite it?';
     rsSaveDialogTitle = 'Save new database as...';
     rsOpenDialogTitle = 'Open database...';
-    rsOpenDocumentError = 'Can''t open %s.' + #10#13 + 'Is this a right file?';
+    rsOpenDocumentError = 'Can''t open %s' + #10#13 + 'Please, make sure it is the correct file.';
     rsOpenDocumentErrorTitle = 'Open document error';
     //frmMain
 

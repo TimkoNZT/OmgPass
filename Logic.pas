@@ -43,7 +43,6 @@ procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
 
 function InitGlobal: Boolean;
-function InitSecondary: Boolean;
 function DocManager(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
@@ -500,7 +499,6 @@ begin
 end;
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
 //Удаление любого узла
-//Избавиться от хардкода
 var
 	Msg: String;
     Node: IXMLNode;
@@ -509,22 +507,22 @@ begin
 	Node:=IXMLNode(treeNode.Data);
     case GetNodeType(Node) of
     ntItem:
-    	msg:='Внимание!' + #10#13 + 'Вы действительно хотите удалить запись ' + AnsiQuotedStr(GetNodeTitle(Node), '"') + '?';
+    	msg:= Format(rsDelItem, [AnsiQuotedStr(GetNodeTitle(Node), '"')]);
     ntFolder:
-    	msg:='Внимание!' + #10#13 + 'Вы действительно хотите удалить папку ' + AnsiQuotedStr(GetNodeTitle(Node), '"') + '?' +
-        					#10#13 + 'Это приведет к удалению всех вложенных папок и записей!';
+    	msg:= Format(rsDelFolder, [AnsiQuotedStr(GetNodeTitle(Node), '"')]);
     ntPage: begin
     	if PageList.Count = 1 then begin
-        	MessageBox(Application.Handle, 'Нельзя удалить последнюю страницу!', 'Удаление записи', MB_ICONINFORMATION + MB_SYSTEMMODAL);
+        	MessageBox(Application.Handle,
+                        PWideChar(rsCantDelPage),
+                        PWideChar(rsDelNodeTitle),
+                        MB_ICONWARNING + MB_SYSTEMMODAL);
         	Exit;
         end;
-    	msg:='ВНИМАНИЕ!' + #10#13 + 'Вы действительно хотите удалить страницу ' + AnsiQuotedStr(GetNodeTitle(Node), '"') + '?' +
-        					#10#13 + 'Это приведет к удалению всех вложенных папок и записей!!!' +
-                            #10#13 + 'Продолжить?';
-    	end;
+    	msg:= Format(rsDelPage, [AnsiQuotedStr(GetNodeTitle(Node), '"')]);
+   	    end;
     end;
     if not withoutConfirm then
-    if MessageBox(Application.Handle, PWideChar(Msg), 'Удаление записи',
+    if MessageBox(Application.Handle, PWideChar(Msg), PWideChar(rsDelNodeTitle),
     	 MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL then Exit;
     Log('Deleting confirmed...');
     Node.ParentNode.ChildNodes.Remove(Node);           //returns thmthng
@@ -1031,10 +1029,6 @@ begin
 //    SetButtonImg(btnTheme, imlTab, 41);
 //    end;
 
-end;
-function InitSecondary: Boolean;
-begin
-    //
 end;
 procedure CreateNewBase(fPath: String);
 //Новый документ с нуля
