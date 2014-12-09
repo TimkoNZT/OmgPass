@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Clipbrd,
   Vcl.ImgList,
 
-  Logic;
+  Logic, uStrings;
 
 type
   TfrmGenerator = class(TForm)
@@ -173,11 +173,11 @@ procedure TfrmGenerator.FormShow(Sender: TObject);
 begin
     WindowsOnTop(bWindowsOnTop, Self);
     if formType = 0 then begin
-      btnModal.Caption:='ОК';
-      btnClose.Caption:='Отмена';
+      btnModal.Caption:=rsOk;
+      btnClose.Caption:=rsClose;
     end else begin
-      btnModal.Caption:='Копировать';
-      btnClose.Caption:='Закрыть';
+      btnModal.Caption:=rsCopy;
+      btnClose.Caption:=rsClose;
     end;
 end;
 

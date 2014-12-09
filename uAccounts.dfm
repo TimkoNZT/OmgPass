@@ -1,10 +1,11 @@
 object frmAccounts: TfrmAccounts
   Left = 480
   Top = 269
-  BorderStyle = bsDialog
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'frmAccounts'
-  ClientHeight = 366
-  ClientWidth = 356
+  ClientHeight = 376
+  ClientWidth = 357
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -16,19 +17,18 @@ object frmAccounts: TfrmAccounts
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
-  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    356
-    366)
+    357
+    376)
   PixelsPerInch = 96
   TextHeight = 13
   object pcAccounts: TPageControl
     Left = 8
     Top = 8
-    Width = 340
-    Height = 302
+    Width = 341
+    Height = 312
     ActivePage = tsOpen
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = imlAccounts
@@ -40,11 +40,11 @@ object frmAccounts: TfrmAccounts
       ImageIndex = 7
       OnShow = tsOpenShow
       DesignSize = (
-        332
-        267)
+        333
+        277)
       object Image1: TImage
-        Left = 283
-        Top = 202
+        Left = 284
+        Top = 212
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -147,11 +147,12 @@ object frmAccounts: TfrmAccounts
           0000000100000C0A011C00030000000100010000012800030000000100020000
           0000000000080008000800080000000800000234000005AB000009340000022C
           00000377000003890000020348000000010000004800000001000000}
+        ExplicitLeft = 283
         ExplicitTop = 178
       end
       object Image2: TImage
-        Left = 283
-        Top = 202
+        Left = 284
+        Top = 212
         Width = 32
         Height = 32
         Anchors = [akRight, akBottom]
@@ -249,11 +250,12 @@ object frmAccounts: TfrmAccounts
           0000012800030000000100020000000000000008000800080008000000080000
           020800000564000008A6000002000000035C00000342000001DF480000000100
           00004800000001000000}
+        ExplicitLeft = 283
         ExplicitTop = 178
       end
       object Label1: TLabel
         Left = 12
-        Top = 188
+        Top = 198
         Width = 50
         Height = 13
         Anchors = [akLeft, akBottom]
@@ -270,7 +272,7 @@ object frmAccounts: TfrmAccounts
       end
       object btnRemove: TSpeedButton
         Left = 218
-        Top = 146
+        Top = 156
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
@@ -281,7 +283,7 @@ object frmAccounts: TfrmAccounts
       end
       object btnAdd: TSpeedButton
         Left = 116
-        Top = 146
+        Top = 156
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
@@ -292,7 +294,7 @@ object frmAccounts: TfrmAccounts
       end
       object btnNew: TSpeedButton
         Left = 11
-        Top = 146
+        Top = 156
         Width = 100
         Height = 26
         Anchors = [akLeft, akBottom]
@@ -304,8 +306,8 @@ object frmAccounts: TfrmAccounts
       object lvFiles: TListView
         Left = 11
         Top = 24
-        Width = 307
-        Height = 120
+        Width = 308
+        Height = 130
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -326,7 +328,7 @@ object frmAccounts: TfrmAccounts
       end
       object chkShowMainPass: TCheckBox
         Left = 11
-        Top = 239
+        Top = 249
         Width = 158
         Height = 16
         Anchors = [akLeft, akBottom]
@@ -337,14 +339,13 @@ object frmAccounts: TfrmAccounts
       end
       object txtPass: TEdit
         Left = 11
-        Top = 204
-        Width = 266
+        Top = 214
+        Width = 267
         Height = 27
         Anchors = [akLeft, akRight, akBottom]
         BevelInner = bvSpace
         BevelKind = bkSoft
         BevelOuter = bvSpace
-        Enabled = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -380,8 +381,8 @@ object frmAccounts: TfrmAccounts
       ImageIndex = 4
       OnShow = tsNewShow
       DesignSize = (
-        332
-        267)
+        333
+        277)
       object lblPassConfirm: TLabel
         Left = 12
         Top = 95
@@ -406,7 +407,7 @@ object frmAccounts: TfrmAccounts
         Enabled = False
       end
       object btnGeneratePass: TSpeedButton
-        Left = 295
+        Left = 296
         Top = 68
         Width = 26
         Height = 26
@@ -416,7 +417,7 @@ object frmAccounts: TfrmAccounts
         ExplicitLeft = 279
       end
       object btnNewBase: TSpeedButton
-        Left = 295
+        Left = 296
         Top = 21
         Width = 26
         Height = 26
@@ -428,7 +429,7 @@ object frmAccounts: TfrmAccounts
       object txtPassConfirm: TEdit
         Left = 11
         Top = 111
-        Width = 282
+        Width = 283
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         Enabled = False
@@ -438,7 +439,7 @@ object frmAccounts: TfrmAccounts
       object txtNewPass: TEdit
         Left = 11
         Top = 71
-        Width = 282
+        Width = 283
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         Ctl3D = True
@@ -448,9 +449,9 @@ object frmAccounts: TfrmAccounts
         TabOrder = 1
       end
       object chkShowPass: TCheckBox
-        Left = 212
+        Left = 213
         Top = 52
-        Width = 80
+        Width = 81
         Height = 16
         Alignment = taLeftJustify
         Anchors = [akTop, akRight]
@@ -460,7 +461,7 @@ object frmAccounts: TfrmAccounts
       end
       object CheckBox1: TCheckBox
         Left = 11
-        Top = 141
+        Top = 151
         Width = 134
         Height = 13
         Anchors = [akLeft, akBottom]
@@ -470,8 +471,8 @@ object frmAccounts: TfrmAccounts
       end
       object Memo1: TMemo
         Left = 11
-        Top = 159
-        Width = 310
+        Top = 169
+        Width = 311
         Height = 45
         Anchors = [akLeft, akRight, akBottom]
         Enabled = False
@@ -480,18 +481,19 @@ object frmAccounts: TfrmAccounts
         TabOrder = 4
       end
       object txtNewBase: TEdit
-        Left = 11
+        Left = 12
         Top = 24
         Width = 282
         Height = 21
+        Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 5
       end
     end
   end
   object btnClose: TButton
-    Left = 162
-    Top = 321
+    Left = 163
+    Top = 331
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -500,8 +502,8 @@ object frmAccounts: TfrmAccounts
     OnClick = btnCloseClick
   end
   object btnOK: TButton
-    Left = 252
-    Top = 321
+    Left = 253
+    Top = 331
     Width = 81
     Height = 35
     Anchors = [akRight, akBottom]
@@ -511,8 +513,8 @@ object frmAccounts: TfrmAccounts
     OnClick = btnOKClick
   end
   object btnCreateNewBase: TButton
-    Left = 252
-    Top = 321
+    Left = 253
+    Top = 331
     Width = 81
     Height = 35
     Anchors = [akRight, akBottom]
@@ -536,7 +538,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 312
     Bitmap = {
-      494C010108001C03A40316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108001C03B00316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

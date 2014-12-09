@@ -22,14 +22,14 @@ object frmGenerator: TfrmGenerator
     Top = 8
     Width = 190
     Height = 146
-    Caption = #1057#1080#1084#1074#1086#1083#1099
+    Caption = 'Symbols'
     TabOrder = 0
     object chkCap: TCheckBox
       Left = 16
       Top = 20
       Width = 161
       Height = 17
-      Caption = #1047#1072#1075#1083#1072#1074#1085#1099#1077' (A ... Z)'
+      Caption = 'Upper case (A ... Z)'
       Checked = True
       State = cbChecked
       TabOrder = 0
@@ -40,7 +40,7 @@ object frmGenerator: TfrmGenerator
       Top = 43
       Width = 161
       Height = 17
-      Caption = #1057#1090#1088#1086#1095#1085#1099#1077' (a ... z)'
+      Caption = 'Lower case (a ... z)'
       Checked = True
       State = cbChecked
       TabOrder = 1
@@ -51,7 +51,7 @@ object frmGenerator: TfrmGenerator
       Top = 66
       Width = 161
       Height = 17
-      Caption = #1062#1080#1092#1088#1099' (0 ... 9)'
+      Caption = 'Digits (0 ... 9)'
       Checked = True
       State = cbChecked
       TabOrder = 2
@@ -62,7 +62,7 @@ object frmGenerator: TfrmGenerator
       Top = 89
       Width = 167
       Height = 17
-      Caption = #1057#1087#1077#1094#1089#1080#1084#1074#1086#1083#1099' (!,'#8470',$,%, ...)'
+      Caption = 'Special (!,'#8470',$,%, ...)'
       TabOrder = 3
       OnClick = CheckMe
     end
@@ -71,7 +71,7 @@ object frmGenerator: TfrmGenerator
       Top = 111
       Width = 58
       Height = 19
-      Caption = #1057#1074#1086#1080':'
+      Caption = 'Custom:'
       TabOrder = 4
       WordWrap = True
       OnClick = CheckMe
@@ -92,14 +92,14 @@ object frmGenerator: TfrmGenerator
     Top = 8
     Width = 190
     Height = 146
-    Caption = #1054#1087#1094#1080#1080
+    Caption = 'Options'
     TabOrder = 1
     object lblLength: TLabel
       Left = 16
       Top = 17
-      Width = 75
+      Width = 83
       Height = 13
-      Caption = #1044#1083#1080#1085#1072' '#1087#1072#1088#1086#1083#1103':'
+      Caption = 'Password lenght:'
     end
     object UpDown: TUpDown
       Left = 129
@@ -129,7 +129,7 @@ object frmGenerator: TfrmGenerator
       Width = 152
       Height = 17
       Hint = #1057#1080#1084#1074#1086#1083#1099' '#1074' '#1087#1072#1088#1086#1083#1077' '#1085#1077' '#1087#1086#1074#1090#1086#1088#1103#1102#1090#1089#1103
-      Caption = #1053#1077' '#1087#1086#1074#1090#1086#1088#1103#1090#1100' '#1089#1080#1084#1074#1086#1083#1099
+      Caption = 'Use symbols once'
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
@@ -142,7 +142,7 @@ object frmGenerator: TfrmGenerator
       Width = 152
       Height = 17
       Hint = #1053#1077' '#1089#1090#1072#1074#1080#1090#1100' '#1088#1103#1076#1086#1084' '#1086#1076#1080#1085#1072#1082#1086#1074#1099#1077' '#1089#1080#1084#1074#1086#1083#1099
-      Caption = #1048#1089#1082#1083#1102#1095#1080#1090#1100' '#1076#1091#1073#1083#1080
+      Caption = 'Do not duplicate symbols'
       Checked = True
       ParentShowHint = False
       ShowHint = True
@@ -156,7 +156,7 @@ object frmGenerator: TfrmGenerator
       Width = 152
       Height = 19
       Hint = #1048#1089#1082#1083#1102#1095#1072#1077#1090' '#1087#1086#1093#1086#1078#1080#1077' '#1089#1080#1084#1074#1086#1083#1099' (1, l, i, ...)'
-      Caption = #1048#1089#1082#1083#1102#1095#1080#1090#1100' '#1085#1077#1095#1077#1090#1082#1080#1077
+      Caption = 'Exclude illegible symbols'
       Checked = True
       ParentShowHint = False
       ShowHint = True
@@ -170,7 +170,7 @@ object frmGenerator: TfrmGenerator
     Top = 160
     Width = 390
     Height = 57
-    Caption = #1055#1072#1088#1086#1083#1100
+    Caption = 'Password'
     TabOrder = 2
     object lblResult: TLabel
       Left = 16
@@ -193,7 +193,7 @@ object frmGenerator: TfrmGenerator
     Top = 228
     Width = 80
     Height = 33
-    Caption = #1054#1050
+    Caption = 'OK'
     Default = True
     TabOrder = 3
     OnClick = btnModalClick
@@ -203,7 +203,7 @@ object frmGenerator: TfrmGenerator
     Top = 228
     Width = 81
     Height = 33
-    Caption = #1047#1072#1082#1088#1099#1090#1100
+    Caption = 'Close'
     TabOrder = 4
     OnClick = btnCloseClick
   end
@@ -212,7 +212,7 @@ object frmGenerator: TfrmGenerator
     Top = 228
     Width = 81
     Height = 33
-    Caption = #1057#1086#1079#1076#1072#1090#1100
+    Caption = 'Create'
     TabOrder = 5
     OnClick = btnGenerateClick
   end

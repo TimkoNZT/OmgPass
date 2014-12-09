@@ -107,9 +107,9 @@ begin
     for i := 0 to fpEdit.ControlCount - 1 do begin
 		With (fpEdit.Controls[i] as TFieldFrame) do begin
         //Log(GetNodeValue(IXMLNode(Tag)));
-        //Log(StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
-            if GetNodeValue(IXMLNode(Tag)) <> StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]) then begin
-                SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, #13#10, '|', [rfReplaceAll]));
+        //Log(StringReplace(textInfo.Text, CrLf, '|', [rfReplaceAll]));
+            if GetNodeValue(IXMLNode(Tag)) <> StringReplace(textInfo.Text, CrLf , '|', [rfReplaceAll]) then begin
+                SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, CrLf, '|', [rfReplaceAll]));
                 //MakeUndoPoint;
             end;
         end;
@@ -174,6 +174,7 @@ end;
 
 procedure TfrmEditItem.tbtnAdvancedClick(Sender: TObject);
 begin
+SaveValues;
 bAdvancedEdit:=tbtnAdvanced.Down;
 GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
 end;
@@ -192,13 +193,13 @@ begin
         MessageBox(Self.Handle,
         PWideChar(rsCantDelTitleField),
         PWideChar(rsDelFieldConfirmationCaption),
-        MB_ICONEXCLAMATION + MB_OK + MB_APPLMODAL);
+        MB_ICONEXCLAMATION + MB_OK + MB_SYSTEMMODAL);
         Exit;
     end;
     if MessageBox(Self.Handle,
         PWideChar(Format(rsDelFieldConfirmationText,[GetNodeTitle(delField)])),
         PWideChar(rsDelFieldConfirmationCaption),
-        MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL)
+        MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL)
         = ID_CANCEL then Exit;
     Log('Deleting field: Confirmed');
     fItem.ChildNodes.Remove(delField);

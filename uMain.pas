@@ -148,6 +148,7 @@ TfrmMain = class(TForm)
     procedure N12Click(Sender: TObject);
     procedure mnuServiceClick(Sender: TObject);
     procedure mnuEditDefaultClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -661,6 +662,11 @@ begin
     	frmLog.tmrLog.OnTimer(nil);
 end;
 
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+WindowsOnTop(bWindowsOnTop, Self);
+end;
+
 procedure TfrmMain.fpMainMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 //Скролирование панели
@@ -670,11 +676,8 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-//Action:=caFree;
-    //if not XMLMain.IsEmptyDoc then
     DocumentClose;
     SaveSettings;
-    //DeleteFile(xmlMain.FileName);   //
     Application.Terminate;
 end;
 
@@ -682,7 +685,6 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
     if not InitGlobal then
         frmMain.Close;
-//        Application.Terminate;
 end;
 
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);

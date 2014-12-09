@@ -42,8 +42,13 @@ procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
 
+
+
 function InitGlobal: Boolean;
+
+
 function DocManager(Reopen: Boolean = False): Boolean;
+function DocManagerEx(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
 procedure LoadSettings;
@@ -172,16 +177,17 @@ begin
 //Инфо
 	Log('Start: GeneratePanel(' + GetNodeTitle(nItem) + ' in ' + Panel.Name +')');
     Log('IsEdit', isEdit);
+    Log('IsNew', isNew);
+    Log('IsAdvanced', isAdvanced);
     LogNodeInfo(nItem, 'GeneratePanel');
     //Против лагов в изображении
     //Очень капризная функция
-    //SendMessage(Panel.Handle, WM_SETREDRAW, Ord(False), 0);
-    //Panel.Visible:=False;
+    //Отключать видимость жизненно необходимо
+    //Если это не делать, то самописный TEdit криво работает с переносами
     LockWindowUpdate(Panel.Handle);
-
+    Panel.Visible:=False;
     //Чистим панельку
     CleaningPanel(Panel);
-
     case GetNodeType(nItem) of
         ntFolder, ntPage: begin
             GenerateFolderPanel(nItem, Panel);
@@ -189,7 +195,7 @@ begin
         ntItem, ntDefItem: begin
             //И разбиваем ноду по полям
             for i := nItem.ChildNodes.Count -1 downto 0 do
-                GenerateField(nItem.ChildNodes[i], Panel, IsEdit, IsNew, IsAdvanced);
+                GenerateField(nItem.ChildNodes[i], Panel, isEdit, IsNew, IsAdvanced);
             //Установка TabOrder
             if isEdit then
                 for i := Panel.ControlCount - 1 downto 0 do begin
@@ -198,9 +204,9 @@ begin
                 end;
         end;
     end;
-    //
-    //Panel.Visible:=True;
-    //SendMessage(Panel.Handle, WM_SETREDRAW, Ord(True), 0);
+    //Сначала возвращаем видимость
+    Panel.Visible:=True;
+    //Потом выводим панельку из комы
     LockWindowUpdate(0);
     Result:=True;
 end;
@@ -214,25 +220,26 @@ begin
     //LogNodeInfo(nField, 'GenerateField');
     fieldFormat:= GetFieldFormat(nField);
     Result:= TFieldFrame.CreateParented(Panel.Handle{, isEdit});
+    //Погнали
 	With Result do begin
 		Parent:=Panel;
         Align:=alTop;
         //Заполняем метку
         lblTitle.Caption:=GetNodeTitle(nField);
-//        chkTitle.Caption:=lblTitle.Caption;
         //Заполняем текст, в комментариях поле выше и требует обработки текста
         if fieldFormat = ffComment then begin
             textInfo.AutoSize:=False;
             textInfo.Height:=62;
             textInfo.BevelEdges:=[beTop];
-//            textInfo.BevelKind:= bkNone;
+            textInfo.BevelKind:= bkNone;
             textInfo.Multiline:=True;
-			textInfo{.Lines}.Text:=
-                StringReplace(VarToStr(nField.NodeValue),'|',#13#10,[rfReplaceAll]);
-        end else
-            textInfo{.Lines}.Text:=VarToStr(nField.NodeValue);
+			textInfo.Text:=
+                StringReplace(VarToStr(nField.NodeValue),'|', sLineBreak, [rfReplaceAll]);
+        end
+            else textInfo.Text:=VarToStr(nField.NodeValue);
         //Доступность текста для редактирования
         textInfo.ReadOnly:=not IsEdit;
+        textInfo.Enabled:=isEdit;
         //Присваивание указателей
 		btnSmart.Tag:=NativeInt(textInfo);		        //Кнопки ссылаются на текстовое поле
         btnAdditional.Tag:=NativeInt(textInfo);
@@ -268,7 +275,6 @@ begin
                     SetButtonImg(btnSmart, frmMain.imlField, 0);
                 end; //case
             end; //if
-            textInfo.Enabled:=False;
             //EnableWindow(textInfo.Handle, False);
             //DisableTextFrame;
         end else begin                                 //Режим редактирования
@@ -296,6 +302,7 @@ begin
             end;
         end;
     end;
+    //Result.Visible:=True;
     //Log('--------------------GenerateField:End');
 end;
 procedure GenerateFolderPanel(nItem: IXMLNode; Panel: TWinControl);
@@ -803,13 +810,10 @@ begin
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
     frmMain.mnuShowPass.Checked:= bShowPasswords;
     frmMain.mnuTop.Checked:= bWindowsOnTop;
-    WindowsOnTop(bWindowsOnTop, frmMain);
     if xmlCfg.HasSection('Position') then begin
         frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
         if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
         if frmMain.WindowState = wsNormal then begin
-            //Принудительно показываем форму
-            frmMain.Show;
             //И задаем положение
             frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
                 xmlCfg.GetValue('Top', 0, 'Position'),
@@ -933,10 +937,11 @@ procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 //Поверх всех окон
 begin
     Log('Form ' + Form.Name + ' topmost:', Flag);
-    if Flag then
-        SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW)
-    else
-        SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
+    with Form do
+        if Flag then
+            SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW)
+        else
+            SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
 end;
 function GetFolderInformation(Node: IXMLNode): String;
 //Формирование строки информации о папке или странице
@@ -965,10 +970,10 @@ begin
 end;
 
 begin
-    result:= rsInfoTitle  + GetNodeTitle(Node) + #10#13 +
-            rsInfoSubfolders + IntToStr(IterateFolders(Node, False)) + #10#13 +
-            rsInfoTotalFolders + IntToStr(IterateFolders(Node, True)) + #10#13 +
-            rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  #10#13 +
+    result:= rsInfoTitle  + GetNodeTitle(Node) + CrLf +
+            rsInfoSubfolders + IntToStr(IterateFolders(Node, False)) + CrLf +
+            rsInfoTotalFolders + IntToStr(IterateFolders(Node, True)) + CrLf +
+            rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  CrLf +
             rsInfoTotalItems + IntToStr(IterateItems(Node, True));
 end;
 procedure EditDefaultItem;
@@ -1010,17 +1015,18 @@ begin
     xmlCfg:=TSettings.Create();
     lsStoredDocs:= LoadStoredDocs;
 	Log('Инициализация...');
+    LoadSettings;
     //LoadThemes;
-    //intCurrentPage:=0;
     if not DocManager then begin
         Result:=False;
         Exit
     end;
+    //Принудительно показываем форму
+    frmMain.Show;
     //if not IsDocValidate then Exit;
 
     CheckVersion;
     CheckUpdates;
-    LoadSettings;
     Result:=True;
 
 //    with frmMain do begin
@@ -1152,7 +1158,7 @@ begin
         if (MessageBox(Application.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
-                MB_YESNO + MB_APPLMODAL + MB_ICONINFORMATION)
+                MB_YESNO + MB_SYSTEMMODAL + MB_ICONINFORMATION)
                 = ID_YES)
                 then begin
                     AddNewPage;
@@ -1170,21 +1176,45 @@ begin
     if (not Assigned(frmAccounts)) then
         frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
     while not Accept do begin
-        if frmAccounts.ShowModal = mrOK then begin
+    if frmAccounts.ShowModal = mrOK then begin
             Log ('frmAccounts: mrOK');
-            if DocumentOpen(frmAccounts.FFileName) then begin
-                Accept:=True;
-                Result:=True;
-            end;
+            Accept:=True;
+            Result:=True;
         end else begin
             Log ('frmAccounts: mrCancel');
-            //frmMain.WindowState:=wsMinimized;
             Accept:=True;
             Result:=False;
         end;
     end;
     FreeAndNil(frmAccounts);
+    //ShowWindow(Application.Handle, SW_RESTORE);
 end;
+
+function DocManagerEx(Reopen: Boolean = False): Boolean;
+var Accept: Boolean;
+begin
+    Accept:=False;
+    if (not Assigned(frmAccounts)) then
+        frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
+    frmAccounts.Show;
+//    while not Accept do begin end;
+//    if frmAccounts.ModalResult = mrOK then begin
+//            Log ('frmAccounts: mrOK');
+//            if DocumentOpen(frmAccounts.FFileName) then begin
+//                Accept:=True;
+//                Result:=True;
+//            end;
+//        end else begin
+//            Log ('frmAccounts: mrCancel');
+//            Accept:=True;
+//            Result:=False;
+//        end;
+//    end;
+//    FreeAndNil(frmAccounts);
+    //ShowWindow(Application.Handle, SW_RESTORE);
+end;
+
+
 function DocumentOpen(Path: String{; isReOpen: Boolean = False}): Boolean;
 //функция ддолжна попытаться открыть файл всеми возможными способами
 //и проверить его на валидность
@@ -1205,8 +1235,8 @@ try
 except
     on e: Exception do begin
         ErrorMsg(e, 'DocumentOpen');
-        MessageBox(Application.Handle,
-            PWideChar(Format(rsOpenDocumentError {+ #10#13 + e.Message}, [frmAccounts.FFileName])),
+        MessageBox(frmAccounts.Handle,
+            PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
             PWideChar(rsOpenDocumentErrorTitle),
             MB_APPLMODAL + MB_ICONWARNING);
         Result:=False;

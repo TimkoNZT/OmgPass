@@ -61,7 +61,6 @@ type
     procedure btnRemoveClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
@@ -69,11 +68,15 @@ private
 //    FShowVert: Boolean;
 //    FListViewWndProc: TWndMethod;
 //    procedure ListViewWndProc(var Msg: TMessage);
+protected
+    procedure CreateParams(var Params: TCreateParams); override;
 
 public
     FFileName: String;
     FPassword: String;
     fNewFile: Boolean;
+
+
 end;
 var
     frmAccounts: TfrmAccounts;
@@ -105,9 +108,10 @@ begin
         btnClose.Click;
 end;
 
-procedure TfrmAccounts.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TfrmAccounts.CreateParams(var Params: TCreateParams);
 begin
-    //
+  inherited;
+  Params.ExStyle := Params.ExStyle or WS_EX_APPWINDOW;
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
@@ -143,8 +147,9 @@ end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
+WindowsOnTop(bWindowsOnTop, Self);
+//ShowWindow(Application.Handle, SW_HIDE);
 try
-    WindowsOnTop(bWindowsOnTop, Self);
     txtPass.SetFocus;
 except
     Log('Same error');
@@ -237,7 +242,7 @@ With SaveDialog do begin
             case MessageBox(Application.Handle,
                             PWideChar(Format(rsSaveDialogFileExists, [FileName])),
                             PWideChar(Application.Title),
-                            MB_YESNOCANCEL + MB_DEFBUTTON3 + MB_APPLMODAL + MB_ICONWARNING) of
+                            MB_YESNOCANCEL + MB_DEFBUTTON3 + MB_SYSTEMMODAL + MB_ICONWARNING) of
             ID_YES: Accept:=True;
             ID_CANCEL: Exit;
             end
@@ -290,8 +295,10 @@ begin
             MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
             then Exit
             else CreateNewBase(FFileName);
-    ReloadStoredDocs(FFileName);
-    Self.ModalResult:=mrOK;
+    if DocumentOpen(FFileName) then begin
+        ReloadStoredDocs(FFileName);
+        Self.ModalResult:=mrOK;
+    end;
 end;
 
 procedure TfrmAccounts.btnRemoveClick(Sender: TObject);
