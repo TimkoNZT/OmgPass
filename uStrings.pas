@@ -3,7 +3,8 @@ interface
 const
     //xmlMain
     CrLf = sLineBreak;
-    strDefaultExt = 'xml';
+    strDefaultExt = '.xml';
+    strCryptedExt = '.opwd';
     strRootNode = 'Root';
     strHeaderNode = 'Header';
     strDataNode = 'Data';
@@ -108,12 +109,14 @@ resourcestring
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          CrLf + 'Would you like to create a new document' +
                          CrLf + '%s ?';
+    rsFileNotFoundMsgTitle = 'File not found';
     rsSaveDialogFileExists = 'You have selected an existing file:' + CrLf + '%s' + CrLf+ 'Overwrite it?';
     rsSaveDialogTitle = 'Save new database as...';
     rsOpenDialogTitle = 'Open database...';
     rsOpenDocumentError = 'Can''t open %s' + CrLf + 'Please, make sure it is the correct file.';
     rsOpenDocumentErrorTitle = 'Open document error';
     rsTxtPassFileNotFound = 'File not found';
+    rsTxtPassFileIsBad = 'Bad or corupted file';
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
 

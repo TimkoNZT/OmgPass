@@ -1,15 +1,16 @@
 > Stored Documents: Index 0 = C:\Users\Tim\Desktop\2.xml 
-> Stored Documents: Index 1 = C:\Users\Tim\Desktop\1.xml 
-> Stored Documents: Index 2 = C:\Users\Tim\Desktop\3.xml 
+> Stored Documents: Index 1 = C:\Users\Tim\Desktop\6.xml 
+> Stored Documents: Index 2 = C:\Users\Tim\Desktop\1.xml 
+> Stored Documents: Index 3 = C:\Users\Tim\Desktop\2.xm 
+> Stored Documents: Index 4 = C:\Users\Tim\Desktop\444.xml 
+> Stored Documents: Index 5 = C:\Users\Tim\Desktop\3.xml 
 > Инициализация...
 > Form frmAccounts topmost: False
-> Error : EAccessViolation
+> Error : EXMLDocError
 >     Procedure: DocumentPreOpen
->     Error Message: Access violation at address 00407AB0 in module 'OmgPass.exe'. Read of address 00000000
->     Except Address:  00407AB0
-> 9615E61BE413D3610D8C8DEE8F242FDD
-> D41D8CD98F00B204E9800998ECF8427E
-> Error : EAccessViolation
+>     Error Message: Node "Root" not found
+>     Except Address:  006972C2
+> Error : EXMLDocError
 >     Procedure: DocumentPreOpen
->     Error Message: Access violation at address 00407AB0 in module 'OmgPass.exe'. Read of address 00000000
->     Except Address:  00407AB0
+>     Error Message: Node "Root" not found
+>     Except Address:  006972C2

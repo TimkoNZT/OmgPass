@@ -99,8 +99,8 @@ procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
 
-function DocumentPreOpenXML(Path: String): Boolean;
-function DocumentPreOpenCrypted(Path: String; TryPass: String): Boolean;
+function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
+function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 
 function DocumentOpenXML(xmlPath: String): Boolean;
 function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
@@ -1198,7 +1198,6 @@ begin
     FreeAndNil(frmAccounts);
     //ShowWindow(Application.Handle, SW_RESTORE);
 end;
-
 function DocManagerEx(Reopen: Boolean = False): Boolean;
 var Accept: Boolean;
 begin
@@ -1231,10 +1230,13 @@ begin
         FileStream := TFileStream.Create(xmlPath, fmOpenReadWrite);
         DocumentOpenXMLfromStream(FileStream);
     finally
-        FreeAndNil(Filestream);
+        //FreeAndNil(FileStream);
     end;
 end;
-
+function DocumentOpenCrypted(cryPath: String; Password: String): Boolean;
+begin
+    //Empty for a while
+end;
 function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
 var
     xmlTemp: TXMLDocument;
@@ -1269,8 +1271,10 @@ end;
     Result:=True;
 end;
 
-function DocumentPreOpenXML(Path: String{; isReOpen: Boolean = False}): Boolean;
-//функция ддолжна попытаться открыть файл всеми возможными способами
+//Document Save?
+
+function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
+//функция ддолжна попытаться открыть файл XML
 //и проверить его на валидность
 var
     xmlTemp: TXMLDocument;
@@ -1281,15 +1285,14 @@ try
     xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
     xmlTemp.ParseOptions:=[poValidateOnParse];
     xmlTemp.Active:=True;
-    //Если дожили досюда и не скатились в ексцепшен, значит XML годный
-    //Закрываем старый документ
-    {if isReOpen then }DocumentClose;
-    //Переназначаем документ на рабочую переменную
-    xmlMain:=xmlTemp;
+    if xmlTemp.ChildNodes[strRootNode] <> nil then
+        if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
+    Result:=True;
 except
     on e: Exception do begin
-        ErrorMsg(e, 'DocumentOpen');
-        MessageBox(frmAccounts.Handle,
+        ErrorMsg(e, 'DocumentPreOpen');
+        if AlertMsg then
+            MessageBox(frmAccounts.Handle,
             PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
             PWideChar(rsOpenDocumentErrorTitle),
             MB_APPLMODAL + MB_ICONWARNING);
@@ -1297,16 +1300,16 @@ except
         Exit;
     end;
 end;
-    xmlTemp:=nil;
-    Result:=True;
+    FreeAndNil(xmlTemp);
 end;
-
-function DocumentPreOpenCrypted(Path: String; TryPass: String): Boolean;
+function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 var
     H: TCryptedFileHeader;
 begin
-    if MD5String('Password') = MD5String(TryPass) then
-        Result:=True;
+    if MD5String('Password').ToHexString = MD5String(TryPass).ToHexString then
+        Result:=idOk
+    else
+        Result:=idTryAgain;
 end;
 
 procedure DocumentClose;

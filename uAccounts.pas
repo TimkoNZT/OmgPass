@@ -65,7 +65,7 @@ type
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
-    procedure CheckPreOpenCrypted;
+    function OpenPreCheck(AlertMsg: Boolean = False): Boolean;
 //    FShowHoriz: Boolean;
 //    FShowVert: Boolean;
 //    FListViewWndProc: TWndMethod;
@@ -146,7 +146,6 @@ begin
     for i := 0 to lsStoredDocs.Count - 1 do
         lvFiles.AddItem(lsStoredDocs[i], nil);
     lvFiles.ItemIndex:=0;
-
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
@@ -154,47 +153,66 @@ begin
 WindowsOnTop(bWindowsOnTop, Self);
 //ShowWindow(Application.Handle, SW_HIDE);
 try
-    txtPass.SetFocus;
+    OpenPreCheck;
 except
-    Log('Same error');
+    Log('Initial precheck error');
 end;
 end;
 
-procedure TfrmAccounts.CheckPreOpenCrypted;
+function TfrmAccounts.OpenPreCheck(AlertMsg: Boolean = False): Boolean;
 begin
-    imgNotShallPass.Visible:= DocumentPreOpenCrypted(FFileName, txtPass.Text);
+    Result:= False;
+    txtPass.Enabled:=False;
+    txtPass.Font.Style:= [fsItalic];
+    imgNotShallPass.Visible:=True;
+    FFileName:=lvFiles.Selected.Caption;
+    if not FileExists(FFileName) then begin      //Where is the file?
+        txtPass.Text:=rsTxtPassFileNotFound;
+        lvFiles.Selected.ImageIndex:=8;
+        Exit;
+    end;
+    if ExtractFileExt(FFileName) = strDefaultExt {*.xml?} then
+        if DocumentPreOpenXML(FFileName, AlertMsg) then begin
+            txtPass.Text:= rsTxtPassPassNotReq;
+            imgNotShallPass.Visible:=False;
+            Result:=True;
+        end else begin
+            txtPass.Text:= rsTxtPassFileIsBad;
+            lvFiles.Selected.ImageIndex:=8;
+        end
+    else
+        case DocumentPreOpenCrypted(FFileName, txtPass.Text, AlertMsg) of
+        idOk: begin
+            txtPass.Enabled:=True;
+            txtPass.Font.Style:= [];
+            imgNotShallPass.Visible:=False;
+            Result:=True;
+            end;
+        idTryAgain: begin
+            txtPass.Enabled:=True;
+            txtPass.Font.Style:= [];
+            if Self.Visible = True then txtPass.SetFocus;
+            end;
+        idCancel: begin
+            txtPass.Text:= rsTxtPassFileIsBad;
+            lvFiles.Selected.ImageIndex:=8;
+        end;
+    end;
 end;
 
+//Precheck
 procedure TfrmAccounts.lvFilesClick(Sender: TObject);
 {$J+}
 const LastSelected: Integer = 0;
 {$J-}
 begin
-if lvFiles.Items.Count <> 0 then
+    if lvFiles.Items.Count = 0 then Exit;
     if lvFiles.Selected = nil then
         lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
-    FFileName:=lvFiles.Selected.Caption;
     if lvFiles.ItemIndex <> LastSelected then
         txtPass.Text:='';
     LastSelected:= lvFiles.ItemIndex;
-    txtPass.Enabled:=True;
-    if not FileExists(FFileName) then
-//        if MessageBox(Self.Handle,
-//            PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
-//            'Title',
-//            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
-//            then
-                begin
-                    txtPass.Text:=rsTxtPassFileNotFound;
-                    txtPass.Enabled:=False;
-                    lvFiles.Selected.ImageIndex:=8;
-                    Exit;
-                end;
-    if ExtractFileExt(FFileName) = 'xml' then
-        DocumentPreOpenXML(FFileName)
-    else
-        DocumentPreOpenCrypted(FFileName, txtPass.Text);
-
+    OpenPreCheck;
 end;
 
 procedure TfrmAccounts.lvFilesDblClick(Sender: TObject);
@@ -221,8 +239,9 @@ end;
 
 procedure TfrmAccounts.txtPassChange(Sender: TObject);
 begin
+if not txtPass.Enabled then Exit;
 Log(md5.MD5String(txtPass.Text).ToHexString);
-CheckPreOpenCrypted;
+imgNotShallPass.Visible:= (DocumentPreOpenCrypted(FFileName, txtPass.Text) <> idOk);
 end;
 
 procedure TfrmAccounts.btnAddClick(Sender: TObject);
@@ -324,6 +343,7 @@ end;
 
 end;
 
+//OK!
 procedure TfrmAccounts.btnOKClick(Sender: TObject);
 begin
     if lvFiles.Selected = nil then Exit;
@@ -331,11 +351,11 @@ begin
     if not FileExists(FFileName) then
         if MessageBox(Self.Handle,
             PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
-            'Title',
-            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
+            rsFileNotFoundMsgTitle,
+            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL) = ID_CANCEL
             then Exit
             else CreateNewBase(FFileName);
-    if DocumentPreOpenXML(FFileName) then begin
+    if OpenPrecheck(True) then begin
         ReloadStoredDocs(FFileName);
         Self.ModalResult:=mrOK;
     end;
