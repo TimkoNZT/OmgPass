@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
     XMLutils, uFieldFrame, uFolderFrame, uFolderFrameInfo,
-    uSmartMethods, uSettings,
+    uSmartMethods, uSettings, md5,
     {Themes}
     Styles, Themes
   	;
@@ -98,12 +98,19 @@ function LoadStoredDocs(): TStringList;
 procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
-function DocumentOpen(Path: String): Boolean;
+
+function DocumentPreOpenXML(Path: String): Boolean;
+function DocumentPreOpenCrypted(Path: String; TryPass: String): Boolean;
+
+function DocumentOpenXML(xmlPath: String): Boolean;
+function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
+function DocumentOpenCrypted(cryPath: String; Password: String): Boolean;
+
 procedure DocumentClose;
 procedure MessageIfEmptyDoc;
 
 implementation
-uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
+uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uFileIO;
 
 function GeneratePassword(Len: Integer = 8): String;
 //Генерация пароля в строку нужной длины
@@ -1154,8 +1161,7 @@ end;
 procedure MessageIfEmptyDoc;
 begin
     if PageList.Count = 0 then begin
-        frmMain.Show;
-        if (MessageBox(Application.Handle,
+        if (MessageBox(frmMain.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
                 MB_YESNO + MB_SYSTEMMODAL + MB_ICONINFORMATION)
@@ -1168,24 +1174,27 @@ begin
     end;
 end;
 function DocManager(Reopen: Boolean = False): Boolean;
-var Accept: Boolean;
+//var Accept: Boolean;
 //Загрузка документа
 //Вызывается менеджер документов
 begin
-    Accept:=False;
+    //Accept:=False;
     if (not Assigned(frmAccounts)) then
         frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
-    while not Accept do begin
+//    while not Accept do begin
     if frmAccounts.ShowModal = mrOK then begin
             Log ('frmAccounts: mrOK');
-            Accept:=True;
+            //Accept:=True;
+            if not Reopen then frmMain.Show;    //Принудительно
+            frmAccounts.Hide;
+            DocumentOpenXML(frmAccounts.FFileName);
             Result:=True;
         end else begin
             Log ('frmAccounts: mrCancel');
-            Accept:=True;
+            //Accept:=True;
             Result:=False;
         end;
-    end;
+//    end;
     FreeAndNil(frmAccounts);
     //ShowWindow(Application.Handle, SW_RESTORE);
 end;
@@ -1214,8 +1223,53 @@ begin
     //ShowWindow(Application.Handle, SW_RESTORE);
 end;
 
+function DocumentOpenXML(xmlPath: String): Boolean;
+var
+    FileStream : TFileStream;
+begin
+    try
+        FileStream := TFileStream.Create(xmlPath, fmOpenReadWrite);
+        DocumentOpenXMLfromStream(FileStream);
+    finally
+        FreeAndNil(Filestream);
+    end;
+end;
 
-function DocumentOpen(Path: String{; isReOpen: Boolean = False}): Boolean;
+function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
+var
+    xmlTemp: TXMLDocument;
+begin
+    try
+    xmlTemp:=TXMLDocument.Create(Application);
+    xmlTemp.LoadFromStream(xmlMainStream);
+    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    xmlTemp.ParseOptions:=[poValidateOnParse];
+    xmlTemp.Active:=True;
+    //Если дожили досюда и не скатились в ексцепшен, значит XML годный
+    //Закрываем старый документ
+    {if isReOpen then }DocumentClose;
+    //Переназначаем документ на рабочую переменную
+    xmlMain:=xmlTemp;
+except
+    on e: Exception do begin
+        ErrorMsg(e, 'DocumentOpen');
+        MessageBox(frmAccounts.Handle,
+            PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
+            PWideChar(rsOpenDocumentErrorTitle),
+            MB_APPLMODAL + MB_ICONWARNING);
+        Result:=False;
+        Exit;
+    end;
+end;
+    xmlTemp:=nil;
+    Result:=True;
+    LoadDocSettings;
+    MessageIfEmptyDoc;
+    frmMain.Caption:= Application.Title + xmlMain.FileName;
+    Result:=True;
+end;
+
+function DocumentPreOpenXML(Path: String{; isReOpen: Boolean = False}): Boolean;
 //функция ддолжна попытаться открыть файл всеми возможными способами
 //и проверить его на валидность
 var
@@ -1244,11 +1298,17 @@ except
     end;
 end;
     xmlTemp:=nil;
-    LoadDocSettings;
-    MessageIfEmptyDoc;
-    frmMain.Caption:= Application.Title +' ['+ Path +']';
     Result:=True;
 end;
+
+function DocumentPreOpenCrypted(Path: String; TryPass: String): Boolean;
+var
+    H: TCryptedFileHeader;
+begin
+    if MD5String('Password') = MD5String(TryPass) then
+        Result:=True;
+end;
+
 procedure DocumentClose;
 begin
     if xmlMain = nil then Exit;

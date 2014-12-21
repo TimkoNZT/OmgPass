@@ -2,7 +2,7 @@ object frmGenerator: TfrmGenerator
   Left = 427
   Top = 266
   BorderStyle = bsDialog
-  Caption = #1043#1077#1085#1077#1088#1072#1090#1086#1088' '#1087#1072#1088#1086#1083#1077#1081
+  Caption = 'Passwords generator'
   ClientHeight = 272
   ClientWidth = 409
   Color = clBtnFace

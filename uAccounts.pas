@@ -35,7 +35,7 @@ type
     btnOK: TButton;
     Memo1: TMemo;
     lblNoFiles: TStaticText;
-    Image2: TImage;
+    imgNotShallPass: TImage;
     txtNewBase: TEdit;
     SaveDialog: TSaveDialog;
     btnRemove: TSpeedButton;
@@ -61,9 +61,11 @@ type
     procedure btnRemoveClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure txtPassChange(Sender: TObject);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
+    procedure CheckPreOpenCrypted;
 //    FShowHoriz: Boolean;
 //    FShowVert: Boolean;
 //    FListViewWndProc: TWndMethod;
@@ -85,12 +87,12 @@ implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator, Logic, uSettings, uStrings;
+uses uMain, uGenerator, Logic, uSettings, uStrings, md5;
 
 constructor TfrmAccounts.Create(AOwner: TComponent; isChange: Boolean = False);
 begin
-inherited Create (AOwner);
 fIsChange :=IsChange;
+inherited Create (AOwner);
 if isChange then begin
     Self.Caption:= Application.Title + rsFrmAccountsCaptionChange;
     btnClose.Caption:=rsCancel;
@@ -111,7 +113,9 @@ end;
 procedure TfrmAccounts.CreateParams(var Params: TCreateParams);
 begin
   inherited;
-  Params.ExStyle := Params.ExStyle or WS_EX_APPWINDOW;
+  //Если форма отображается не в первый раз, то у неё не будет кнопки
+  if not fIsChange then
+    Params.ExStyle := Params.ExStyle or WS_EX_APPWINDOW;
 end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
@@ -156,11 +160,41 @@ except
 end;
 end;
 
+procedure TfrmAccounts.CheckPreOpenCrypted;
+begin
+    imgNotShallPass.Visible:= DocumentPreOpenCrypted(FFileName, txtPass.Text);
+end;
+
 procedure TfrmAccounts.lvFilesClick(Sender: TObject);
+{$J+}
+const LastSelected: Integer = 0;
+{$J-}
 begin
 if lvFiles.Items.Count <> 0 then
     if lvFiles.Selected = nil then
         lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
+    FFileName:=lvFiles.Selected.Caption;
+    if lvFiles.ItemIndex <> LastSelected then
+        txtPass.Text:='';
+    LastSelected:= lvFiles.ItemIndex;
+    txtPass.Enabled:=True;
+    if not FileExists(FFileName) then
+//        if MessageBox(Self.Handle,
+//            PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
+//            'Title',
+//            MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
+//            then
+                begin
+                    txtPass.Text:=rsTxtPassFileNotFound;
+                    txtPass.Enabled:=False;
+                    lvFiles.Selected.ImageIndex:=8;
+                    Exit;
+                end;
+    if ExtractFileExt(FFileName) = 'xml' then
+        DocumentPreOpenXML(FFileName)
+    else
+        DocumentPreOpenCrypted(FFileName, txtPass.Text);
+
 end;
 
 procedure TfrmAccounts.lvFilesDblClick(Sender: TObject);
@@ -183,6 +217,12 @@ begin
     //
     btnCreateNewBase.Visible:=False;
     btnOK.Visible:=True;
+end;
+
+procedure TfrmAccounts.txtPassChange(Sender: TObject);
+begin
+Log(md5.MD5String(txtPass.Text).ToHexString);
+CheckPreOpenCrypted;
 end;
 
 procedure TfrmAccounts.btnAddClick(Sender: TObject);
@@ -239,10 +279,10 @@ With SaveDialog do begin
     while not Accept do begin
         SaveDialog.Execute;
         if FileExists(FileName) then
-            case MessageBox(Application.Handle,
+            case MessageBox(Self.Handle,
                             PWideChar(Format(rsSaveDialogFileExists, [FileName])),
                             PWideChar(Application.Title),
-                            MB_YESNOCANCEL + MB_DEFBUTTON3 + MB_SYSTEMMODAL + MB_ICONWARNING) of
+                            MB_YESNOCANCEL + MB_DEFBUTTON3 + MB_APPLMODAL + MB_ICONWARNING) of
             ID_YES: Accept:=True;
             ID_CANCEL: Exit;
             end
@@ -289,13 +329,13 @@ begin
     if lvFiles.Selected = nil then Exit;
     FFileName:=lvFiles.Selected.Caption;
     if not FileExists(FFileName) then
-        if MessageBox(Application.Handle,
+        if MessageBox(Self.Handle,
             PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
             'Title',
             MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL) = ID_CANCEL
             then Exit
             else CreateNewBase(FFileName);
-    if DocumentOpen(FFileName) then begin
+    if DocumentPreOpenXML(FFileName) then begin
         ReloadStoredDocs(FFileName);
         Self.ModalResult:=mrOK;
     end;

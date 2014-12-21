@@ -23,7 +23,9 @@ uses
   uSettings in 'uSettings.pas',
   uStrings in 'uStrings.pas',
   uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame},
-  uFolderFrameInfo in 'uFolderFrameInfo.pas' {FolderFrameInfo: TFrame};
+  uFolderFrameInfo in 'uFolderFrameInfo.pas' {FolderFrameInfo: TFrame},
+  md5 in 'md5.pas',
+  uFileIO in 'uFileIO.pas';
 
 {$R *.res}
 

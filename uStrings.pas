@@ -113,6 +113,8 @@ resourcestring
     rsOpenDialogTitle = 'Open database...';
     rsOpenDocumentError = 'Can''t open %s' + CrLf + 'Please, make sure it is the correct file.';
     rsOpenDocumentErrorTitle = 'Open document error';
+    rsTxtPassFileNotFound = 'File not found';
+    rsTxtPassPassNotReq = 'Not required';
     //frmMain
 
     //
