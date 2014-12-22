@@ -44,7 +44,7 @@ begin
 
     {......................}
 
-	With xmlMain.DocumentElement.ChildNodes['Header'] do begin
+	With omgDoc.XML.DocumentElement.ChildNodes['Header'] do begin
     	for i := 0 to ChildNodes.Count - 1 do begin
 //        	log(ChildNodes[i].NodeName);log(ChildNodes[i].Text); log(vleProp.Values[ChildNodes[i].NodeName]);
     		ChildNodes[i].Text:=vleProp.Values[ChildNodes[i].NodeName];
@@ -59,11 +59,11 @@ end;
 procedure TfrmProperties.FormCreate(Sender: TObject);
 var i: Integer;
 begin
-    vleProp.InsertRow('Сигнатура*', xmlMain.DocumentElement.AttributeNodes['signature'].Text, True);
-    vleProp.InsertRow('Версия БД*', xmlMain.DocumentElement.AttributeNodes['version'].Text, True);
-    vleProp.InsertRow('Путь файла*', xmlMain.FileName, True);
+    vleProp.InsertRow('Сигнатура*', omgDoc.XML.DocumentElement.AttributeNodes['signature'].Text, True);
+    vleProp.InsertRow('Версия БД*', omgDoc.XML.DocumentElement.AttributeNodes['version'].Text, True);
+    vleProp.InsertRow('Путь файла*', omgDoc.XML.FileName, True);
     vleProp.InsertRow('Размер файла*', '42kB', True);
-    With xmlMain.DocumentElement.ChildNodes['Header'] do begin
+    With omgDoc.XML.DocumentElement.ChildNodes['Header'] do begin
         for i := 0 to ChildNodes.Count - 1 do
             vleProp.InsertRow(ChildNodes[i].NodeName, ChildNodes[i].Text, True);
     //	Старые методы

@@ -305,6 +305,8 @@ begin
 	pth:= TStringList.Create();
     pth.AddStrings(fNodePath.Split(['\', '/', '|', '.']));
     fNode:= x.Node;
+    LogNodeInfo(fNode);
+    Log(FNode.NodeName);
     while pth.Count<>0 do begin
         fNode:=fNode.ChildNodes[pth[0]];
         pth.Delete(0);

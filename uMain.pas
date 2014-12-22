@@ -323,7 +323,7 @@ end;
 procedure TfrmMain.mnuInsertPageClick(Sender: TObject);
 begin
     AddNewPage();
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
     frmMain.tabMainChange(nil);
 end;
 
@@ -334,7 +334,7 @@ end;
 procedure TfrmMain.btnAddPageClick(Sender: TObject);
 begin
     AddNewPage();
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
     frmMain.tabMainChange(nil);
 end;
 {$ENDREGION}
@@ -579,7 +579,7 @@ end;
 procedure TfrmMain.tmrSearchTimer(Sender: TObject);
 begin
     //Beep;
-    ParsePageToTree(intCurrentPage, tvMain, txtSearch.Text);
+    ParsePageToTree(omgDoc.CurrentPage, tvMain, txtSearch.Text);
     with txtSearch do begin
         if Text = '' then
             tvMain.Items[iSelected].Selected:=True
@@ -629,7 +629,7 @@ begin
         RightButton.ImageIndex:=0;
         RightButton.Enabled:=False;
         if Text <> '' then begin
-            ParsePageToTree(intCurrentPage, tvMain);
+            ParsePageToTree(omgDoc.CurrentPage, tvMain);
             tvMain.Items[iSelected].Selected:=True;
             tvMain.SetFocus;
         end;

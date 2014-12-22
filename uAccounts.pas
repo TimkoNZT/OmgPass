@@ -127,7 +127,7 @@ LoadLvFiles;
 //end else lvFiles.Items[0].Selected:=True;
 
 if lvFiles.Items.Count > 5 then
-    lvFiles.Column[0].Width:=(lvFiles.ClientRect.Width - 20);
+    lvFiles.Column[0].Width:=(lvFiles.ClientRect.Width - 17);
 
 Logic.SetButtonImg(btnNewBase, imlAccounts, 3);
 Logic.SetButtonImg(btnGeneratePass, imlAccounts, 1);

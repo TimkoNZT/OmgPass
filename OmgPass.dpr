@@ -25,7 +25,7 @@ uses
   uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame},
   uFolderFrameInfo in 'uFolderFrameInfo.pas' {FolderFrameInfo: TFrame},
   md5 in 'md5.pas',
-  uFileIO in 'uFileIO.pas';
+  uDocument in 'uDocument.pas';
 
 {$R *.res}
 

@@ -6,7 +6,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
-    XMLutils, uFieldFrame, uFolderFrame, uFolderFrameInfo,
+    XMLutils, uDocument, uFieldFrame, uFolderFrame, uFolderFrameInfo,
     uSmartMethods, uSettings, md5,
     {Themes}
     Styles, Themes
@@ -14,11 +14,12 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 const
 	bShowLogAtStart: Boolean = True;
 var
-	xmlMain: TXMLDocument;          //Основной наш документ
+    omgDoc: cOmgDocument;           //Основной наш синглтон-документ
+	//xmlMain: TXMLDocument;          //Деприкейтед
     xmlCfg: TSettings;
     LogList: TStringList;           //Переменная для логирования
-	PageList: IXMLNodeList;      	//Список страниц
-    intCurrentPage: Integer;    	//Текущая страничка
+	//omgDoc.Pages: IXMLNodeList;      	//Список страниц
+    //intCurrentPage: Integer;    	//Текущая страничка
     intThemeIndex: Integer;         //Номер выбранной темы
     intExpandFlag: Integer;    	    //Состояние программы
     								//0 - нормальная работа
@@ -27,10 +28,9 @@ var
     bSearchMode: Boolean;           //Режим поиска
 	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
-//    strCurrentBase: String;
     bShowPasswords: Boolean;        //Загадочная переменная
-    bWindowsOnTop: Boolean;          //Ещё одна
-    bAppSimpleMode: Boolean;           //Углупленный режим программы для смертных
+    bWindowsOnTop: Boolean;         //Ещё одна
+    bAppSimpleMode: Boolean;        //Углупленный режим программы для смертных
     intTickToExpand: Integer;       //  \
     oldNode: TTreeNode;             //  }Разворачивание узлов при перетаскивании
     nodeToExpand: TTreeNode;        // /
@@ -48,7 +48,6 @@ function InitGlobal: Boolean;
 
 
 function DocManager(Reopen: Boolean = False): Boolean;
-function DocManagerEx(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
 procedure LoadSettings;
@@ -91,9 +90,8 @@ function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
 procedure CreateNewBase(fPath: String);
-function IsDocValidate: Boolean;
-function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
-function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
+//function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
+//function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
 function LoadStoredDocs(): TStringList;
 procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
@@ -102,15 +100,13 @@ function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
 function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 
-function DocumentOpenXML(xmlPath: String): Boolean;
-function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
-function DocumentOpenCrypted(cryPath: String; Password: String): Boolean;
-
+function DocumentOpen(Path: String; Pass: String): Boolean;
 procedure DocumentClose;
+
 procedure MessageIfEmptyDoc;
 
 implementation
-uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uFileIO;
+uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
 
 function GeneratePassword(Len: Integer = 8): String;
 //Генерация пароля в строку нужной длины
@@ -331,19 +327,23 @@ function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeLis
 //Рисование страниц из документа в TtabControl
 var i: Integer;
 tabList: TStringList;
+RootNode: IXMLNode;
 begin
 	Log('--------------------ParsePagesToTabs:Start');
-    xmlMain.Active:=False;
-	xmlMain.Active:=True;
+    {xmlMain.SaveToFile('c:\1.xml');
+//xmlStream
     intExpandFlag:=1;
     //intCurrentPage:=-1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
-	PageList:= NodeByPath(x, 'Root|Data').ChildNodes;
-    tabControl.Visible:= (PageList.Count<>0);
-    for i := 0 to PageList.Count - 1 do begin
-		LogNodeInfo(PageList[i]);
-		tabList.Add(GetNodeTitle(PageList[i]));
+	omgDoc.Pages:= NodeByPath(x, 'Root|Data').ChildNodes;
+
+//    LogNodeInfo(omgDoc.Pages[0], 'PL');
+
+    tabControl.Visible:= (omgDoc.Pages.Count<>0);
+    for i := 0 to omgDoc.Pages.Count - 1 do begin
+		LogNodeInfo(omgDoc.Pages[i]);
+		tabList.Add(GetNodeTitle(omgDoc.Pages[i]));
     end;
     tabControl.Tabs:=tabList;
     if intCurrentPage < tabControl.Tabs.Count then
@@ -351,6 +351,22 @@ begin
     else
        	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     //frmMain.btnAddPage.Left:=tabControl.TabRect(tabControl.Tabs.Count-1).Width + tabControl.TabRect(tabControl.Tabs.Count-1).Left + 3;
+    intExpandFlag:=0;}
+
+    intExpandFlag:=1;
+    //intCurrentPage:=-1;
+    tabList:=TStringList.Create;
+	tabControl.Tabs.Clear;
+    tabControl.Visible:= (omgDoc.Pages.Count<>0);
+    for i := 0 to omgDoc.Pages.Count - 1 do begin
+		LogNodeInfo(omgDoc.Pages[i]);
+		tabList.Add(GetNodeTitle(omgDoc.Pages[i]));
+    end;
+    tabControl.Tabs:=tabList;
+    if omgDoc.CurrentPage < tabControl.Tabs.Count then
+    	tabControl.TabIndex:= omgDoc.CurrentPage
+    else
+       	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     intExpandFlag:=0;
     Log('--------------------ParsePagesToTabs:End');
 end;
@@ -359,21 +375,21 @@ procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start---------------------------');
-    if PageList.Count = 0 then begin
+    if omgDoc.Pages.Count = 0 then begin
         Log('Warning! There is no pages in document');
         Exit;
     end;
     intExpandFlag:=1;
 	Tree.Items.Clear;
-    RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(PageList[pageIndex]));
+    RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(omgDoc.Pages[pageIndex]));
     RootNode.ImageIndex:=2;
     RootNode.SelectedIndex:=2;
-    RootNode.Data:=Pointer(PageList[pageIndex]);
+    RootNode.Data:=Pointer(omgDoc.Pages[pageIndex]);
     Tree.Items.BeginUpdate;
-	IterateNodesToTree(PageList[pageIndex], RootNode, Tree, SearchStr);
+	IterateNodesToTree(omgDoc.Pages[pageIndex], RootNode, Tree, SearchStr);
     Tree.Items.EndUpdate;
     RootNode.Expand(False);
-    intCurrentPage:= pageIndex;
+    omgDoc.CurrentPage:= pageIndex;
     intExpandFlag:=0;
     Log('--------------------ParsePageToTree:End-----------------------------');
 end;
@@ -508,7 +524,7 @@ begin
     ntFolder:
 		Exit;
     ntPage:
-        frmMain.tabMain.Tabs[intCurrentPage]:=Title;
+        frmMain.tabMain.Tabs[omgDoc.CurrentPage]:=Title;
     end;
 end;
 procedure DeleteNode(treeNode: TTreeNode; withoutConfirm: Boolean= False);
@@ -525,7 +541,7 @@ begin
     ntFolder:
     	msg:= Format(rsDelFolder, [AnsiQuotedStr(GetNodeTitle(Node), '"')]);
     ntPage: begin
-    	if PageList.Count = 1 then begin
+    	if omgDoc.Pages.Count = 1 then begin
         	MessageBox(Application.Handle,
                         PWideChar(rsCantDelPage),
                         PWideChar(rsDelNodeTitle),
@@ -541,15 +557,15 @@ begin
     Log('Deleting confirmed...');
     Node.ParentNode.ChildNodes.Remove(Node);           //returns thmthng
     if GetNodeType(Node) = ntPage then begin
-        ParsePagesToTabs(xmlMain, frmMain.tabMain);
+        ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
         frmMain.tabMainChange(nil);
     end else treeNode.Delete;
 end;
 procedure AddNewPage();
 //Новая страничка
 begin
-    inc(intCurrentPage);
-    PageList.Insert(intCurrentPage, CreateClearPage);
+    inc(omgDoc.CurrentPage);
+    omgDoc.Pages.Insert(omgDoc.CurrentPage, CreateClearPage);
 //    ParsePagesToTabs(xmlMain, frmMain.tabMain);
 //    frmMain.tabMainChange(nil);
 end;
@@ -560,7 +576,7 @@ var
     dItem: IXMLNode;       //defitem
     tField: IXMLNode;      //tempfield..okay?
 begin
-    newPageNode:=xmlMain.CreateNode('Page');
+    newPageNode:=omgDoc.XML.CreateNode('Page');
     newPageNode.Text:=rsNewPageTitle +'_'+ DateToStr(now);
     newPageNode.SetAttributeNS('type', '', 'page');
     dItem:= newPageNode.AddChild('DefItem');
@@ -634,7 +650,7 @@ begin
 end;
 
 begin
-    if LimitItems(NodeByPath(xmlMain, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
+    if LimitItems(NodeByPath(omgDoc.XML, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
         MessageBox(Application.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR);
         Exit;
     end;
@@ -646,7 +662,7 @@ begin
         treeNode:=treeNode.Parent;
     end;
     Log(destNode.NodeName);
-	defItem:=PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
+	defItem:=omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode('DefItem');
     //
 	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do
@@ -836,13 +852,20 @@ end;
 procedure LoadDocSettings;
 //А здесь грузятся настройки документа и заодно документ выводится в форму
 begin
-    ParsePagesToTabs(xmlMain, frmMain.tabMain);
-    if GetDocProperty('SelectedPage', 0) < PageList.Count then
+    {ParsePagesToTabs(xmlMain, frmMain.tabMain);
+    if GetDocProperty('SelectedPage', 0) < omgDoc.Pages.Count then
         frmMain.tabMain.TabIndex := GetDocProperty('SelectedPage', 0);
     //Эта строчка необходима тУт!
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
     if GetDocProperty('Selected', 0) < frmMain.tvMain.Items.Count  then
-        frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;
+        frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;}
+    ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
+    if omgDoc.CurrentPage < omgDoc.Pages.Count then
+        frmMain.tabMain.TabIndex := omgDoc.CurrentPage;
+    //Эта строчка необходима тУт!
+    ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
+    if omgDoc.CurrentRecord < frmMain.tvMain.Items.Count  then
+        frmMain.tvMain.Items[omgDoc.CurrentRecord].Selected:=True;
 end;
 procedure SaveSettings;
 //Сохраняем всё в файл перед выходом из программы
@@ -871,14 +894,14 @@ begin
     //Номер выбранного элемента и страницы сохраняется в документ
     //Если вдруг режим поиска, то записываем сохраненное значение
     if bSearchMode then
-        SetDocProperty('Selected', iSelected)
+        omgDoc.CurrentRecord:= iSelected
     //Иначе если нормальный режим, то записываем номер выделенного узла
     //Если узла нет, то записывается ноль
-    else if frmMain.tvMain.Selected<>nil then
-        SetDocProperty('Selected', frmMain.tvMain.Selected.AbsoluteIndex)
+    else if frmMain.tvMain.Selected <> nil then
+        omgDoc.CurrentRecord:= frmMain.tvMain.Selected.AbsoluteIndex
     else
-        SetDocProperty('Selected', 0);
-    SetDocProperty('SelectedPage', intCurrentPage);
+        omgDoc.CurrentRecord:= 0;
+//    omgDoc.CurrentPage:= Хехехе
 end;
 procedure LoadThemes;
 var
@@ -988,8 +1011,8 @@ procedure EditDefaultItem;
 var
     defItem: IXMLNode;
 begin
-    LogNodeInfo(PageList[intCurrentPage], 'EditDefaultItem, Page = ');
-    defItem:= PageList[intCurrentPage].ChildNodes.FindNode('DefItem');
+    LogNodeInfo(omgDoc.Pages[omgDoc.CurrentPage], 'EditDefaultItem, Page = ');
+    defItem:= omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode('DefItem');
     LogNodeInfo(defItem, 'EditDefaultItem, DefItem = ');
     if EditItem(defItem, False, True) then
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
@@ -997,7 +1020,7 @@ end;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
 //Функция возвращает новое поле
 begin
-    Result:=xmlMain.CreateNode('Field');
+    Result:=omgDoc.XML.CreateNode('Field');
     if fFmt = ffNone then begin
         SetAttribute(Result, 'name', arrDefFieldNames[Ord(fFmt)]);
         SetAttribute(Result, 'format', arrFieldFormats[Ord(ffText)]);
@@ -1030,7 +1053,6 @@ begin
     end;
     //Принудительно показываем форму
     frmMain.Show;
-    //if not IsDocValidate then Exit;
 
     CheckVersion;
     CheckUpdates;
@@ -1055,26 +1077,14 @@ begin
 //        xmlTemp.LoadFromXML('<?xml version="1.0" encoding="UTF-8"?>' + #10#10 + '<Root><Header/><Data/></Root>');
         Log('Create new base!');
         xmlTemp.FileName:=fPath;
-        xmlTemp.Encoding := 'UTF-8';
-        xmlTemp.Version := '1.0';
+//        xmlTemp.Encoding := 'UTF-8';
+//        xmlTemp.Version := '1.0';
         With xmlTemp.AddChild('Root') do begin
             AddChild('Header');
             AddChild('Data');
         end;
         xmlTemp.SaveToFile(fPath);
 //        FreeAndNil(xmlTemp);
-end;
-function IsDocValidate: Boolean;
-//Проверка на валидность базы, сейчас просто проверка XML
-//При ошибке выходит и сохраняет лог на диск
-begin
-    try
-    if xmlMain.ChildNodes[strRootNode] <> nil then
-        if xmlMain.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
-            result:=True;
-    except
-        on e: Exception do ErrorMsg(e, 'Validate Document', True);
-    end;
 end;
 function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
 //Логирование ошибок
@@ -1088,26 +1098,26 @@ begin
     if isFatal then Application.Terminate;
 end;
 {$REGION '#DocProperty'}
-function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
+{function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 //Установка и чтение свойств документа
 //Все свойства хранятся в ntHeader
 //Функции удаления нет.. нужна
 begin
-if (xmlMain.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode) = nil)
-or (xmlMain.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(PropertyName) = nil)
+if (omgDoc.XML.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode) = nil)
+or (omgDoc.XML.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(PropertyName) = nil)
         then Result:=DefValue
-    else Result:=xmlMain.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildValues[PropertyName];;
+    else Result:=omgDoc.XML.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildValues[PropertyName];;
 end;
 function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
 var hNode: IXMLNode;
 begin
-    hNode:= xmlMain.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode);
+    hNode:= omgDoc.XML.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode);
     if hNode = nil then
-        hNode:=xmlMain.ChildNodes[strRootNode].AddChild(strHeaderNode);
+        hNode:=omgDoc.XML.ChildNodes[strRootNode].AddChild(strHeaderNode);
     if hNode.ChildNodes.FindNode(PropertyName) = nil then
         hNode.AddChild(PropertyName);
     hNode.ChildValues[PropertyName]:=Value;
-end;
+end;        }
 {$ENDREGION}
 {$REGION '#StoredDocs'}
 function LoadStoredDocs(): TStringList;
@@ -1160,15 +1170,15 @@ end;
 {$ENDREGION}
 procedure MessageIfEmptyDoc;
 begin
-    if PageList.Count = 0 then begin
+    if omgDoc.Pages.Count = 0 then begin
         if (MessageBox(frmMain.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
-                MB_YESNO + MB_SYSTEMMODAL + MB_ICONINFORMATION)
+                MB_YESNO + MB_APPLMODAL + MB_ICONINFORMATION)
                 = ID_YES)
                 then begin
                     AddNewPage;
-                    ParsePagesToTabs(xmlMain, frmMain.tabMain);
+                    ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
                     ParsePageToTree(0, frmMain.tvMain);
         end;
     end;
@@ -1187,7 +1197,7 @@ begin
             //Accept:=True;
             if not Reopen then frmMain.Show;    //Принудительно
             frmAccounts.Hide;
-            DocumentOpenXML(frmAccounts.FFileName);
+            DocumentOpen(frmAccounts.FFileName, frmAccounts.txtPass.Text);
             Result:=True;
         end else begin
             Log ('frmAccounts: mrCancel');
@@ -1198,80 +1208,32 @@ begin
     FreeAndNil(frmAccounts);
     //ShowWindow(Application.Handle, SW_RESTORE);
 end;
-function DocManagerEx(Reopen: Boolean = False): Boolean;
-var Accept: Boolean;
-begin
-    Accept:=False;
-    if (not Assigned(frmAccounts)) then
-        frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
-    frmAccounts.Show;
-//    while not Accept do begin end;
-//    if frmAccounts.ModalResult = mrOK then begin
-//            Log ('frmAccounts: mrOK');
-//            if DocumentOpen(frmAccounts.FFileName) then begin
-//                Accept:=True;
-//                Result:=True;
-//            end;
-//        end else begin
-//            Log ('frmAccounts: mrCancel');
-//            Accept:=True;
-//            Result:=False;
-//        end;
-//    end;
-//    FreeAndNil(frmAccounts);
-    //ShowWindow(Application.Handle, SW_RESTORE);
-end;
-
-function DocumentOpenXML(xmlPath: String): Boolean;
+function DocumentOpen(Path: String; Pass: String): Boolean;
 var
-    FileStream : TFileStream;
+    tmpDoc: cOmgDocument;
 begin
     try
-        FileStream := TFileStream.Create(xmlPath, fmOpenReadWrite);
-        DocumentOpenXMLfromStream(FileStream);
-    finally
-        //FreeAndNil(FileStream);
+        tmpDoc:=cOmgDocument.Create;
+        tmpDoc.Open(Path, Pass);
+        DocumentClose;
+        omgDoc:=tmpDoc;
+        frmMain.Caption:= Application.Title +' [' + omgDoc.FilePath + ']';
+        LoadDocSettings;
+        MessageIfEmptyDoc;
+    except
+        on e: Exception do begin
+            ErrorMsg(e, 'DocumentOpen');
+            Result:=False;
+        end;
     end;
+        tmpDoc:=nil;
 end;
-function DocumentOpenCrypted(cryPath: String; Password: String): Boolean;
+procedure DocumentClose;
 begin
-    //Empty for a while
+    if omgDoc = nil then Exit;
+    omgDoc.Save;
+    omgDoc.Free;
 end;
-function DocumentOpenXMLfromStream(xmlMainStream: TStream): Boolean;
-var
-    xmlTemp: TXMLDocument;
-begin
-    try
-    xmlTemp:=TXMLDocument.Create(Application);
-    xmlTemp.LoadFromStream(xmlMainStream);
-    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-    xmlTemp.ParseOptions:=[poValidateOnParse];
-    xmlTemp.Active:=True;
-    //Если дожили досюда и не скатились в ексцепшен, значит XML годный
-    //Закрываем старый документ
-    {if isReOpen then }DocumentClose;
-    //Переназначаем документ на рабочую переменную
-    xmlMain:=xmlTemp;
-except
-    on e: Exception do begin
-        ErrorMsg(e, 'DocumentOpen');
-        MessageBox(frmAccounts.Handle,
-            PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
-            PWideChar(rsOpenDocumentErrorTitle),
-            MB_APPLMODAL + MB_ICONWARNING);
-        Result:=False;
-        Exit;
-    end;
-end;
-    xmlTemp:=nil;
-    Result:=True;
-    LoadDocSettings;
-    MessageIfEmptyDoc;
-    frmMain.Caption:= Application.Title + xmlMain.FileName;
-    Result:=True;
-end;
-
-//Document Save?
 
 function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 //функция ддолжна попытаться открыть файл XML
@@ -1282,8 +1244,8 @@ begin
 try
     xmlTemp:=TXMLDocument.Create(Application);
     xmlTemp.LoadFromFile(Path);
-    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-    xmlTemp.ParseOptions:=[poValidateOnParse];
+//    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+//    xmlTemp.ParseOptions:=[poValidateOnParse];
     xmlTemp.Active:=True;
     if xmlTemp.ChildNodes[strRootNode] <> nil then
         if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
@@ -1310,15 +1272,6 @@ begin
         Result:=idOk
     else
         Result:=idTryAgain;
-end;
-
-procedure DocumentClose;
-begin
-    if xmlMain = nil then Exit;
-    if xmlMain.IsEmptyDoc then Exit;
-    SaveDocSettings;
-    xmlMain.Active:=False;
-    FreeAndNil(xmlMain);
 end;
 
 end.

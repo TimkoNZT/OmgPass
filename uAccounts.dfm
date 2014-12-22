@@ -35,8 +35,6 @@ object frmAccounts: TfrmAccounts
     TabOrder = 3
     Visible = False
     OnClick = btnCreateNewBaseClick
-    ExplicitLeft = 253
-    ExplicitTop = 331
   end
   object pcAccounts: TPageControl
     Left = 8
@@ -49,14 +47,10 @@ object frmAccounts: TfrmAccounts
     MultiLine = True
     TabHeight = 25
     TabOrder = 0
-    ExplicitWidth = 341
-    ExplicitHeight = 312
     object tsOpen: TTabSheet
       Caption = 'Open document'
       ImageIndex = 7
       OnShow = tsOpenShow
-      ExplicitWidth = 333
-      ExplicitHeight = 277
       DesignSize = (
         332
         266)
@@ -339,8 +333,6 @@ object frmAccounts: TfrmAccounts
         ViewStyle = vsReport
         OnClick = lvFilesClick
         OnDblClick = lvFilesDblClick
-        ExplicitWidth = 308
-        ExplicitHeight = 130
       end
       object chkShowMainPass: TCheckBox
         Left = 11
@@ -352,7 +344,6 @@ object frmAccounts: TfrmAccounts
         Enabled = False
         TabOrder = 1
         OnClick = chkShowMainPassClick
-        ExplicitTop = 249
       end
       object txtPass: TEdit
         Left = 11
@@ -397,8 +388,6 @@ object frmAccounts: TfrmAccounts
       Caption = 'Create new document'
       ImageIndex = 4
       OnShow = tsNewShow
-      ExplicitWidth = 333
-      ExplicitHeight = 277
       DesignSize = (
         332
         266)
@@ -502,8 +491,6 @@ object frmAccounts: TfrmAccounts
         Lines.Strings = (
           'Not realized yet')
         TabOrder = 4
-        ExplicitTop = 169
-        ExplicitWidth = 311
       end
       object txtNewBase: TEdit
         Left = 12
@@ -526,8 +513,6 @@ object frmAccounts: TfrmAccounts
     Caption = #1054#1090#1084#1077#1085#1072
     TabOrder = 1
     OnClick = btnCloseClick
-    ExplicitLeft = 163
-    ExplicitTop = 331
   end
   object btnOK: TButton
     Left = 252
@@ -539,8 +524,6 @@ object frmAccounts: TfrmAccounts
     Default = True
     TabOrder = 2
     OnClick = btnOKClick
-    ExplicitLeft = 253
-    ExplicitTop = 331
   end
   object OpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
@@ -556,7 +539,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 312
     Bitmap = {
-      494C01010A001C03EC0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010A001C03F00316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       011800101768000A0F5400000012000000030000000000000000000000000000
