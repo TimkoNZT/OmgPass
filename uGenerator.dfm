@@ -182,7 +182,7 @@ object frmGenerator: TfrmGenerator
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clBlue
       Font.Height = -19
-      Font.Name = 'Courier New'
+      Font.Name = 'Consolas'
       Font.Style = [fsBold]
       ParentFont = False
       ShowAccelChar = False

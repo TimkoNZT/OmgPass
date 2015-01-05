@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 353
   Top = 186
   Caption = 'Omg!Pass'
-  ClientHeight = 389
+  ClientHeight = 396
   ClientWidth = 507
   Color = clBtnFace
   Constraints.MinHeight = 330
@@ -22,8 +22,8 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object lblEmpty: TLabel
-    Left = 176
-    Top = 248
+    Left = 313
+    Top = 312
     Width = 267
     Height = 26
     Alignment = taCenter
@@ -130,7 +130,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 54
     Width = 507
-    Height = 316
+    Height = 323
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -146,7 +146,7 @@ object frmMain: TfrmMain
     OnMouseLeave = tabMainMouseLeave
     DesignSize = (
       507
-      316)
+      323)
     object btnAddPage: TSpeedButton
       Left = 479
       Top = 0
@@ -181,10 +181,10 @@ object frmMain: TfrmMain
       ExplicitLeft = 595
     end
     object Splitter: TSplitter
-      Left = 201
+      Left = 217
       Top = 6
       Width = 5
-      Height = 306
+      Height = 313
       Hint = 'DblClick for restore position'
       Margins.Left = 2
       Margins.Top = 2
@@ -199,10 +199,10 @@ object frmMain: TfrmMain
     end
     object fpMain: TScrollBox
       AlignWithMargins = True
-      Left = 206
+      Left = 222
       Top = 6
-      Width = 295
-      Height = 305
+      Width = 279
+      Height = 312
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 2
@@ -224,8 +224,8 @@ object frmMain: TfrmMain
     object pnlTree: TPanel
       Left = 4
       Top = 6
-      Width = 197
-      Height = 306
+      Width = 213
+      Height = 313
       Align = alLeft
       BevelOuter = bvNone
       ParentBackground = False
@@ -234,8 +234,8 @@ object frmMain: TfrmMain
       object tvMain: TTreeView
         Left = 0
         Top = 34
-        Width = 197
-        Height = 272
+        Width = 213
+        Height = 279
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -266,7 +266,7 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 0
         Top = 5
-        Width = 197
+        Width = 213
         Height = 24
         Margins.Left = 0
         Margins.Top = 5
@@ -303,7 +303,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 370
+    Top = 377
     Width = 507
     Height = 19
     Margins.Left = 2
@@ -330,8 +330,12 @@ object frmMain: TfrmMain
         ShortCut = 16466
         OnClick = mnuAccountsClick
       end
+      object mnuSaveAsCrypted: TMenuItem
+        Caption = 'Save as crypted'
+        OnClick = mnuSaveAsCryptedClick
+      end
       object mnuPass: TMenuItem
-        Caption = 'Password...'
+        Caption = 'Main password...'
       end
       object mnuBaseProperties: TMenuItem
         Caption = 'Properties'
@@ -466,10 +470,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 48
     Width = 48
-    Left = 203
-    Top = 96
+    Left = 307
+    Top = 192
     Bitmap = {
-      494C010108001800300230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101080018003C0230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4049,7 +4053,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 144
     Bitmap = {
-      494C01010D002401300317001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D0024013C0317001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5158,7 +5162,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 96
     Bitmap = {
-      494C010104003400700116001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C0101040034007C0116001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5652,10 +5656,10 @@ object frmMain: TfrmMain
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 203
-    Top = 144
+    Left = 347
+    Top = 192
     Bitmap = {
-      494C01013800CC01200316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01013800CC012C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000004A0100000100200000000000C0C5
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9458,7 +9462,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 96
     Bitmap = {
-      494C01010500F001600316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010500F0016C0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -9985,7 +9989,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 142
     Bitmap = {
-      494C010103000800D80010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103000800E40010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000E00121B78002B

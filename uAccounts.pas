@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   StdCtrls, Vcl.CategoryButtons,
   Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs, Vcl.ImgList,
-  Vcl.Imaging.pngimage;
+  Vcl.Imaging.pngimage, Vcl.ToolWin;
 
 type
   TfrmAccounts = class(TForm)
@@ -87,7 +87,7 @@ implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator, Logic, uSettings, uStrings, md5;
+uses uMain, uGenerator, Logic, uSettings, uStrings, uMD5;
 
 constructor TfrmAccounts.Create(AOwner: TComponent; isChange: Boolean = False);
 begin
@@ -240,7 +240,7 @@ end;
 procedure TfrmAccounts.txtPassChange(Sender: TObject);
 begin
 if not txtPass.Enabled then Exit;
-Log(md5.MD5String(txtPass.Text).ToHexString);
+Log(uMD5.MD5String(txtPass.Text).ToHexString);
 imgNotShallPass.Visible:= (DocumentPreOpenCrypted(FFileName, txtPass.Text) <> idOk);
 end;
 

@@ -281,36 +281,33 @@ object frmAccounts: TfrmAccounts
       end
       object btnRemove: TSpeedButton
         Left = 218
-        Top = 145
+        Top = 144
         Width = 100
-        Height = 26
+        Height = 28
         Anchors = [akLeft, akBottom]
         Caption = 'Remove'
         Flat = True
         OnClick = btnRemoveClick
-        ExplicitTop = 144
       end
       object btnAdd: TSpeedButton
         Left = 116
-        Top = 145
+        Top = 144
         Width = 100
-        Height = 26
+        Height = 28
         Anchors = [akLeft, akBottom]
         Caption = 'Add'
         Flat = True
         OnClick = btnAddClick
-        ExplicitTop = 144
       end
       object btnNew: TSpeedButton
         Left = 11
-        Top = 145
+        Top = 144
         Width = 100
-        Height = 26
+        Height = 28
         Anchors = [akLeft, akBottom]
         Caption = 'New'
         Flat = True
         OnClick = btnNewClick
-        ExplicitTop = 144
       end
       object lvFiles: TListView
         Left = 11
@@ -442,7 +439,6 @@ object frmAccounts: TfrmAccounts
         Anchors = [akLeft, akTop, akRight]
         Enabled = False
         TabOrder = 0
-        ExplicitWidth = 283
       end
       object txtNewPass: TEdit
         Left = 11
@@ -454,7 +450,6 @@ object frmAccounts: TfrmAccounts
         Enabled = False
         ParentCtl3D = False
         TabOrder = 1
-        ExplicitWidth = 283
       end
       object chkShowPass: TCheckBox
         Left = 212
@@ -468,7 +463,6 @@ object frmAccounts: TfrmAccounts
         State = cbChecked
         TabOrder = 2
         OnClick = chkShowPassClick
-        ExplicitLeft = 213
       end
       object CheckBox1: TCheckBox
         Left = 11
@@ -479,7 +473,6 @@ object frmAccounts: TfrmAccounts
         Caption = #1055#1086#1076#1089#1082#1072#1079#1082#1072' '#1076#1083#1103' '#1087#1072#1088#1086#1083#1103
         Enabled = False
         TabOrder = 3
-        ExplicitTop = 151
       end
       object Memo1: TMemo
         Left = 11
@@ -500,7 +493,6 @@ object frmAccounts: TfrmAccounts
         Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 5
-        ExplicitWidth = 282
       end
     end
   end
@@ -539,7 +531,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 312
     Bitmap = {
-      494C01010A001C03F00316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010A001C03F80316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       011800101768000A0F5400000012000000030000000000000000000000000000

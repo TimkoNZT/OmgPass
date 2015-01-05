@@ -10,6 +10,7 @@ const
     strDataNode = 'Data';
     strFolderNode = 'Folder';
     strItemNode = 'Item';
+    strDefItemNode = 'DefItem';
     strConfigFile = 'config.xml';
     strLink = 'https://cloud.mail.ru/public/86079c1768cf/OmgPass/';
 
@@ -52,7 +53,10 @@ resourcestring
 //    rsChangeTitleWarning = 'Can''t change format for only title of record';
     rsFieldNotSelected = 'Field not selected';
     rsDemo = 'Sorry, you''ve reached the limit of the records count for the test version of program';
-    rsDocumentIsEmpty = 'Hmm, it looks like your document is empty!' + CrLf + 'Would you like add new page?';
+    rsDocumentIsEmpty = 'Hmm, it looks like your document is empty!' + CrLf +
+                        'Before working with the document,' + CrLf +
+                        'you must add at least one page.' + CrLf + CrLf +
+                        'Would you like to add new page?';
     rsDocumentIsEmptyTitle = 'Ooops!';
     //
     //
@@ -86,15 +90,18 @@ resourcestring
                                                     'Mail',
                                                     'File',
                                                     'Text or Login');
+    //Window captions
     //Заголовки окошек
     rsFrmAccountsCaption = ' welcomes you!';
     rsFrmAccountsCaptionOpen = 'Open base';
     rsFrmAccountsCaptionChange = ' - Document manager';
     rsFrmEditItemCaption = 'Edit record';
+    rsFrmEditItemCaptionDef = 'Edit default record';
     rsFrmEditItemCaptionNew = 'New record';
     rsFrmEditFieldCaption = 'Edit field properties';
     rsFrmEditFieldCaptionNew = 'New field...';
 
+    //Modal buttons
     //Модальные кнопочки
     rsClose = 'Close';
     rsCancel = 'Cancel';
@@ -102,6 +109,16 @@ resourcestring
     rsExit = 'Exit';
     rsOpen = 'Open';
     rsCopy = 'Copy';
+
+    //Smart-buttons hints
+    //Подсказки для кнопулек
+    rsHintOpenLink = 'Open link';
+    rsHintCopyToClipboard = 'Copy to clipboard';
+    rsHintCopyFromClipboard = 'Copy from clipboard';
+    rsHintGenerate = 'Generate password';
+    rsHintEditField = 'Edit field properties';
+    rsHintSaveFile = 'Save file(s)';
+    rsHintAddFile = 'Add file(s)';
 
     //frmAccounts
     rsSaveDialogFilter = 'Omg!Pass XML|*.xml|Omg!Pass Crypted|*.opwd';

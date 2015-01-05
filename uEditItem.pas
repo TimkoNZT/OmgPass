@@ -78,8 +78,12 @@ begin
     tbtnAdvanced.Down:=bAdvancedEdit;
     //–исуем
     GeneratePanel(fItem, fpEdit, True, IsNew, bAdvancedEdit);
-    if isNew then self.Caption:= rsFrmEditItemCaptionNew
-    else Self.Caption:=rsFrmEditItemCaption;
+    if isNew then
+        Self.Caption:= rsFrmEditItemCaptionNew
+    else if GetNodeType(nItem) = ntDefItem then
+        Self.Caption:=rsFrmEditItemCaptionDef
+    else
+        Self.Caption:=rsFrmEditItemCaption;
     //”ндо-лист
     UndoDoc:=TXMLDocument.Create(nil);
     UndoDoc.Active:=True;

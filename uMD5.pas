@@ -19,7 +19,7 @@ Copyright:   http://www.faqs.org/rfcs/rfc1321.html
 { http://www.faqs.org/rfcs/rfc1321.html }
 {******************************************************************}
 
-unit md5;
+unit uMD5;
 
 interface
 

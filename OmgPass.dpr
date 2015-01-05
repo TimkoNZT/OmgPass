@@ -24,8 +24,10 @@ uses
   uStrings in 'uStrings.pas',
   uFolderFrame in 'uFolderFrame.pas' {FolderFrame: TFrame},
   uFolderFrameInfo in 'uFolderFrameInfo.pas' {FolderFrameInfo: TFrame},
-  md5 in 'md5.pas',
-  uDocument in 'uDocument.pas';
+  uMD5 in 'uMD5.pas',
+  uDocument in 'uDocument.pas',
+  uCrypt in 'uCrypt.pas',
+  WCrypt2 in 'WCrypt2.pas';
 
 {$R *.res}
 

@@ -83,6 +83,7 @@ TfrmMain = class(TForm)
     mnuEditDefault: TMenuItem;
     Advancedmode1: TMenuItem;
     N2: TMenuItem;
+    mnuSaveAsCrypted: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -149,6 +150,7 @@ TfrmMain = class(TForm)
     procedure mnuServiceClick(Sender: TObject);
     procedure mnuEditDefaultClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure mnuSaveAsCryptedClick(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -456,7 +458,10 @@ procedure TfrmMain.tvMainChange(Sender: TObject; Node: TTreeNode);
 begin
     if Node.Data = nil then Exit;
     GeneratePanel(IXMLNode(Node.Data), fpMain);
-    if not bSearchMode then iSelected:=tvMain.Selected.AbsoluteIndex;
+    if not bSearchMode then begin
+        iSelected:=tvMain.Selected.AbsoluteIndex;
+        omgDoc.CurrentRecord:= tvMain.Selected.AbsoluteIndex;
+    end;
 end;
 procedure TfrmMain.tabMainChange(Sender: TObject);
 begin
@@ -608,7 +613,8 @@ begin
     bSearchMode:=True;
     with txtSearch do begin
         if (Font.Color = clGrayText) then begin
-            iSelected:=tvMain.Selected.AbsoluteIndex;
+            if tvMain.Selected <> nil then
+                iSelected:=tvMain.Selected.AbsoluteIndex;
             Text:= String.Empty;
             Font.Color:=clWindowText;
             Font.Style:= [];
@@ -652,7 +658,7 @@ procedure TfrmMain.FormResize(Sender: TObject);
 begin
 	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
     //tvMain.Align:=alLeft;
-    Splitter.Left:=tvMain.Width;
+    Splitter.Left:=tvMain.Width;              //WTF?
     lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
                         (Height - lblEmpty.Height) div 2,
                          lblEmpty.Width,
@@ -716,6 +722,11 @@ end;
 procedure TfrmMain.N12Click(Sender: TObject);
 begin
     ShellExecute(frmMain.Handle, 'open', PwideChar(strLink), nil, nil, SW_SHOW);
+end;
+
+procedure TfrmMain.mnuSaveAsCryptedClick(Sender: TObject);
+begin
+omgDoc.SaveAsCrypted;
 end;
 
 procedure TfrmMain.mnuServiceClick(Sender: TObject);

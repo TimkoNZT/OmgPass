@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
     XMLutils, uDocument, uFieldFrame, uFolderFrame, uFolderFrameInfo,
-    uSmartMethods, uSettings, md5,
+    uSmartMethods, uSettings, uMD5,
     {Themes}
     Styles, Themes
   	;
@@ -41,7 +41,6 @@ procedure Log(Text: String); overload;
 procedure Log(Flag: Boolean); overload;
 procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
-
 
 
 function InitGlobal: Boolean;
@@ -103,7 +102,7 @@ function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean
 function DocumentOpen(Path: String; Pass: String): Boolean;
 procedure DocumentClose;
 
-procedure MessageIfEmptyDoc;
+function MessageIsEmptyDoc: Boolean;
 
 implementation
 uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
@@ -329,30 +328,6 @@ var i: Integer;
 tabList: TStringList;
 RootNode: IXMLNode;
 begin
-	Log('--------------------ParsePagesToTabs:Start');
-    {xmlMain.SaveToFile('c:\1.xml');
-//xmlStream
-    intExpandFlag:=1;
-    //intCurrentPage:=-1;
-    tabList:=TStringList.Create;
-	tabControl.Tabs.Clear;
-	omgDoc.Pages:= NodeByPath(x, 'Root|Data').ChildNodes;
-
-//    LogNodeInfo(omgDoc.Pages[0], 'PL');
-
-    tabControl.Visible:= (omgDoc.Pages.Count<>0);
-    for i := 0 to omgDoc.Pages.Count - 1 do begin
-		LogNodeInfo(omgDoc.Pages[i]);
-		tabList.Add(GetNodeTitle(omgDoc.Pages[i]));
-    end;
-    tabControl.Tabs:=tabList;
-    if intCurrentPage < tabControl.Tabs.Count then
-    	tabControl.TabIndex:=intCurrentPage
-    else
-       	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
-    //frmMain.btnAddPage.Left:=tabControl.TabRect(tabControl.Tabs.Count-1).Width + tabControl.TabRect(tabControl.Tabs.Count-1).Left + 3;
-    intExpandFlag:=0;}
-
     intExpandFlag:=1;
     //intCurrentPage:=-1;
     tabList:=TStringList.Create;
@@ -437,6 +412,10 @@ var
 	trgNode: IXMLNode;
     //tmpNode: IXMLNode;
 begin
+    if treeNode = nil then
+            if MessageIsEmptyDoc then Exit     //Во избежание
+            else treeNode:=frmMain.tvMain.Selected;
+
 	if treeNode.Data = nil then Exit;
     //Если узел в режиме редактирования то просто применяем изменения
     if TTreeView(treeNode.TreeView).IsEditing then begin
@@ -533,6 +512,11 @@ var
 	Msg: String;
     Node: IXMLNode;
 begin
+    if treeNode = nil then begin
+            MessageIsEmptyDoc;
+            Exit;
+    end;
+
 	Log('DeleteNode:' + treeNode.Text);
 	Node:=IXMLNode(treeNode.Data);
     case GetNodeType(Node) of
@@ -564,8 +548,9 @@ end;
 procedure AddNewPage();
 //Новая страничка
 begin
-    inc(omgDoc.CurrentPage);
-    omgDoc.Pages.Insert(omgDoc.CurrentPage, CreateClearPage);
+if omgDoc.Pages.Count <> 0 then inc(omgDoc.CurrentPage);
+omgDoc.Pages.Insert(omgDoc.CurrentPage, CreateClearPage);
+
 //    ParsePagesToTabs(xmlMain, frmMain.tabMain);
 //    frmMain.tabMainChange(nil);
 end;
@@ -611,6 +596,10 @@ var
 	newFolderNode: IXMLNode;
 	//newTreeNode: TTreeNode;
 begin
+    if treeNode = nil then
+            if MessageIsEmptyDoc then Exit     //Во избежание
+            else treeNode:=frmMain.tvMain.Selected;
+
 	if GetNodeType(IXMLNode(treeNode.Data))=ntItem then begin
         treeNode:=treeNode.Parent;
     end;
@@ -650,6 +639,10 @@ begin
 end;
 
 begin
+    if treeNode = nil then
+            if MessageIsEmptyDoc then Exit     //Во избежание
+            else treeNode:=frmMain.tvMain.Selected;
+
     if LimitItems(NodeByPath(omgDoc.XML, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
         MessageBox(Application.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR);
         Exit;
@@ -688,6 +681,10 @@ procedure CloneNode(treeNode: TTreeNode);
 var
 	Node: IXMLNode;
 begin
+    if treeNode = nil then begin
+        MessageIsEmptyDoc;
+        Exit;
+    end;
     Node:=IXMLNode(treeNode.Data);
     case GetNodeType(Node) of
     ntPage:
@@ -852,13 +849,6 @@ end;
 procedure LoadDocSettings;
 //А здесь грузятся настройки документа и заодно документ выводится в форму
 begin
-    {ParsePagesToTabs(xmlMain, frmMain.tabMain);
-    if GetDocProperty('SelectedPage', 0) < omgDoc.Pages.Count then
-        frmMain.tabMain.TabIndex := GetDocProperty('SelectedPage', 0);
-    //Эта строчка необходима тУт!
-    ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
-    if GetDocProperty('Selected', 0) < frmMain.tvMain.Items.Count  then
-        frmMain.tvMain.Items[GetDocProperty('Selected', 0)].Selected:=True;}
     ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
     if omgDoc.CurrentPage < omgDoc.Pages.Count then
         frmMain.tabMain.TabIndex := omgDoc.CurrentPage;
@@ -1011,8 +1001,9 @@ procedure EditDefaultItem;
 var
     defItem: IXMLNode;
 begin
+    if MessageIsEmptyDoc then Exit;     //Во избежание
     LogNodeInfo(omgDoc.Pages[omgDoc.CurrentPage], 'EditDefaultItem, Page = ');
-    defItem:= omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode('DefItem');
+    defItem:= omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode(strDefItemNode);
     LogNodeInfo(defItem, 'EditDefaultItem, DefItem = ');
     if EditItem(defItem, False, True) then
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
@@ -1168,9 +1159,13 @@ begin
     SaveStoredDocs;
 end;
 {$ENDREGION}
-procedure MessageIfEmptyDoc;
+function MessageIsEmptyDoc: Boolean;
+//Возвращаем True если документ пустой и
+//пользователь не захотел добавлять страничку
+
 begin
-    if omgDoc.Pages.Count = 0 then begin
+    if omgDoc.IsEmpty then begin
+        Result:=True;
         if (MessageBox(frmMain.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
@@ -1180,7 +1175,9 @@ begin
                     AddNewPage;
                     ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
                     ParsePageToTree(0, frmMain.tvMain);
-        end;
+                    frmMain.tvMain.Items[0].Selected:=True;
+                    Result:=False;
+                end;
     end;
 end;
 function DocManager(Reopen: Boolean = False): Boolean;
@@ -1214,19 +1211,25 @@ var
 begin
     try
         tmpDoc:=cOmgDocument.Create;
-        tmpDoc.Open(Path, Pass);
+        if not tmpDoc.Open(Path, Pass) then begin
+            tmpDoc.Close;
+            FreeAndNil(tmpDoc);
+            Result:=False;
+            Exit;
+        end;
         DocumentClose;
         omgDoc:=tmpDoc;
         frmMain.Caption:= Application.Title +' [' + omgDoc.FilePath + ']';
         LoadDocSettings;
-        MessageIfEmptyDoc;
+        MessageIsEmptyDoc;
+        Result:=True;
     except
         on e: Exception do begin
             ErrorMsg(e, 'DocumentOpen');
             Result:=False;
         end;
     end;
-        tmpDoc:=nil;
+    tmpDoc:=nil;
 end;
 procedure DocumentClose;
 begin
@@ -1247,9 +1250,11 @@ try
 //    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
 //    xmlTemp.ParseOptions:=[poValidateOnParse];
     xmlTemp.Active:=True;
+    xmlTemp.Options :=[doAttrNull];                     //!!!
     if xmlTemp.ChildNodes[strRootNode] <> nil then
-        if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
-    Result:=True;
+        if xmlTemp.ChildNodes[strRootNode].ChildNodes[strHeaderNode] <> nil then
+            if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
+                Result:=True;
 except
     on e: Exception do begin
         ErrorMsg(e, 'DocumentPreOpen');
@@ -1266,7 +1271,8 @@ end;
 end;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 var
-    H: TCryptedFileHeader;
+    H: TCryFileHeader;
+    Stream: TFileStream;
 begin
     if MD5String('Password').ToHexString = MD5String(TryPass).ToHexString then
         Result:=idOk
