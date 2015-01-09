@@ -17,7 +17,7 @@ uses
   uFieldFrame in 'uFieldFrame.pas' {FieldFrame: TFrame},
   uSmartMethods in 'uSmartMethods.pas',
   uEditItem in 'uEditItem.pas' {frmEditItem},
-  uLog in 'uLog.pas' {frmLog},
+  uConsole in 'uConsole.pas' {frmLog},
   uEditField in 'uEditField.pas' {frmEditField},
   uCustomEdit in 'uCustomEdit.pas',
   uSettings in 'uSettings.pas',
@@ -27,7 +27,8 @@ uses
   uMD5 in 'uMD5.pas',
   uDocument in 'uDocument.pas',
   uCrypt in 'uCrypt.pas',
-  WCrypt2 in 'WCrypt2.pas';
+  WCrypt2 in 'WCrypt2.pas',
+  uLog in 'uLog.pas';
 
 {$R *.res}
 

@@ -1,19 +1,20 @@
 unit uDocument;
 interface
 
-uses SysUtils, Classes, XMLIntf, XMLDoc, uStrings, XMLUtils, wCrypt2;
-
-const ActualDocVersion: Integer = 1;
-
-type tOmgDocType = (dtXML, dtCrypted);
-
-type TCryFileHeader = record
-    Magic: array[0..3] of AnsiChar;
-    docVersion: Integer;
-    cryData: array[0..63] of Byte;
-end;
+uses SysUtils, Windows, Classes, XMLIntf, XMLDoc, uStrings, XMLUtils;
 
 type cOmgDocument = class
+    type tOmgDocType = (dtXML, dtCrypted);
+    type TCryFileHeader = record
+        Magic: array[0..3] of AnsiChar;
+        docVersion: Byte;
+        rsrvdByte1: Byte;
+        rsrvdByte2: Byte;
+        rsrvdByte3: Byte;
+        cryData: array[0..63] of Byte;
+    end;
+const ActualDocVersion: Byte = 1;
+var
     FilePath: String;
     DocumentType: tOmgDocType;
     XML: iXMLDocument;
@@ -41,13 +42,16 @@ public
     function GetProperty(PropertyName: String; DefValue: Variant): Variant;
     function SetProperty(PropertyName: String; Value: Variant): Boolean;
     function IsEmpty: Boolean;
+    class function CreateHeader(sPassword: String): TCryFileHeader;
     procedure SaveAsCrypted;
-published
-  	property IsDocEmpty: Boolean read IsEmpty;
+//published
+//  	property IsDocEmpty: Boolean read IsEmpty;
 end;
 
+
+
 implementation
-uses Logic;
+uses uLog, uCrypt;
 
 constructor cOmgDocument.Create;
 begin
@@ -74,7 +78,7 @@ try
     Result:=True;
     except
         on e: Exception do begin
-        ErrorMsg(e, 'DocumentOpen');
+        ErrorLog(e, 'DocumentOpen');
         Result:=False;
     end;
 end;
@@ -109,9 +113,10 @@ begin
     if Self.DocumentType = dtCrypted then Exit; //Already crypted
     fName:=  ChangeFileExt(Self.FilePath, strCryptedExt);
     with Head do begin
-        Magic:='OMG!';
-        docVersion := ActualDocVersion;
+
     end;
+    uCrypt.Init;
+
     fStream:=TFileStream.Create(fName, fmOpenWrite or fmCreate);
     fStream.Write(Head, SizeOf(Head));
     FreeAndNil(fStream);
@@ -173,6 +178,17 @@ end;
 function cOmgDocument.IsEmpty: Boolean;
 begin
     Result:= (Self.Pages.Count= 0);
+end;
+
+class function cOmgDocument.CreateHeader(sPassword: String): TCryFileHeader;
+var
+    Head: TCryFileHeader;
+    Data: array of byte;
+begin
+    with Head do begin
+        Magic:='OMG!';
+        docVersion := ActualDocVersion;
+    end;
 end;
 
 {$REGION '#DocProperty'}

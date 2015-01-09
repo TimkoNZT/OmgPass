@@ -10,7 +10,7 @@ function CheckVersion(i: IXMLDocument): Boolean;
 function GetVersion(i: IXMLDocument): String;
 
 implementation
-uses Logic;
+uses Logic, uLog;
 
 function CheckVersion(i: IXMLDocument): Boolean;
 begin

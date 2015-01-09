@@ -87,7 +87,7 @@ implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator, Logic, uSettings, uStrings, uMD5;
+uses uMain, uGenerator, Logic, uSettings, uStrings, uLog, uMD5;
 
 constructor TfrmAccounts.Create(AOwner: TComponent; isChange: Boolean = False);
 begin

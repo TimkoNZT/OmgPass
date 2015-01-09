@@ -167,7 +167,8 @@ implementation
 
 {$R *.dfm}
 
-uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings;
+uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings,
+  uConsole;
 {//////////////////////////////////////////////////////////////////////////////}
 
 {$REGION '#Форма логирования'}
@@ -184,7 +185,7 @@ begin
                 frmLog.SetBounds(
         				frmMain.Left + frmMain.Width,
         				frmMain.Top,
-						400,
+						frmLog.Width,
         				frmMain.Height);
 //        frmLog.Left:=frmMain.Left + frmMain.Width +3;
 //        frmLog.Top:=frmMain.Top;
@@ -745,7 +746,7 @@ end;
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 //var i: Integer;
 begin
-//
+omgDoc.SaveAsCrypted;
 end;
 
 end.

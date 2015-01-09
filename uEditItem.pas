@@ -66,7 +66,7 @@ var
   frmEditItem: TfrmEditItem;
 
 implementation
-uses Logic, uFieldFrame, XMLUtils, uEditField;
+uses Logic, uLog, uFieldFrame, XMLUtils, uEditField;
 {$R *.dfm}
 
 constructor TfrmEditItem.Create(AOwner: TComponent; nItem: IXMLNode; isNew: Boolean = False; isAdvanced: Boolean = False);

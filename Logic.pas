@@ -9,7 +9,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
     XMLutils, uDocument, uFieldFrame, uFolderFrame, uFolderFrameInfo,
     uSmartMethods, uSettings, uMD5,
     {Themes}
-    Styles, Themes
+    Styles, Themes, uCrypt
   	;
 const
 	bShowLogAtStart: Boolean = True;
@@ -17,7 +17,6 @@ var
     omgDoc: cOmgDocument;           //Основной наш синглтон-документ
 	//xmlMain: TXMLDocument;          //Деприкейтед
     xmlCfg: TSettings;
-    LogList: TStringList;           //Переменная для логирования
 	//omgDoc.Pages: IXMLNodeList;      	//Список страниц
     //intCurrentPage: Integer;    	//Текущая страничка
     intThemeIndex: Integer;         //Номер выбранной темы
@@ -36,16 +35,7 @@ var
     nodeToExpand: TTreeNode;        // /
     lsStoredDocs: TStringList;      //Список ранее открывавшихся файлов
 
-procedure Log(Val: Integer); overload;
-procedure Log(Text: String); overload;
-procedure Log(Flag: Boolean); overload;
-procedure Log(Text: String; Val: variant); overload;
-procedure Log(Strs: TStrings); overload;
-
-
 function InitGlobal: Boolean;
-
-
 function DocManager(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
@@ -87,7 +77,6 @@ procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
-function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
 procedure CreateNewBase(fPath: String);
 //function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
 //function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
@@ -105,7 +94,7 @@ procedure DocumentClose;
 function MessageIsEmptyDoc: Boolean;
 
 implementation
-uses uMain, uLog, uEditItem, uEditField, uGenerator, uAccounts, uStrings;
+uses uMain, uConsole, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uLog;
 
 function GeneratePassword(Len: Integer = 8): String;
 //Генерация пароля в строку нужной длины
@@ -117,38 +106,6 @@ begin
    Result:= frmGenerator.lblResult.Caption;
    FreeAndNil(frmGenerator);
 end;
-{$REGION 'Логирование'}
-procedure Log(Text: String);
-begin
-	LogList.Add({TimeToStr(Now) +}'> '+ Text);
-    if Assigned(frmLog) then begin
-	    frmLog.lbLog.Items.Add({TimeToStr(Now) +}'> '+ Text);
-    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
-        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
-    end;
-end;
-procedure Log(Val: Integer);
-begin
-	Log(IntToStr(Val));
-end;
-procedure Log(Flag: Boolean);
-begin
-    if Flag then Log('True') else Log('False');
-end;
-procedure Log(Strs: TStrings);
-begin
-    LogList.AddStrings(Strs);
-    if Assigned(frmLog) then begin
-	    frmLog.lbLog.Items.AddStrings(Strs);
-    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
-        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
-    end;
-end;
-procedure Log(Text: String; Val: variant);
-begin
-	Log(Text + ' ' + VarToStr(Val));
-end;
-{$ENDREGION}
 function CleaningPanel(Panel: TWinControl; realCln: Boolean=True): Boolean;
 //Очистка панельки (TScrollBox)
 //Используется в основной форме и форме редактирования
@@ -1036,6 +993,7 @@ begin
     xmlCfg:=TSettings.Create();
     lsStoredDocs:= LoadStoredDocs;
 	Log('Инициализация...');
+    uCrypt.EnumProviders;
     LoadSettings;
     //LoadThemes;
     if not DocManager then begin
@@ -1044,7 +1002,6 @@ begin
     end;
     //Принудительно показываем форму
     frmMain.Show;
-
     CheckVersion;
     CheckUpdates;
     Result:=True;
@@ -1076,17 +1033,6 @@ begin
         end;
         xmlTemp.SaveToFile(fPath);
 //        FreeAndNil(xmlTemp);
-end;
-function ErrorMsg(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
-//Логирование ошибок
-//Параметр isFatal немедленно завершает программу
-begin
-    Log('Error : ' + e.ClassName);
-    if Method<>'' then Log('    Procedure: ' + Method);
-    Log('    Error Message: ' + e.Message);
-    Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
-    LogList.SaveToFile('log.txt');
-    if isFatal then Application.Terminate;
 end;
 {$REGION '#DocProperty'}
 {function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
@@ -1225,7 +1171,7 @@ begin
         Result:=True;
     except
         on e: Exception do begin
-            ErrorMsg(e, 'DocumentOpen');
+            ErrorLog(e, 'DocumentOpen');
             Result:=False;
         end;
     end;
@@ -1257,7 +1203,7 @@ try
                 Result:=True;
 except
     on e: Exception do begin
-        ErrorMsg(e, 'DocumentPreOpen');
+        ErrorLog(e, 'DocumentPreOpen');
         if AlertMsg then
             MessageBox(frmAccounts.Handle,
             PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
@@ -1271,7 +1217,7 @@ end;
 end;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 var
-    H: TCryFileHeader;
+    //H: TCryFileHeader;
     Stream: TFileStream;
 begin
     if MD5String('Password').ToHexString = MD5String(TryPass).ToHexString then

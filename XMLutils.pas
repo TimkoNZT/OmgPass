@@ -4,7 +4,7 @@ interface
 
 uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, ComCtrls, TypInfo, StrUtils,
-  uStrings;
+  uStrings, uLog;
 type eNodeType = (ntRoot, ntHeader, ntData,
 					ntPage, ntFolder, ntDefFolder,
                     ntItem, ntDefItem, ntField, ntNone);

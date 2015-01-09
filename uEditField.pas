@@ -39,7 +39,7 @@ var
 
 
 implementation
-uses Logic, XMLUtils, uStrings;
+uses Logic, uLog, XMLUtils, uStrings;
 {$R *.dfm}
 
 procedure TfrmEditField.btnCloseClick(Sender: TObject);

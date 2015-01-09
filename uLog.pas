@@ -1,120 +1,104 @@
 unit uLog;
-
 interface
-
-uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls,
-  Vcl.ToolWin;
-
-type
-  TfrmLog = class(TForm)
-    lbLog: TListBox;
-    tmrLog: TTimer;
-    Shape1: TShape;
-    StatusBar1: TStatusBar;
-    procedure OnMove(var Msg: TWMMove); message WM_MOVE;
-    procedure tmrLogTimer(Sender: TObject);
-    procedure lbLogMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-private
-  	procedure HitTest(var Msg: TWMNcHitTest); message WM_NCHITTEST;
-
-    { Private declarations }
-public
-    { Public declarations }
-end;
+uses SysUtils, Classes, Variants, Vcl.Forms, Windows;
 
 var
-   frmLog: TfrmLog;
+LogList: TStringList;           //Переменная для логирования
+
+procedure Log(Val: Integer); overload;
+procedure Log(Text: String); overload;
+procedure Log(Flag: Boolean); overload;
+procedure Log(Text: String; Val: variant); overload;
+procedure Log(Strs: TStrings); overload;
+procedure Log(Arr: array of byte; Count: Integer = 0; Msg: String = ''); overload;
+procedure Log(Stream: TStream; Count: Integer = 0; Msg: String = ''); overload;
+function ErrorLog(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
 
 implementation
-uses uMain, Logic;
+uses uConsole;
 
-{$R *.dfm}
-
-procedure TfrmLog.FormClose(Sender: TObject; var Action: TCloseAction);
+{$REGION 'Логирование'}
+procedure Log(Text: String);
+var myThread: TThread;
 begin
-	frmMain.tbtnLog.Down:=False;
-    Action:=caFree;       	//Не закрываем, а выгружаем
-	Self.Release;			//Контрольный в голову
-    frmLog:=nil;
-end;
-
-procedure TfrmLog.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-if Ord(Key) = vk_Escape then begin
-	frmLog.Close;
-end;
-end;
-
-procedure TfrmLog.lbLogMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-if Button = TMouseButton.mbRight then lbLog.Items.Clear
-else begin
-	ReleaseCapture;
-	Self.Perform(WM_SysCommand, $F012, 0);
-end;
-end;
-
-procedure TfrmLog.OnMove(var Msg: TWMMove);
-begin
-tmrLog.Enabled:=False;
-tmrLog.Enabled:=True;
-end;
-
-//Липни, форма! Липни крепче! //Пока только справа и снизу
-procedure TfrmLog.tmrLogTimer(Sender: TObject);
-begin
-//Log ('X', Self.Left - frmMain.Left - frmMain.Width);
-//Log ('Y', Self.Top - frmMain.Top) ;
-	if (Abs(Self.Left - frmMain.Left - frmMain.Width) < 100) and
-		(Abs(Self.Top - frmMain.Top) < 100) then begin
-        Self.SetBounds(
-        				frmMain.Left + frmMain.Width,
-        				frmMain.Top,
-						400,
-        				frmMain.Height);
-        bLogDocked:=True;
-    end else
-    if (Abs(Self.Top - frmMain.Top - frmMain.Height) < 100) and
-       	(Abs(Self.Left - frmMain.Left) < 100) then begin
-        Self.SetBounds(
-        				frmMain.Left,
-  						frmMain.Top + frmMain.Height,
-						800,
-        				200);
-        bLogDocked:=True;
-    end else
-    bLogDocked:=False;
-	tmrLog.Enabled:=False;
-end;
-
-procedure TfrmLog.HitTest(var Msg: TWMNcHitTest);
-var X, Y: Integer;
-begin
-  inherited;
- // получаем координаты мыши относительно формы
-  X := Msg.XPos - Left;
-  Y := Msg.YPos - Top;
-	if X <= 5 then begin // если мышь у левого края формы
-  		if Y <= 5 then Msg.Result := HTTOPLEFT// если мышь у верхнего края формы
-    	else if Y >= ClientHeight - 5 then Msg.Result := HTBOTTOMLEFT // мышь у левого нижнего края
-      	else Msg.Result := HTLEFT;
-  	end
-    else if X >= ClientWidth - 5 then begin
-    	if Y <= 5 then Msg.Result := HTTOPRIGHT
-        else if Y >= ClientHeight - 5 then Msg.Result := HTBOTTOMRIGHT
-        else Msg.Result := HTRIGHT;
-    end
-    else begin
-        if Y <= 5 then Msg.Result := HTTOP
-        else if Y >= ClientHeight - 5 then Msg.Result := HTBOTTOM
-        else Msg.Result := HTCAPTION
+	LogList.Add({TimeToStr(Now) +}'> '+ Text);
+    if Assigned(frmLog) then begin
+        LockWindowUpdate(frmLog.Handle);
+	    frmLog.lbLog.Items.Add({TimeToStr(Now) +}'> '+ Text);
+    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
+        LockWindowUpdate(0);
     end;
 end;
-
+procedure Log(Val: Integer);
+begin
+	Log(IntToStr(Val));
+end;
+procedure Log(Flag: Boolean);
+begin
+    if Flag then Log('True') else Log('False');
+end;
+procedure Log(Strs: TStrings);
+begin
+    LogList.AddStrings(Strs);
+    if Assigned(frmLog) then begin
+	    frmLog.lbLog.Items.AddStrings(Strs);
+    	frmLog.lbLog.ItemIndex:=frmLog.lbLog.Items.Count-1;
+        frmLog.StatusBar1.Panels[1].Text:= 'Lines Count: ' + IntToStr(LogList.Count);
+    end;
+end;
+procedure Log(Arr: array of byte; Count: Integer = 0; Msg: String = '');
+var
+    s: string;
+    i, imx: integer;
+begin
+    if Msg <> '' then begin
+        Log('Array: ' + Msg);
+        Log('Count:'+ IntToStr(Count) + ', size:' +IntToStr(SizeOf(arr)));
+    end;
+    if (Count <= 0) or (Count > SizeOf(arr) ) then imx:= SizeOf(arr)
+    else imx:= Count;
+    if imx > 100 then imx:= 100;
+    for i := 0 to imx do s:=s + arr[i].ToHexString(2) + ' ';
+    Log(s);
+end;
+procedure Log(Stream: TStream; Count: Integer = 0; Msg: String = '');
+var
+    s: string;
+    i, imx: integer;
+    h: Byte;
+    p: Dword;
+begin
+    p:=Stream.Position;
+    Stream.Position:=0;
+    if Msg <> '' then begin
+        Log('Stream: ' + Msg);
+        Log('Count:'+ IntToStr(Count) + ', size:' +IntToStr(Stream.Size));
+    end;
+    if (Count <= 0) or (Count > Stream.Size) then imx:= Stream.Size
+    else imx:=Count;
+    if imx > 100 then imx:= 100;
+    for i := 0 to imx do begin
+            Stream.Read(h, 1);
+            s:= s + h.ToHexString(2) + ' ';
+    end;
+    Stream.Position:=p;
+    Log(s);
+end;
+procedure Log(Text: String; Val: variant);
+begin
+	Log(Text + ' ' + VarToStr(Val));
+end;
+function ErrorLog(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+//Логирование ошибок
+//Параметр isFatal немедленно завершает программу
+begin
+    Log('Error : ' + e.ClassName);
+    if Method<>'' then Log('    Procedure: ' + Method);
+    Log('    Error Message: ' + e.Message);
+    Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
+    LogList.SaveToFile('log.txt');
+    if isFatal then Application.Terminate;
+end;
+{$ENDREGION}
 end.

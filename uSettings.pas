@@ -31,7 +31,7 @@ end;
 
 implementation
 
-uses Logic;
+uses Logic, uLog;
 
 constructor TSettings.Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
 begin
@@ -49,7 +49,7 @@ begin
             RootNode:=sXML.Node.AddChild(RootNodename);
         end;
     except
-        on e: Exception do ErrorMsg(e)
+        on e: Exception do ErrorLog(e)
     end;
 end;
 
