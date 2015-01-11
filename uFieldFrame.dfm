@@ -4,7 +4,9 @@ object FieldFrame: TFieldFrame
   Width = 170
   Height = 41
   AutoSize = True
+  DoubleBuffered = True
   Padding.Bottom = 3
+  ParentDoubleBuffered = False
   TabOrder = 0
   OnResize = FrameResize
   DesignSize = (

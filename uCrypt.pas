@@ -74,7 +74,7 @@ procedure LogHashInfo(Hash: HCRYPTHASH);
 procedure LogProviderInfo(hProv: HCRYPTPROV);
 procedure Init;
 function GetHeader(Password: string): TMemoryStream;
-function GetBackdoor(Password: string): TMemoryStream;
+function GetSecondHeader(Password: string): TMemoryStream;
 
 function CryptStr(ASourceStr, APassword: string;
                     ABuffSize: integer): string;
@@ -302,7 +302,7 @@ try
 //CryptDestroyHash(Hash);
 //CryptReleaseContext(Prov, 0)
 //Log(exPrivateKey, 5, 'PubKey');
-Log(GetBackdoor('Password'), 0, '=');
+Log(GetHeader('SH'), 0, '=');
 except on e: Exception do begin
         ErrorLog(e, 'Start');
     end;
@@ -394,37 +394,23 @@ end;
 
 function GetHeader(Password: string): TMemoryStream;
 var
-    data: PByte;
-    hProv: HCRYPTPROV;
-    hash: HCRYPTHASH;
-    pKey, uKey: HCRYPTKEY;
-    lBufLen, lDataLen: DWORD;
+    InStream: TMemoryStream;
 begin
     try
         try
-            {получаем контекст криптопровайдера}
-            if not CryptAcquireContext(@hProv, nil, nil, AProvType, AProvFlag) then RaiseLastOSError;
-            {создаем хеш-объект}
-            if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
-            {хешируем пароль}
-            if not CryptHashData(hash, @Password[1], length(Password), 0) then RaiseLastOSError;
-            {создаем ключ на основании пароля для потокового шифра RC4}
-            if not CryptDeriveKey(hProv, AAlgCrypt, hash, CRYPT_EXPORTABLE or CRYPT_NO_SALT, @uKey) then RaiseLastOSError;
-            {импортируем ключ =)}
-            if not CryptImportKey(hProv, @exPublicKey, SizeOf(exPublicKey), 0, 0, @pKey) then RaiseLastOSError;
-            {готовим поток, и выделяем место}
-            Result:=TMemoryStream.Create;
-            if not CryptExportKey(uKey, pKey, SIMPLEBLOB, 0, nil, @lBufLen)  then RaiseLastOSError;
-            Result.SetSize(lBufLen);
-            if not CryptExportKey(uKey, pKey, SIMPLEBLOB, 0, PByte(Result.Memory), @lBufLen) then RaiseLastOSError;
-
+            InStream:= TMemoryStream.Create;
+            InStream.Write(@exPublicKey[20], $40);
+            Result:= TMemoryStream.Create;
+            if not CryptStream(InStream, Result, Password, $40) then RaiseLastOSError;
         except on e: Exception do begin
             ErrorLog(e, 'GetHeaderFirst');
             end;
         end;
-    finally end;
+    finally
+        InStream.Free;
+    end;
 end;
-function GetBackdoor(Password: string): TMemoryStream;
+function GetSecondHeader(Password: string): TMemoryStream;
 var
     data: PByte;
     hProv: HCRYPTPROV;
@@ -441,7 +427,7 @@ begin
             if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
             {хешируем пароль}
             if not CryptHashData(hash, @Password[1], length(Password), 0) then RaiseLastOSError;
-            {создаем ключ на основании пароля для потокового шифра RC4}
+            {создаем ключ на основании пароля для потокового шифра}
             if not CryptDeriveKey(hProv, AAlgCrypt, hash, CRYPT_EXPORTABLE or CRYPT_NO_SALT, @uKey) then RaiseLastOSError;
             {импортируем ключ =)}
             if not CryptImportKey(hProv, @exPublicKey, SizeOf(exPublicKey), 0, 0, @pKey) then RaiseLastOSError;
@@ -454,6 +440,7 @@ begin
             {обрезаем поток до нужных размеров}
             Stream.Seek(12, TSeekOrigin.soBeginning);
             Result.CopyFrom(Stream, $40);
+            Result.Position:=0;
         except on e: Exception do begin
             ErrorLog(e, 'GetHeaderSecond');
             end;
@@ -480,12 +467,15 @@ var
 begin
     try
         try
+            //Log('CryptStream----------------------------------------------------');
+            //Log(ASourceStream, 0 , 'SourseStream');
             {получаем контекст криптопровайдера}
             if not CryptAcquireContext(@hProv, nil, nil, AProvType, AProvFlag) then RaiseLastOSError;
             {создаем хеш-объект}
             if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
             {хешируем пароль}
             if not CryptHashData(hash, @APassword[1], length(APassword), 0) then RaiseLastOSError;
+            //LogHashInfo(hash);
             {создаем ключ на основании пароля для потокового шифра RC4}
             if not CryptDeriveKey(hProv, AAlgCrypt, hash, 0, @key) then RaiseLastOSError;
             {выделяем место для буфера}
@@ -500,6 +490,10 @@ begin
                 if not CryptEncrypt(key, 0, lisEnd, 0, (data), @lBufLen, ABufferSize) then RaiseLastOSError;
                 ADestStream.Write(data^, lBufLen);
             until (lisEnd);
+            //Log(ADestStream, 0, 'OutStream');
+            ASourceStream.Position:= 0;
+            ADestStream.Position:= 0;
+            Result:=True;
         except on e: Exception do begin
             ErrorLog(e, 'CryptStream');
             end;
@@ -538,15 +532,17 @@ begin
         RaiseLastOSError;
         {создаем ключ на основании пароля для потокового шифра RC4}
         if not CryptDeriveKey(hProv, AAlgCrypt, hash, 0, @key) then RaiseLastOSError;
-        ASourceStream.Position:= 0;
-        ADestStream.Position:= 0;
+        lBufSize:= ABufferSize div 2;
+        ASourceStream.Position:= 0; ADestStream.Position:= 0;
         {шифруем данные}
         repeat
             lisEnd:= ASourceStream.Position >= ASourceStream.Size;
             lBufLen:= ASourceStream.Read(data^, lBufSize);
             if not CryptDecrypt(key, 0, lisEnd, 0, (data), @lBufLen) then RaiseLastOSError;
-            ADestStream.Write(data^,lBufLen);
+            ADestStream.Write(data^, lBufLen);
         until lisEnd;
+        ASourceStream.Position:= 0; ADestStream.Position:= 0;
+        Result:=True;
         except on e: Exception do begin
             ErrorLog(e, 'DecryptStream');
             end;

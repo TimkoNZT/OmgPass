@@ -47,6 +47,7 @@ object frmEditField: TfrmEditField
     Font.Style = []
     ParentColor = False
     ParentFont = False
+    Transparent = True
     Visible = False
   end
   object txtFieldTitle: TEdit
@@ -115,7 +116,7 @@ object frmEditField: TfrmEditField
   end
   object pnlLine: TPanel
     Left = 8
-    Top = 147
+    Top = 144
     Width = 275
     Height = 2
     BevelOuter = bvLowered
@@ -129,7 +130,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C010108001800480010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108005000500010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

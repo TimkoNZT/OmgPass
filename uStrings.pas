@@ -132,8 +132,12 @@ resourcestring
     rsOpenDialogTitle = 'Open database...';
     rsOpenDocumentError = 'Can''t open %s' + CrLf + 'Please, make sure it is the correct file.';
     rsOpenDocumentErrorTitle = 'Open document error';
+    rsWrongPasswordError = 'Wrong or incorrect password! You can try again.' + CrLf + ' Please, check CapsLock and see on hint image';
+    rsWrongPasswordErrorTitle = 'Wrong password';
     rsTxtPassFileNotFound = 'File not found';
     rsTxtPassFileIsBad = 'Bad or corupted file';
+    rsTxtPassPassEmpty = 'Empty password used';
+    rsTxtPassAlrOpened = 'File already opened';
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
 

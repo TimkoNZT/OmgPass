@@ -23,17 +23,19 @@ object frmEditItem: TfrmEditItem
   TextHeight = 13
   object btnClose: TButton
     Left = 185
-    Top = 338
+    Top = 339
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
     Caption = 'Cancel'
     TabOrder = 0
     OnClick = btnCloseClick
+    ExplicitLeft = 193
+    ExplicitTop = 350
   end
   object btnOK: TButton
     Left = 274
-    Top = 338
+    Top = 339
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -41,6 +43,8 @@ object frmEditItem: TfrmEditItem
     Default = True
     TabOrder = 1
     OnClick = btnOKClick
+    ExplicitLeft = 282
+    ExplicitTop = 350
   end
   object fpEdit: TScrollBox
     AlignWithMargins = True
@@ -61,6 +65,8 @@ object frmEditItem: TfrmEditItem
     ParentDoubleBuffered = False
     TabOrder = 2
     OnMouseWheel = fpEditMouseWheel
+    ExplicitWidth = 376
+    ExplicitHeight = 271
   end
   object ToolBarEdit: TToolBar
     AlignWithMargins = True
@@ -75,9 +81,11 @@ object frmEditItem: TfrmEditItem
     ButtonHeight = 54
     ButtonWidth = 55
     Caption = 'tool'
+    GradientEndColor = 11319229
     Images = imlToolBarEdit
     Indent = 1
     TabOrder = 3
+    ExplicitWidth = 382
     object tbtnAddField: TToolButton
       Left = 1
       Top = 0
@@ -149,6 +157,8 @@ object frmEditItem: TfrmEditItem
     Ctl3D = True
     ParentCtl3D = False
     TabOrder = 4
+    ExplicitTop = 338
+    ExplicitWidth = 369
   end
   object imlToolBarEdit: TImageList
     ColorDepth = cd32Bit
@@ -157,7 +167,7 @@ object frmEditItem: TfrmEditItem
     Left = 40
     Top = 336
     Bitmap = {
-      494C010107001800740030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107008400840030003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C00000006000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -746,7 +746,7 @@ end;
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 //var i: Integer;
 begin
-omgDoc.SaveAsCrypted;
+//omgDoc.SaveAsCrypted;
 end;
 
 end.

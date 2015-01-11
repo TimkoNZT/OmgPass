@@ -1181,49 +1181,79 @@ procedure DocumentClose;
 begin
     if omgDoc = nil then Exit;
     omgDoc.Save;
+    omgDoc.Close;
     omgDoc.Free;
 end;
-
 function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 //функция ддолжна попытаться открыть файл XML
 //и проверить его на валидность
 var
     xmlTemp: TXMLDocument;
 begin
-try
-    xmlTemp:=TXMLDocument.Create(Application);
-    xmlTemp.LoadFromFile(Path);
-//    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
-//    xmlTemp.ParseOptions:=[poValidateOnParse];
-    xmlTemp.Active:=True;
-    xmlTemp.Options :=[doAttrNull];                     //!!!
-    if xmlTemp.ChildNodes[strRootNode] <> nil then
-        if xmlTemp.ChildNodes[strRootNode].ChildNodes[strHeaderNode] <> nil then
-            if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
-                Result:=True;
-except
-    on e: Exception do begin
-        ErrorLog(e, 'DocumentPreOpen');
-        if AlertMsg then
-            MessageBox(frmAccounts.Handle,
-            PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
-            PWideChar(rsOpenDocumentErrorTitle),
-            MB_APPLMODAL + MB_ICONWARNING);
-        Result:=False;
-        Exit;
+    try
+        try
+            xmlTemp:=TXMLDocument.Create(Application);
+            xmlTemp.LoadFromFile(Path);
+        //    xmlTemp.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+        //    xmlTemp.ParseOptions:=[poValidateOnParse];
+            xmlTemp.Active:=True;
+            xmlTemp.Options :=[doAttrNull];                     //!!!
+            if xmlTemp.ChildNodes[strRootNode] <> nil then
+                if xmlTemp.ChildNodes[strRootNode].ChildNodes[strHeaderNode] <> nil then
+                    if xmlTemp.ChildNodes[strRootNode].ChildNodes[strDataNode] <> nil then
+                        Result:=True;
+        except
+            on e: Exception do begin
+                ErrorLog(e, 'DocumentPreOpen');
+                if AlertMsg then
+                    MessageBox(frmAccounts.Handle,
+                    PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
+                    PWideChar(rsOpenDocumentErrorTitle),
+                    MB_APPLMODAL + MB_ICONWARNING);
+                Result:=False;
+                Exit;
+            end;
+        end;
+    finally
+        FreeAndNil(xmlTemp);
     end;
-end;
-    FreeAndNil(xmlTemp);
 end;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 var
     //H: TCryFileHeader;
-    Stream: TFileStream;
+    fStream: TFileStream;
+    cryHeader: cOmgDocument.TCryFileHeader;
 begin
-    if MD5String('Password').ToHexString = MD5String(TryPass).ToHexString then
-        Result:=idOk
-    else
-        Result:=idTryAgain;
+    try
+        try
+            fStream:=TFileStream.Create(Path, fmOpenRead);
+            fStream.ReadBuffer(cryHeader, SizeOf(CryHeader));
+            if cryHeader.Magic <> 'OMG!' then
+                raise Exception.Create('Wrong crypted signature');
+            if CompareMem(GetHeader(TryPass).Memory, @CryHeader.firstHeader[0], $40) then
+                Result:=idOk
+            else begin
+                Result:=idTryAgain;
+                if AlertMsg then
+                    MessageBox(frmAccounts.Handle,
+                    PWideChar(rsWrongPasswordError),
+                    PWideChar(rsWrongPasswordErrorTitle),
+                    MB_APPLMODAL + MB_ICONWARNING);
+            end;
+        except
+            on e: Exception do begin
+                ErrorLog(e, 'DocumentPreOpenCrypted');
+                if AlertMsg then
+                    MessageBox(frmAccounts.Handle,
+                    PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
+                    PWideChar(rsOpenDocumentErrorTitle),
+                    MB_APPLMODAL + MB_ICONWARNING);
+                Result:=idCancel;
+                Exit;
+            end;
+        end;
+    finally
+        FreeAndNil(fStream);
+    end;
 end;
-
 end.

@@ -42,6 +42,7 @@ type
     btnAdd: TSpeedButton;
     btnNew: TSpeedButton;
     btnCreateNewBase: TButton;
+    btnDelete: TSpeedButton;
     constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure btnNextClick(Sender: TObject);
     procedure chkShowPassClick(Sender: TObject);
@@ -134,6 +135,7 @@ Logic.SetButtonImg(btnGeneratePass, imlAccounts, 1);
 Logic.SetButtonImg(btnAdd, imlAccounts, 5);
 Logic.SetButtonImg(btnRemove, imlAccounts, 6);
 Logic.SetButtonImg(btnNew, imlAccounts, 4);
+Logic.SetButtonImg(btnDelete, imlAccounts, 10);
 
 end;
 
@@ -146,23 +148,19 @@ begin
     for i := 0 to lsStoredDocs.Count - 1 do
         lvFiles.AddItem(lsStoredDocs[i], nil);
     lvFiles.ItemIndex:=0;
+    OpenPreCheck;
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
-//ShowWindow(Application.Handle, SW_HIDE);
-try
-    OpenPreCheck;
-except
-    Log('Initial precheck error');
 end;
-end;
-
+//Precheck
 function TfrmAccounts.OpenPreCheck(AlertMsg: Boolean = False): Boolean;
 begin
     Result:= False;
     txtPass.Enabled:=False;
+    txtPass.Text:='';
     txtPass.Font.Style:= [fsItalic];
     imgNotShallPass.Visible:=True;
     FFileName:=lvFiles.Selected.Caption;
@@ -171,6 +169,13 @@ begin
         lvFiles.Selected.ImageIndex:=8;
         Exit;
     end;
+    if omgDoc<> nil then
+        if FFilename = omgDoc.FilePath then begin
+            txtPass.Text := rsTxtPassAlrOpened;
+            Result:=False;
+            if AlertMsg then Self.Close;
+            Exit;
+        end;
     if ExtractFileExt(FFileName) = strDefaultExt {*.xml?} then
         if DocumentPreOpenXML(FFileName, AlertMsg) then begin
             txtPass.Text:= rsTxtPassPassNotReq;
@@ -183,8 +188,13 @@ begin
     else
         case DocumentPreOpenCrypted(FFileName, txtPass.Text, AlertMsg) of
         idOk: begin
-            txtPass.Enabled:=True;
-            txtPass.Font.Style:= [];
+//            if txtPass.Text = '' then begin
+//                txtPass.Text:=rsTxtPassPassEmpty
+//            end else begin
+                txtPass.Enabled:=True;
+                txtPass.Font.Style:= [];
+                if Self.Visible = True then txtPass.SetFocus;
+//            end;
             imgNotShallPass.Visible:=False;
             Result:=True;
             end;
@@ -200,7 +210,6 @@ begin
     end;
 end;
 
-//Precheck
 procedure TfrmAccounts.lvFilesClick(Sender: TObject);
 {$J+}
 const LastSelected: Integer = 0;
@@ -219,7 +228,8 @@ procedure TfrmAccounts.lvFilesDblClick(Sender: TObject);
 begin
 if lvFiles.Items.Count = 0 then Exit;
 if lvFiles.Selected = nil then
-    lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
+    lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True
+else
     btnOk.Click;
 end;
 
