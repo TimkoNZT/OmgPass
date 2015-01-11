@@ -28,7 +28,8 @@ uses
   uDocument in 'uDocument.pas',
   uCrypt in 'uCrypt.pas',
   WCrypt2 in 'WCrypt2.pas',
-  uLog in 'uLog.pas';
+  uLog in 'uLog.pas',
+  uPassword in 'uPassword.pas' {frmPassword};
 
 {$R *.res}
 
@@ -36,5 +37,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmPassword, frmPassword);
   Application.Run;
 end.

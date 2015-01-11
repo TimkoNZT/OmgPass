@@ -17,7 +17,7 @@ var
     omgDoc: cOmgDocument;           //Основной наш синглтон-документ
 	//xmlMain: TXMLDocument;          //Деприкейтед
     xmlCfg: TSettings;
-	//omgDoc.Pages: IXMLNodeList;      	//Список страниц
+	//omgDoc.docPages: IXMLNodeList;      	//Список страниц
     //intCurrentPage: Integer;    	//Текущая страничка
     intThemeIndex: Integer;         //Номер выбранной темы
     intExpandFlag: Integer;    	    //Состояние программы
@@ -289,10 +289,10 @@ begin
     //intCurrentPage:=-1;
     tabList:=TStringList.Create;
 	tabControl.Tabs.Clear;
-    tabControl.Visible:= (omgDoc.Pages.Count<>0);
-    for i := 0 to omgDoc.Pages.Count - 1 do begin
-		LogNodeInfo(omgDoc.Pages[i]);
-		tabList.Add(GetNodeTitle(omgDoc.Pages[i]));
+    tabControl.Visible:= (omgDoc.docPages.Count<>0);
+    for i := 0 to omgDoc.docPages.Count - 1 do begin
+		LogNodeInfo(omgDoc.docPages[i]);
+		tabList.Add(GetNodeTitle(omgDoc.docPages[i]));
     end;
     tabControl.Tabs:=tabList;
     if omgDoc.CurrentPage < tabControl.Tabs.Count then
@@ -307,18 +307,18 @@ procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String
 var RootNode: TTreeNode;
 begin
 	Log('--------------------ParsePageToTree:Start---------------------------');
-    if omgDoc.Pages.Count = 0 then begin
+    if omgDoc.docPages.Count = 0 then begin
         Log('Warning! There is no pages in document');
         Exit;
     end;
     intExpandFlag:=1;
 	Tree.Items.Clear;
-    RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(omgDoc.Pages[pageIndex]));
+    RootNode:=Tree.Items.AddChild(nil, GetNodeTitle(omgDoc.docPages[pageIndex]));
     RootNode.ImageIndex:=2;
     RootNode.SelectedIndex:=2;
-    RootNode.Data:=Pointer(omgDoc.Pages[pageIndex]);
+    RootNode.Data:=Pointer(omgDoc.docPages[pageIndex]);
     Tree.Items.BeginUpdate;
-	IterateNodesToTree(omgDoc.Pages[pageIndex], RootNode, Tree, SearchStr);
+	IterateNodesToTree(omgDoc.docPages[pageIndex], RootNode, Tree, SearchStr);
     Tree.Items.EndUpdate;
     RootNode.Expand(False);
     omgDoc.CurrentPage:= pageIndex;
@@ -482,7 +482,7 @@ begin
     ntFolder:
     	msg:= Format(rsDelFolder, [AnsiQuotedStr(GetNodeTitle(Node), '"')]);
     ntPage: begin
-    	if omgDoc.Pages.Count = 1 then begin
+    	if omgDoc.docPages.Count = 1 then begin
         	MessageBox(Application.Handle,
                         PWideChar(rsCantDelPage),
                         PWideChar(rsDelNodeTitle),
@@ -505,8 +505,8 @@ end;
 procedure AddNewPage();
 //Новая страничка
 begin
-if omgDoc.Pages.Count <> 0 then inc(omgDoc.CurrentPage);
-omgDoc.Pages.Insert(omgDoc.CurrentPage, CreateClearPage);
+if omgDoc.docPages.Count <> 0 then inc(omgDoc.CurrentPage);
+omgDoc.docPages.Insert(omgDoc.CurrentPage, CreateClearPage);
 
 //    ParsePagesToTabs(xmlMain, frmMain.tabMain);
 //    frmMain.tabMainChange(nil);
@@ -612,7 +612,7 @@ begin
         treeNode:=treeNode.Parent;
     end;
     Log(destNode.NodeName);
-	defItem:=omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode('DefItem');
+	defItem:=omgDoc.docPages[omgDoc.CurrentPage].ChildNodes.FindNode('DefItem');
     //
 	newItem:=destNode.OwnerDocument.CreateNode('Item');
 	for i := 0 to defItem.ChildNodes.Count - 1 do
@@ -807,7 +807,7 @@ procedure LoadDocSettings;
 //А здесь грузятся настройки документа и заодно документ выводится в форму
 begin
     ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
-    if omgDoc.CurrentPage < omgDoc.Pages.Count then
+    if omgDoc.CurrentPage < omgDoc.docPages.Count then
         frmMain.tabMain.TabIndex := omgDoc.CurrentPage;
     //Эта строчка необходима тУт!
     ParsePageToTree(frmMain.tabMain.TabIndex, frmMain.tvMain);
@@ -959,8 +959,8 @@ var
     defItem: IXMLNode;
 begin
     if MessageIsEmptyDoc then Exit;     //Во избежание
-    LogNodeInfo(omgDoc.Pages[omgDoc.CurrentPage], 'EditDefaultItem, Page = ');
-    defItem:= omgDoc.Pages[omgDoc.CurrentPage].ChildNodes.FindNode(strDefItemNode);
+    LogNodeInfo(omgDoc.docPages[omgDoc.CurrentPage], 'EditDefaultItem, Page = ');
+    defItem:= omgDoc.docPages[omgDoc.CurrentPage].ChildNodes.FindNode(strDefItemNode);
     LogNodeInfo(defItem, 'EditDefaultItem, DefItem = ');
     if EditItem(defItem, False, True) then
         Log ('EditDefaultItem: Ok') else Log ('EditDefaultItem: Cancel');
@@ -1138,10 +1138,11 @@ begin
     if frmAccounts.ShowModal = mrOK then begin
             Log ('frmAccounts: mrOK');
             //Accept:=True;
-            if not Reopen then frmMain.Show;    //Принудительно
-            frmAccounts.Hide;
-            DocumentOpen(frmAccounts.FFileName, frmAccounts.txtPass.Text);
-            Result:=True;
+            //frmAccounts.Hide;
+            if DocumentOpen(frmAccounts.FFileName, frmAccounts.txtPass.Text) then begin
+                Result:=True;
+                if not Reopen then frmMain.Show;    //Принудительно
+            end;
         end else begin
             Log ('frmAccounts: mrCancel');
             //Accept:=True;
@@ -1156,16 +1157,10 @@ var
     tmpDoc: cOmgDocument;
 begin
     try
-        tmpDoc:=cOmgDocument.Create;
-        if not tmpDoc.Open(Path, Pass) then begin
-            tmpDoc.Close;
-            FreeAndNil(tmpDoc);
-            Result:=False;
-            Exit;
-        end;
+        tmpDoc:=cOmgDocument.Create(Path, Pass);
         DocumentClose;
         omgDoc:=tmpDoc;
-        frmMain.Caption:= Application.Title +' [' + omgDoc.FilePath + ']';
+        frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
         LoadDocSettings;
         MessageIsEmptyDoc;
         Result:=True;

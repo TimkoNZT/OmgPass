@@ -170,7 +170,7 @@ begin
         Exit;
     end;
     if omgDoc<> nil then
-        if FFilename = omgDoc.FilePath then begin
+        if FFilename = omgDoc.docFilePath then begin
             txtPass.Text := rsTxtPassAlrOpened;
             Result:=False;
             if AlertMsg then Self.Close;

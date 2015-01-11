@@ -18,24 +18,25 @@ const
     ActualDocVersion: Byte = 1;
     cryMagicSig: String = 'OMG!';
 var
-    FilePath: String;
-    DocumentType: tOmgDocType;
+    docFilePath: String;
+    docType: tOmgDocType;
     XML: iXMLDocument;
-    Pages: IXMLNodeList;
+    docPages: IXMLNodeList;
     docPassword: String;
     CurrentPage: Integer;                   //Текущая страничка
     CurrentRecord: Integer;                 //...и запись
 private
+    curHeader: TCryFileHeader;
     fileStream: TFileStream;
-    //xmlStream: TMemoryStream;
-    //cryStream: TMemoryStream;
     procedure LoadPosition;
     procedure SavePosition;
     function OpenXMLfromStream(xmlMainStream: TStream): Boolean;
     function OpenCrypted(Password: String): Boolean;
     function SaveCrypted(): Boolean;
 public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(FilePath: String; Password: String); overload;
+    constructor CreateNew(FilePath: String; docType: tOmgDocType; Password: String = '');
     destructor Destroy; override;
     function Open(Path: String; Pass: String): Boolean;
     //static function Enrypt(_in: TStream, _out:)
@@ -46,6 +47,8 @@ public
     function IsEmpty: Boolean;
     class function CreateHeader(sPassword: String): TCryFileHeader;
     procedure SaveAsCrypted;
+    procedure SaveAs(FilePath: String; dType: tOmgDocType);
+
 //published
 //  	property IsDocEmpty: Boolean read IsEmpty;
 end;
@@ -55,24 +58,37 @@ uses uLog, uCrypt;
 
 constructor cOmgDocument.Create;
 begin
-    inherited Create;
+    //inherited Create;
     XML:=TXMLDocument.Create(nil);
     XML.Options :=[doAttrNull, doAutoSave];
     XML.ParseOptions:=[poValidateOnParse];
+end;
+
+constructor cOmgDocument.Create(FilePath: String; Password: String);
+begin
+    Self.Create;
+    if not Self.Open(filePath, Pass) then raise Exception.Create('Error opening file');
+end;
+
+constructor cOmgDocument.CreateNew(FilePath: String; docType: tOmgDocType; Password: String = '');
+begin
+    //
 end;
 
 function cOmgDocument.Open(Path: String; Pass: String): Boolean;
 begin
 try
     fileStream:= TFileStream.Create(Path, fmOpenReadWrite);
-    Self.FilePath:= Path;
+    Self.docFilePath:= Path;
+    docPassword:=Pass;
     if ExtractFileExt(Path) = strDefaultExt then begin
         Self.OpenXMLfromStream(fileStream);
-        DocumentType:= dtXML;
+        docType:= dtXML;
     end else begin
         Self.OpenCrypted(Pass);
-        DocumentType:=dtCrypted;
+        docType:=dtCrypted;
     end;
+    XML.Active:=True;
     Result:=True;
     except
         Result:=False;
@@ -83,12 +99,12 @@ function cOmgDocument.OpenXMLfromStream(xmlMainStream: TStream): Boolean;
 begin
 try
     XML.LoadFromStream(xmlMainStream);
-    Pages:= NodeByPath(XML, 'Root|Data').ChildNodes;
+    docPages:= NodeByPath(XML, 'Root|Data').ChildNodes;
     LoadPosition;
     Result:=True;
     except
         on e: Exception do begin
-        ErrorLog(e, 'DocumentOpen');
+        ErrorLog(e, 'OpenXMLfromStream');
         Result:=False;
     end;
 end;
@@ -96,17 +112,23 @@ end;
 
 function cOmgDocument.OpenCrypted(Password: String): Boolean;
 var
-cryHeader: TCryFileHeader;
 cryStream, xmlStream: TMemoryStream;
 begin
     try
-        fileStream.Read(cryHeader, SizeOf(cryHeader));
-        cryStream:=TMemoryStream.Create;
-        xmlStream:=TMemoryStream.Create;
-        cryStream.CopyFrom(fileStream, fileStream.Size - SizeOf(cryHeader));
-        Log(cryStream, 50, '>');
-        UnCryptStream(cryStream, xmlStream, Password, 1024);
-        Self.OpenXmlfromStream(xmlStream);
+        try
+            fileStream.Read(curHeader, SizeOf(TCryFileHeader));
+            cryStream:=TMemoryStream.Create;
+            xmlStream:=TMemoryStream.Create;
+            cryStream.CopyFrom(fileStream, fileStream.Size - SizeOf(TCryFileHeader));
+            //Log(cryStream, 50, '>');
+            UnCryptStream(cryStream, xmlStream, Password, 1024);
+            Result:= Self.OpenXmlfromStream(xmlStream);
+        except
+            on e: Exception do begin
+            ErrorLog(e, 'OpenCrypted');
+            Result:=False;
+            end;
+        end;
     finally
         FreeAndNil(cryStream);
         FreeAndNil(xmlStream);
@@ -118,15 +140,15 @@ begin
     //
 end;
 
-procedure cOmgDocument.SaveAsCrypted;
+procedure cOmgDocument.SaveAsCrypted();
 var fName: String;
     Header: TCryFileHeader;
     fStream: TFileStream;
     cStream, xStream: TMemoryStream;
 begin
+    if Self.docType = dtCrypted then Exit; //Already crypted
     try
-        if Self.DocumentType = dtCrypted then Exit; //Already crypted
-        fName:=  ChangeFileExt(Self.FilePath, strCryptedExt);
+        fName:=  ChangeFileExt(Self.docFilePath, strCryptedExt);
         Header:= cOmgDocument.CreateHeader(String.Empty);
         fStream:=TFileStream.Create(fName, fmOpenWrite or fmCreate);
         xStream:=TMemoryStream.Create;
@@ -142,38 +164,49 @@ begin
     end;
 end;
 
+procedure cOmgDocument.SaveAs(FilePath: String; dType: tOmgDocType);
+begin
+    //
+end;
+
 function cOmgDocument.Save: Boolean;
 var
-    xmlStream: TMemoryStream;
+    xStream, cStream: TMemoryStream;
 begin
     Self.SavePosition;
-    //XML.Active:=False;
-    xmlStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
-    Self.XML.SaveToStream(xmlStream);
-    xmlStream.Position:=0;
+    xStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
+    Self.XML.SaveToStream(xStream);
+    xStream.Position:=0;
     fileStream.Position:=0;
-    if Self.DocumentType = dtCrypted then begin
-        //
+    if Self.docType = dtCrypted then begin
+        cStream:=TMemoryStream.Create;
+        fileStream.WriteBuffer(curHeader, sizeOf(TCryFileHeader));
+        cryptStream(xStream, cStream, docPassword, $100);
+        fileStream.CopyFrom(cStream, cStream.Size);
+        fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
     end else begin
-        //fileStream.CopyFrom(xmlStream, xmlStream.Size);
-        xmlStream.SaveToStream(fileStream);
-        fileStream.Size:= xmlStream.Size;
+        xStream.SaveToStream(fileStream);
+        fileStream.Size:= xStream.Size;
     end;
 end;
 
 function cOmgDocument.Close: Boolean;
 begin
-    //Self.Save;
-//    FreeAndNil(xmlStream);
-//    FreeAndNil(cryStream);
+    docFilePath:='';
+    docType:=dtXML;
+    docPages:=nil;
+    XML.XML.Clear;
+    XML.Active:=False;
+    docPassword:='';
+    CurrentPage:=0;                   //Текущая страничка
+    CurrentRecord:=0;
+    ZeroMemory(@curHeader, SizeOf(TCryFileHeader));
     FreeAndNil(fileStream);
 end;
 
 destructor cOmgDocument.Destroy;
 begin
-    XML._Release;
-//    xmlStream.Free;
-//    cryStream.Free;
+    //Self.Close;
     inherited Destroy;
 end;
 
@@ -191,7 +224,7 @@ end;
 
 function cOmgDocument.IsEmpty: Boolean;
 begin
-    Result:= (Self.Pages.Count= 0);
+    Result:= (Self.docPages.Count= 0);
 end;
 
 class function cOmgDocument.CreateHeader(sPassword: String): TCryFileHeader;

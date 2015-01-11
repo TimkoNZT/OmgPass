@@ -151,6 +151,7 @@ TfrmMain = class(TForm)
     procedure mnuEditDefaultClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuSaveAsCryptedClick(Sender: TObject);
+    procedure mnuPassClick(Sender: TObject);
 
 private
 	{ Private declarations }
@@ -168,7 +169,7 @@ implementation
 {$R *.dfm}
 
 uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings,
-  uConsole;
+  uConsole, uPassword;
 {//////////////////////////////////////////////////////////////////////////////}
 
 {$REGION '#Форма логирования'}
@@ -409,6 +410,11 @@ end;
 {$ENDREGION}
 
 {$REGION '#Клонирование овечек'}
+procedure TfrmMain.mnuPassClick(Sender: TObject);
+begin
+frmPassword.Show;
+end;
+
 procedure TfrmMain.mnuPopupCloneItemClick(Sender: TObject);
     var selNode: TTreeNode;
     begin
