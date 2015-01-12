@@ -10,13 +10,13 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  Logic, uCustomEdit, Vcl.Dialogs;
+  Logic, uCustomEdit, uDocument;
 type
 TfrmMain = class(TForm)
     menuMain: TMainMenu;
-    N1: TMenuItem;
+    mnuDocument: TMenuItem;
     mnuAccounts: TMenuItem;
-    mnuPass: TMenuItem;
+    mnuPassword: TMenuItem;
     N4: TMenuItem;
     mnuInsertItem: TMenuItem;
     mnuDelete: TMenuItem;
@@ -79,7 +79,6 @@ TfrmMain = class(TForm)
     tmrSearch: TTimer;
     mnuInsertPage: TMenuItem;
     lblEmpty: TLabel;
-    TaskDialog1: TTaskDialog;
     mnuEditDefault: TMenuItem;
     Advancedmode1: TMenuItem;
     N2: TMenuItem;
@@ -151,8 +150,9 @@ TfrmMain = class(TForm)
     procedure mnuEditDefaultClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuSaveAsCryptedClick(Sender: TObject);
-    procedure mnuPassClick(Sender: TObject);
-
+    procedure mnuPasswordClick(Sender: TObject);
+    procedure mnuDocumentClick(Sender: TObject);
+    procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
 private
 	{ Private declarations }
 public
@@ -164,9 +164,10 @@ var
 resourcestring
     rsAppname = 'OmgPass';
 
+{$R *.dfm}
 implementation
 
-{$R *.dfm}
+
 
 uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings,
   uConsole, uPassword;
@@ -208,6 +209,25 @@ begin
     if Assigned(frmLog) {and bLogDocked} then
       frmLog.tmrLog.OnTimer(nil);
 end;
+procedure TfrmMain.FormResize(Sender: TObject);
+begin
+	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
+    //tvMain.Align:=alLeft;
+    Splitter.Left:=tvMain.Width;              //WTF?
+    lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
+                        (Height - lblEmpty.Height) div 2,
+                         lblEmpty.Width,
+                         lblEmpty.Height);
+    //Log(Sender.ToString);
+    if Assigned(frmLog) and bLogDocked then
+    	frmLog.tmrLog.OnTimer(nil);
+end;
+procedure TfrmMain.WMSysCommand;
+begin
+    if (Msg.CmdType = SC_MAXIMIZE) then
+        SaveSettings;
+    DefaultHandler(Msg) ;
+end;
 {$ENDREGION}
 
 {$REGION '#Открытие модальных окошек'}
@@ -241,6 +261,12 @@ begin
 if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(Self);
 frmOptions.ShowModal;
 FreeAndNil(frmOptions);
+end;
+procedure TfrmMain.mnuPasswordClick(Sender: TObject);
+begin
+    if (not Assigned(frmPassword)) then frmPassword:= TfrmPassword.Create(Self, omgDoc);
+    if frmPassword.ShowModal = mrOK then Log('Password changed');
+    FreeAndNil(frmPassword);
 end;
 {$ENDREGION}
 
@@ -410,11 +436,6 @@ end;
 {$ENDREGION}
 
 {$REGION '#Клонирование овечек'}
-procedure TfrmMain.mnuPassClick(Sender: TObject);
-begin
-frmPassword.Show;
-end;
-
 procedure TfrmMain.mnuPopupCloneItemClick(Sender: TObject);
     var selNode: TTreeNode;
     begin
@@ -661,20 +682,6 @@ end;
 {$Endregion}
 
 {$REGION '#Всякая хрень'}
-procedure TfrmMain.FormResize(Sender: TObject);
-begin
-	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
-    //tvMain.Align:=alLeft;
-    Splitter.Left:=tvMain.Width;              //WTF?
-    lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
-                        (Height - lblEmpty.Height) div 2,
-                         lblEmpty.Width,
-                         lblEmpty.Height);
-    //Log(Sender.ToString);
-    if Assigned(frmLog) and bLogDocked then
-    	frmLog.tmrLog.OnTimer(nil);
-end;
-
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
@@ -731,6 +738,11 @@ begin
     ShellExecute(frmMain.Handle, 'open', PwideChar(strLink), nil, nil, SW_SHOW);
 end;
 
+procedure TfrmMain.mnuDocumentClick(Sender: TObject);
+begin
+    mnuPassword.Enabled:= (omgDoc.docType = TOmgDocument.tOmgDocType.dtCrypted);
+end;
+
 procedure TfrmMain.mnuSaveAsCryptedClick(Sender: TObject);
 begin
 omgDoc.SaveAsCrypted;
@@ -750,7 +762,6 @@ end;
 {$ENDREGION}
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
-//var i: Integer;
 begin
 //omgDoc.SaveAsCrypted;
 end;

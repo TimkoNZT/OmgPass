@@ -1,7 +1,6 @@
 unit uStrings;
 interface
 const
-    //xmlMain
     CrLf = sLineBreak;
     strDefaultExt = '.xml';
     strCryptedExt = '.opwd';
@@ -27,15 +26,15 @@ resourcestring
     //Название новой записи, папки, страницы
     rsNewItemTitle = 'New record';
     rsNewFolderTitle = 'New folder';
-    rsNewPageTitle = 'New Page';
+    rsNewPageTitle = 'Page';
     //Серый текст в поле поиска
     rsSearchText = 'Search';
     //Инфо блок для папок
     rsInfoTitle =           'Title: ';
     rsInfoSubfolders =      'Subfolders:       ';
     rsInfoTotalFolders =    'Total folders:    ';
-    rsInfoSubItems =        'Subitems:         ';
-    rsInfoTotalItems =      'Total items:      ';
+    rsInfoSubItems =        'Subrecords:      ';
+    rsInfoTotalItems =      'Total records:   ';
     //MessageBoxes
     rsDelFieldConfirmationText = 'Confirm to delete field "%s"?' + CrLf + 'Value will be deleted too';
     rsDelFieldConfirmationCaption = 'Deleting field';
@@ -121,8 +120,8 @@ resourcestring
     rsHintAddFile = 'Add file(s)';
 
     //frmAccounts
-    rsSaveDialogFilter = 'Omg!Pass XML|*.xml|Omg!Pass Crypted|*.opwd';
-    rsOpenDialogFilter = 'Omg!Pass XML|*.xml|Omg!Pass Crypted|*.opwd|All files|*.*';
+    rsSaveDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml';
+    rsOpenDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml|All files|*.*';
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          CrLf + 'Would you like to create a new document' +
                          CrLf + '%s ?';
@@ -134,6 +133,9 @@ resourcestring
     rsOpenDocumentErrorTitle = 'Open document error';
     rsWrongPasswordError = 'Wrong or incorrect password! You can try again.' + CrLf + ' Please, check CapsLock and see on hint image';
     rsWrongPasswordErrorTitle = 'Wrong password';
+    {rsDeletingDocument = 'Warning!' + CrLf +
+                            'Are you sure you want to delete the document' + CrLf + '%s ?';
+    rsDeletingDocumentTitle = 'Deleting...';}
     rsTxtPassFileNotFound = 'File not found';
     rsTxtPassFileIsBad = 'Bad or corupted file';
     rsTxtPassPassEmpty = 'Empty password used';
@@ -141,6 +143,17 @@ resourcestring
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
 
-    //
+    //frmPassword
+    rsWrongOldPassword = 'Wrong old password';
+    rsWrongOldPasswordTitle = 'Error';
+    rsWrongNewPassword = 'New password equals to old password';
+    rsWrongNewPasswordTitle = 'Error';
+    rsNewPasswordEmpty = 'Confirm using empty password?';
+    rsNewPasswordEmptyTitle = 'New password is empty';
+    rsWrongConfirmPassword = 'Wrong confirm password';
+    rsWrongConfirmPasswordTitle = 'Error';
+    rsPasswordChanged = 'Password has been succesfully changed!';
+    rsPasswordChangedTitle = 'Excellent news';
+
 implementation
 end.

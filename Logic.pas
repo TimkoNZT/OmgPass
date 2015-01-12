@@ -7,14 +7,14 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
     XMLutils, uDocument, uFieldFrame, uFolderFrame, uFolderFrameInfo,
-    uSmartMethods, uSettings, uMD5,
+    uSmartMethods, uSettings,
     {Themes}
     Styles, Themes, uCrypt
   	;
 const
 	bShowLogAtStart: Boolean = True;
 var
-    omgDoc: cOmgDocument;           //Основной наш синглтон-документ
+    omgDoc: TOmgDocument;           //Основной наш синглтон-документ
 	//xmlMain: TXMLDocument;          //Деприкейтед
     xmlCfg: TSettings;
 	//omgDoc.docPages: IXMLNodeList;      	//Список страниц
@@ -77,9 +77,8 @@ procedure ShowPasswords(Flag: Boolean);
 procedure WindowsOnTop(Flag: Boolean; Form: TForm);
 function GetFolderInformation(Node: IXMLNode): String;
 function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNode;
-procedure CreateNewBase(fPath: String);
-//function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
-//function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
+function CreateNewBase(fPath: String; Password: String): Boolean;
+
 function LoadStoredDocs(): TStringList;
 procedure ReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
@@ -787,21 +786,20 @@ begin
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
     frmMain.mnuShowPass.Checked:= bShowPasswords;
     frmMain.mnuTop.Checked:= bWindowsOnTop;
-    if xmlCfg.HasSection('Position') then begin
-        frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
-        if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
-        if frmMain.WindowState = wsNormal then begin
-            //И задаем положение
-            frmMain.SetBounds(xmlCfg.GetValue('Left', 0, 'Position'),
-                xmlCfg.GetValue('Top', 0, 'Position'),
-                xmlCfg.GetValue('Width', 0, 'Position'),
-                xmlCfg.GetValue('Height', 0, 'Position'));
-            //bLogDocked:= Boolean(xmlCfg.GetValue('DockLog', True));
-            if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
-        end;
+    //if frmMain.WindowState = wsNormal then begin
+        //И задаем положение
+        frmMain.SetBounds(xmlCfg.GetValue('Left', 200, 'Position'),
+        xmlCfg.GetValue('Top', 200, 'Position'),
+        xmlCfg.GetValue('Width', 520, 'Position'),
+        xmlCfg.GetValue('Height', 500, 'Position'));
+        bLogDocked:= Boolean(xmlCfg.GetValue('DockLog', True));
+            frmMain.WindowState:= xmlCfg.GetValue('Window', 0, 'Position');
+    if frmMain.WindowState = wsMinimized then frmMain.WindowState:= wsNormal;
+    //if Boolean(xmlCfg.GetValue('ShowLog', False)) then frmMain.tbtnLogClick(nil);
+    //    end;
         //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
         frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
-    end;
+    //end;
 end;
 procedure LoadDocSettings;
 //А здесь грузятся настройки документа и заодно документ выводится в форму
@@ -953,6 +951,7 @@ begin
             rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  CrLf +
             rsInfoTotalItems + IntToStr(IterateItems(Node, True));
 end;
+
 procedure EditDefaultItem;
 //Вызов формы редактирования для записи по умолчанию
 var
@@ -1011,28 +1010,48 @@ begin
 //    SetButtonImg(btnDeletePage, imlField, 12);
 //    SetButtonImg(btnTheme, imlTab, 41);
 //    end;
-
 end;
-procedure CreateNewBase(fPath: String);
+
+function CreateNewBase(fPath: String; Password: String): Boolean;
 //Новый документ с нуля
 //Формируется файл по заданому пути
 var
-    rootNode: IXMLNode;
-    xmlTemp: TXMLDocument;
+    newDoc: TOmgDocument;
+    docType: TOmgDocument.tOmgDocType;
 begin
-        xmlTemp:=TXMLDocument.Create(nil);
-        xmlTemp.Active:=True;
-//        xmlTemp.LoadFromXML('<?xml version="1.0" encoding="UTF-8"?>' + #10#10 + '<Root><Header/><Data/></Root>');
-        Log('Create new base!');
-        xmlTemp.FileName:=fPath;
-//        xmlTemp.Encoding := 'UTF-8';
-//        xmlTemp.Version := '1.0';
-        With xmlTemp.AddChild('Root') do begin
-            AddChild('Header');
-            AddChild('Data');
+try
+    try
+        if ExtractFileExt(fPath) = strDefaultExt then
+            docType:=dtXML
+        else
+            docType:=dtCrypted;
+        newDoc:=TOmgDocument.CreateNew(fPath, docType, Password);
+        newDoc.Save;
+        newDoc.Close;
+        Result:=True;
+    except
+        on e: Exception do begin
+            ErrorLog(e, 'CreateNewDocument');
+            Result:=False;
         end;
-        xmlTemp.SaveToFile(fPath);
-//        FreeAndNil(xmlTemp);
+    end;
+finally
+    newDoc.Free;
+end;
+//        xmlTemp:=TXMLDocument.Create(nil);
+//        xmlTemp.Active:=True;
+////        xmlTemp.LoadFromXML('<?xml version="1.0" encoding="UTF-8"?>' + #10#10 + '<Root><Header/><Data/></Root>');
+//        Log('Create new base!');
+//        xmlTemp.FileName:=fPath;
+////        xmlTemp.Encoding := 'UTF-8';
+////        xmlTemp.Version := '1.0';
+//        With xmlTemp.AddChild('Root') do begin
+//            AddChild('Header');
+//            AddChild('Data');
+//        end;
+//        xmlTemp.SaveToFile(fPath);
+////        FreeAndNil(xmlTemp);
+///
 end;
 {$REGION '#DocProperty'}
 {function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
@@ -1110,8 +1129,8 @@ function MessageIsEmptyDoc: Boolean;
 //пользователь не захотел добавлять страничку
 
 begin
-    if omgDoc.IsEmpty then begin
-        Result:=True;
+    Result:= omgDoc.IsEmpty;
+    if Result then
         if (MessageBox(frmMain.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
@@ -1124,7 +1143,6 @@ begin
                     frmMain.tvMain.Items[0].Selected:=True;
                     Result:=False;
                 end;
-    end;
 end;
 function DocManager(Reopen: Boolean = False): Boolean;
 //var Accept: Boolean;
@@ -1139,7 +1157,7 @@ begin
             Log ('frmAccounts: mrOK');
             //Accept:=True;
             //frmAccounts.Hide;
-            if DocumentOpen(frmAccounts.FFileName, frmAccounts.txtPass.Text) then begin
+            if DocumentOpen(frmAccounts.FFileName, frmAccounts.FPassword) then begin
                 Result:=True;
                 if not Reopen then frmMain.Show;    //Принудительно
             end;
@@ -1154,10 +1172,10 @@ begin
 end;
 function DocumentOpen(Path: String; Pass: String): Boolean;
 var
-    tmpDoc: cOmgDocument;
+    tmpDoc: TOmgDocument;
 begin
     try
-        tmpDoc:=cOmgDocument.Create(Path, Pass);
+        tmpDoc:=TOmgDocument.Create(Path, Pass);
         DocumentClose;
         omgDoc:=tmpDoc;
         frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
@@ -1217,7 +1235,7 @@ function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean
 var
     //H: TCryFileHeader;
     fStream: TFileStream;
-    cryHeader: cOmgDocument.TCryFileHeader;
+    cryHeader: TOmgDocument.TCryFileHeader;
 begin
     try
         try

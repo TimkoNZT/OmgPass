@@ -3,8 +3,8 @@ interface
 
 uses SysUtils, Windows, Classes, XMLIntf, XMLDoc, uStrings, XMLUtils;
 
-type cOmgDocument = class
-    type tOmgDocType = (dtXML, dtCrypted);
+type TOmgDocument = class
+    type tOmgDocType = (dtUnknown, dtXML, dtCrypted);
     type TCryFileHeader = record
         Magic: array[0..3] of AnsiChar;
         docVersion: Byte;
@@ -17,16 +17,18 @@ type cOmgDocument = class
 const
     ActualDocVersion: Byte = 1;
     cryMagicSig: String = 'OMG!';
+    EmptyXML: AnsiString = '<?xml version="1.0" encoding="UTF-8"?>'
+                  + CrLf + '<Root><Header/><Data/></Root>';
 var
     docFilePath: String;
     docType: tOmgDocType;
     XML: iXMLDocument;
     docPages: IXMLNodeList;
-    docPassword: String;
     CurrentPage: Integer;                   //Текущая страничка
     CurrentRecord: Integer;                 //...и запись
 private
-    curHeader: TCryFileHeader;
+    docHeader: TCryFileHeader;
+    docPassword: String;
     fileStream: TFileStream;
     procedure LoadPosition;
     procedure SavePosition;
@@ -36,9 +38,9 @@ private
 public
     constructor Create; overload;
     constructor Create(FilePath: String; Password: String); overload;
-    constructor CreateNew(FilePath: String; docType: tOmgDocType; Password: String = '');
+    constructor CreateNew(FilePath: String; dType: tOmgDocType; Password: String = ''); overload;
     destructor Destroy; override;
-    function Open(Path: String; Pass: String): Boolean;
+    function Open(Path: String; Password: String): Boolean;
     //static function Enrypt(_in: TStream, _out:)
     function Save: Boolean;
     function Close: Boolean;
@@ -48,15 +50,14 @@ public
     class function CreateHeader(sPassword: String): TCryFileHeader;
     procedure SaveAsCrypted;
     procedure SaveAs(FilePath: String; dType: tOmgDocType);
-
-//published
-//  	property IsDocEmpty: Boolean read IsEmpty;
+    function CheckThisPassword(Password: String): Boolean;
+    function ChangePassword(Password: String): Boolean;
 end;
 
 implementation
 uses uLog, uCrypt;
 
-constructor cOmgDocument.Create;
+constructor TOmgDocument.Create;
 begin
     //inherited Create;
     XML:=TXMLDocument.Create(nil);
@@ -64,28 +65,39 @@ begin
     XML.ParseOptions:=[poValidateOnParse];
 end;
 
-constructor cOmgDocument.Create(FilePath: String; Password: String);
+constructor TOmgDocument.Create(FilePath: String; Password: String);
 begin
     Self.Create;
-    if not Self.Open(filePath, Pass) then raise Exception.Create('Error opening file');
+    if not Self.Open(filePath, Password) then raise Exception.Create('Error opening file');
 end;
 
-constructor cOmgDocument.CreateNew(FilePath: String; docType: tOmgDocType; Password: String = '');
+constructor TOmgDocument.CreateNew(filePath: String; dType: tOmgDocType; Password: String = '');
+//var
+//    fStream: TFileStream;
 begin
-    //
+    Self.Create;
+    fileStream:= TFileStream.Create(FilePath, fmOpenReadWrite or fmCreate);
+    Self.docFilePath:= filePath;
+    Self.docType:= dType;
+    if dType = dtCrypted then begin
+        docPassword:=Password;
+        docHeader:=CreateHeader(Password);
+    end;
+    XML.LoadFromXML(EmptyXML);
+    XML.Active:=True;
 end;
 
-function cOmgDocument.Open(Path: String; Pass: String): Boolean;
+function TOmgDocument.Open(Path: String; Password: String): Boolean;
 begin
 try
     fileStream:= TFileStream.Create(Path, fmOpenReadWrite);
     Self.docFilePath:= Path;
-    docPassword:=Pass;
+    docPassword:=Password;
     if ExtractFileExt(Path) = strDefaultExt then begin
         Self.OpenXMLfromStream(fileStream);
         docType:= dtXML;
     end else begin
-        Self.OpenCrypted(Pass);
+        Self.OpenCrypted(Password);
         docType:=dtCrypted;
     end;
     XML.Active:=True;
@@ -95,7 +107,7 @@ try
     end;
 end;
 
-function cOmgDocument.OpenXMLfromStream(xmlMainStream: TStream): Boolean;
+function TOmgDocument.OpenXMLfromStream(xmlMainStream: TStream): Boolean;
 begin
 try
     XML.LoadFromStream(xmlMainStream);
@@ -110,13 +122,13 @@ try
 end;
 end;
 
-function cOmgDocument.OpenCrypted(Password: String): Boolean;
+function TOmgDocument.OpenCrypted(Password: String): Boolean;
 var
 cryStream, xmlStream: TMemoryStream;
 begin
     try
         try
-            fileStream.Read(curHeader, SizeOf(TCryFileHeader));
+            fileStream.Read(docHeader, SizeOf(TCryFileHeader));
             cryStream:=TMemoryStream.Create;
             xmlStream:=TMemoryStream.Create;
             cryStream.CopyFrom(fileStream, fileStream.Size - SizeOf(TCryFileHeader));
@@ -135,12 +147,12 @@ begin
     end;
 end;
 
-function cOmgDocument.SaveCrypted(): Boolean;
+function TOmgDocument.SaveCrypted(): Boolean;
 begin
     //
 end;
 
-procedure cOmgDocument.SaveAsCrypted();
+procedure TOmgDocument.SaveAsCrypted();
 var fName: String;
     Header: TCryFileHeader;
     fStream: TFileStream;
@@ -149,7 +161,7 @@ begin
     if Self.docType = dtCrypted then Exit; //Already crypted
     try
         fName:=  ChangeFileExt(Self.docFilePath, strCryptedExt);
-        Header:= cOmgDocument.CreateHeader(String.Empty);
+        Header:= TOmgDocument.CreateHeader(String.Empty);
         fStream:=TFileStream.Create(fName, fmOpenWrite or fmCreate);
         xStream:=TMemoryStream.Create;
         cStream:=TMemoryStream.Create;
@@ -164,12 +176,12 @@ begin
     end;
 end;
 
-procedure cOmgDocument.SaveAs(FilePath: String; dType: tOmgDocType);
+procedure TOmgDocument.SaveAs(FilePath: String; dType: tOmgDocType);
 begin
     //
 end;
 
-function cOmgDocument.Save: Boolean;
+function TOmgDocument.Save: Boolean;
 var
     xStream, cStream: TMemoryStream;
 begin
@@ -180,7 +192,7 @@ begin
     fileStream.Position:=0;
     if Self.docType = dtCrypted then begin
         cStream:=TMemoryStream.Create;
-        fileStream.WriteBuffer(curHeader, sizeOf(TCryFileHeader));
+        fileStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
         cryptStream(xStream, cStream, docPassword, $100);
         fileStream.CopyFrom(cStream, cStream.Size);
         fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
@@ -190,7 +202,7 @@ begin
     end;
 end;
 
-function cOmgDocument.Close: Boolean;
+function TOmgDocument.Close: Boolean;
 begin
     docFilePath:='';
     docType:=dtXML;
@@ -200,34 +212,34 @@ begin
     docPassword:='';
     CurrentPage:=0;                   //Текущая страничка
     CurrentRecord:=0;
-    ZeroMemory(@curHeader, SizeOf(TCryFileHeader));
+    ZeroMemory(@docHeader, SizeOf(TCryFileHeader));
     FreeAndNil(fileStream);
 end;
 
-destructor cOmgDocument.Destroy;
+destructor TOmgDocument.Destroy;
 begin
     //Self.Close;
     inherited Destroy;
 end;
 
-procedure cOmgDocument.LoadPosition;
+procedure TOmgDocument.LoadPosition;
 begin
     Self.CurrentPage:= Self.GetProperty('SelectedPage', 0);
     Self.CurrentRecord:= Self.GetProperty('Selected', 0);
 end;
 
-procedure cOmgDocument.SavePosition;
+procedure TOmgDocument.SavePosition;
 begin
     Self.SetProperty('SelectedPage', Self.CurrentPage);
     Self.SetProperty('Selected', Self.CurrentRecord);
 end;
 
-function cOmgDocument.IsEmpty: Boolean;
+function TOmgDocument.IsEmpty: Boolean;
 begin
     Result:= (Self.docPages.Count= 0);
 end;
 
-class function cOmgDocument.CreateHeader(sPassword: String): TCryFileHeader;
+class function TOmgDocument.CreateHeader(sPassword: String): TCryFileHeader;
 var
     Head: TCryFileHeader;
     Data: array of byte;
@@ -245,8 +257,28 @@ begin
     end;
 end;
 
+function TOmgDocument.CheckThisPassword(Password: String): Boolean;
+begin
+    try
+        Result:= CompareMem(GetHeader(Password).Memory, @docHeader.firstHeader[0], $40);
+    except
+        on e: Exception do ErrorLog(e, 'CheckPassword');
+    end;
+end;
+
+function TOmgDocument.ChangePassword(Password: String): Boolean;
+begin
+try
+    Self.docHeader:=CreateHeader(Password);
+    Self.docPassword:=Password;
+    Self.Save;
+except
+    on e: Exception do ErrorLog(e, 'ChangePassword');
+end;
+end;
+
 {$REGION '#DocProperty'}
-function cOmgDocument.GetProperty(PropertyName: String; DefValue: Variant): Variant;
+function TOmgDocument.GetProperty(PropertyName: String; DefValue: Variant): Variant;
 //Установка и чтение свойств документа
 //Все свойства хранятся в ntHeader
 //Функции удаления нет.. нужна
@@ -256,7 +288,7 @@ or (xml.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(Pr
         then Result:=DefValue
     else Result:=xml.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildValues[PropertyName];;
 end;
-function cOmgDocument.SetProperty(PropertyName: String; Value: Variant): Boolean;
+function TOmgDocument.SetProperty(PropertyName: String; Value: Variant): Boolean;
 var hNode: IXMLNode;
 begin
     hNode:= xml.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode);

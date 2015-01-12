@@ -180,9 +180,9 @@ object frmGenerator: TfrmGenerator
       AutoSize = False
       Caption = 'Omg!Pass'
       Font.Charset = RUSSIAN_CHARSET
-      Font.Color = clBlue
+      Font.Color = clHotLight
       Font.Height = -19
-      Font.Name = 'Consolas'
+      Font.Name = 'Courier New'
       Font.Style = [fsBold]
       ParentFont = False
       ShowAccelChar = False

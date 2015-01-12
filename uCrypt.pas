@@ -1,15 +1,6 @@
 unit uCrypt;
 interface
-uses Windows, SysUtils, Variants, Classes, wCrypt2, ClipBrd, uMd5;
-var
-//  Prov: HCRYPTPROV;            //Криптопровайдер
-//  Stream: TMemoryStream;
-//  Hash: HCRYPTHASH;            //Хэш-обьект
-//  puKey: HCRYPTKEY;
-//  usKey: HCRYPTKEY;
-//  jStream: TMemoryStream;
-//  BufSize: DWORD;
-  Pass, Salt: String;
+uses Windows, SysUtils, Variants, Classes, wCrypt2, ClipBrd;
 
 const
 AProvType = PROV_RSA_FULL;
@@ -23,7 +14,7 @@ exPublicKey: array[0..83] of byte = ($06, $02, $00, $00, $00, $A4, $00, $00, $52
                                     $12, $92, $CA, $C4, $62, $F3, $1D, $37, $47, $4E, $22, $4F, $9E, $21, $33, $4F, $46,
                                     $D5, $D1, $5B, $6F, $DC, $BE, $6C, $C3, $C8, $C0, $A9, $CC, $56, $ED, $8D, $12, $D6);
 
-exPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $A4, $00, $00, $52, $53, $41, $32, $00, $02, $00, $00,
+{exPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $A4, $00, $00, $52, $53, $41, $32, $00, $02, $00, $00,
                                     $01, $00, $01, $00, $1F, $7F, $4F, $80, $3A, $B8, $91, $6B, $9F, $9B, $F5, $39, $12,
                                     $45, $A2, $A6, $D0, $3F, $E4, $6A, $58, $F7, $5C, $9B, $88, $7A, $43, $67, $22, $7F,
                                     $12, $92, $CA, $C4, $62, $F3, $1D, $37, $47, $4E, $22, $4F, $9E, $21, $33, $4F, $46,
@@ -67,12 +58,11 @@ sigPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $24, $00, $00, 
                                     $B7, $4F, $ED, $50, $F5, $F2, $30, $9C, $C7, $46, $F3, $B5, $3C, $A6, $9D, $8E, $F6,
                                     $12, $A4, $5D, $65, $0E, $67, $CF, $EB, $95, $06, $55, $4A, $69, $A6, $1D, $57, $B5,
                                     $6A, $1C, $CA, $8C, $4A, $FD, $F9, $A5, $16, $2F, $43, $AD, $2E, $38, $4A, $35, $4B,
-                                    $82, $17, $74);
+                                    $82, $17, $74); }
 
 procedure EnumProviders;
 procedure LogHashInfo(Hash: HCRYPTHASH);
 procedure LogProviderInfo(hProv: HCRYPTPROV);
-procedure Init;
 function GetHeader(Password: string): TMemoryStream;
 function GetSecondHeader(Password: string): TMemoryStream;
 
@@ -156,72 +146,6 @@ begin
   Stream.Free;
 end;
 
-function ImportPublicKey(FileName: String): HCRYPTKEY;
-var
-  Stream: TMemoryStream;
-begin
-//try
-//  Stream:=TMemoryStream.Create;
-//  Stream.LoadFromFile(FileName);
-//  if not CryptImportKey(Prov, PByte(Stream.Memory), Stream.Size, 0, 0, @puKey) then RaiseLastOSError;
-//  Stream.Free;
-//  Except on e: Exception do begin
-//        ErrorLog(e, 'ImportPublicKey');
-//  end;
-//end;
-end;
-
-function SignMessage(): String;
-var
-  Prov: HCRYPTPROV;
-  Hash: HCRYPTHASH;
-  BufLen, flg: DWORD;
-  ExKey, SignKey: HCRYPTKEY;
-  Res: array[0..127] of byte;
-  h:Byte;
-  i: Integer;
-begin
-try
-    Pass :='Password';
-    Salt :='1234567890';
-    Result:='';
-    //CryptAcquireContext(@Prov, nil, nil, PROV_RSA_FULL, CRYPT_DELETEKEYSET);
-    CryptAcquireContext(@Prov, nil, nil, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
-    CryptCreateHash(Prov, CALG_MD5, 0, 0, @Hash);
-    CryptHashData(Hash, @Pass[1], Pass.Length, 0);
-    if not CryptGenKey(Prov, AT_KEYEXCHANGE, (512 shl 16) or CRYPT_EXPORTABLE, @ExKey) then RaiseLastOSError;
-    if not CryptGenKey(Prov, AT_SIGNATURE, (512 shl 16) or CRYPT_EXPORTABLE, @SignKey) then RaiseLastOSError;
-    //if not CryptDeriveKey(Prov, CALG_RC2, Hash, 0, @KeyExchKey) then RaiseLastOSError;
-//    if not ExportPublicKey(SignKey, 'c:\SigKeyPu.bin') then RaiseLastOSError;
-//    if not ExportPublicKey(ExKey, 'c:\ExKeyPu.bin') then RaiseLastOSError;
-//    if not ExportPrivateKey(SignKey, 'c:\SigKeyPr.bin') then RaiseLastOSError;
-//    if not ExportPrivateKey(ExKey, 'c:\ExKeyPr.bin') then RaiseLastOSError;
-
-    //if not CryptDeriveKey(Prov, CALG_RC4, Hash, 0, @Key) then RaiseLastOSError;
-    //ImportPublicKey('c:\SigKey.bin');
-    ///Stream:=TMemoryStream.Create;
-    //Stream.LoadFromFile('c:\SigKeyPu.bin');
-    //if not CryptImportKey(Prov, PByte(Stream.Memory), Stream.Size, 0, 0, @SignKey) then RaiseLastOSError;
-    //Stream.LoadFromFile('c:\SigKeyPu.bin');
-    //Clipboard.AsText:= StreamToStr(Stream);
-
-
-//    if not CryptImportKey(Prov, PByte(Stream.Memory), Stream.Size, 0, 0, @SignKey) then RaiseLastOSError;
-//    if not CryptGetUserKey(Prov, AT_SIGNATURE, @SignKey) then RaiseLastOSError;
-//    BufLen:=0;
-//    if not CryptSignHash(Hash, AT_SIGNATURE, nil, 0 , nil, @BufLen) then RaiseLastOSError;
-//    if BufLen>0 then begin
-//    if not CryptSignHash(Hash, AT_SIGNATURE, nil, 0, @res, @BufLen) then RaiseLastOSError;
-//    for i := 0 to BufLen - 1 do Result:=Result + Res[i].ToHexString(2);
-
-  CryptDestroyHash(Hash);
-  CryptReleaseContext(Prov,0);
-Except on e: Exception do begin
-        ErrorLog(e, 'ExportSign');
-    end;
-end;
-end;
-
 procedure LogHashInfo(Hash: HCRYPTHASH);
 var
     DataLen: DWORD;
@@ -260,6 +184,7 @@ except on e: Exception do begin
     end;
 end;
 end;
+
 procedure LogKeyInfo(Key: HCRYPTKEY);
 var
     KeyLen, DataLen: Dword;
@@ -269,44 +194,6 @@ begin
     DataLen:=4;
     CryptGetKeyParam(Key, KP_KEYLEN, @KeyLen, @DataLen, 0);
     Log('Key_length:', KeyLen);
-end;
-
-
-procedure Init;
-var
-BufLen, DataLen: DWord;
-Buf: TMemoryStream;
-Mess: String;
-begin
-try
-//Pass:='Password';
-//if not CryptAcquireContext(@Prov, nil, nil, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT) then RaiseLastOSError;
-//if not CryptCreateHash(Prov, CALG_MD5, 0, 0, @Hash) then RaiseLastOSError;  //CALG_MAC, CALG_MD2, CALG_MD5, CALG_SHA.
-//if not CryptHashData(Hash, PByte(Pass), Length(Pass), 0) then RaiseLastOSError;
-//if not CryptDeriveKey(Prov, CALG_DES, Hash, CRYPT_EXPORTABLE or CRYPT_NO_SALT, @usKey) then RaiseLastOSError;
-////if not CryptImportKey(Prov, @exPublicKey, SizeOf(exPublicKey), 0, 0, @puKey) then RaiseLastOSError;
-//ImportPublicKey('c:\exKeyPu.bin');
-//if not ExportSessionKey(usKey, puKey, 'c:\1.bin') then RaiseLastOSError;
-//Mess:= umd5.MD5String(Pass).ToHexString;
-//BufLen:=Length(Mess);
-//DataLen:=Length(Mess);
-//CryptEncrypt(usKey, 0,true,0,nil,@BufLen,0);
-//SetLength(Mess, BufLen);
-//CryptEncrypt(usKey, 0, true, 0, PByte(Mess), @DataLen, BufLen);
-//Log(Mess);
-//LogKeyInfo(puKey);
-////LogKeyInfo(usKey);
-//CryptDestroyKey(puKey);
-//CryptDestroyKey(usKey);
-////LogHashInfo(Hash);
-//CryptDestroyHash(Hash);
-//CryptReleaseContext(Prov, 0)
-//Log(exPrivateKey, 5, 'PubKey');
-Log(GetHeader('SH'), 0, '=');
-except on e: Exception do begin
-        ErrorLog(e, 'Start');
-    end;
-end;
 end;
 
 procedure LogProviderInfo(hProv: HCRYPTPROV);
@@ -426,7 +313,7 @@ begin
             {создаем хеш-объект}
             if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
             {хешируем пароль}
-            if not CryptHashData(hash, @Password[1], length(Password), 0) then RaiseLastOSError;
+            if not CryptHashData(hash, @Password[1], length(Password) * 2, 0) then RaiseLastOSError;
             {создаем ключ на основании пароля для потокового шифра}
             if not CryptDeriveKey(hProv, AAlgCrypt, hash, CRYPT_EXPORTABLE or CRYPT_NO_SALT, @uKey) then RaiseLastOSError;
             {импортируем ключ =)}
@@ -474,7 +361,7 @@ begin
             {создаем хеш-объект}
             if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
             {хешируем пароль}
-            if not CryptHashData(hash, @APassword[1], length(APassword), 0) then RaiseLastOSError;
+            if not CryptHashData(hash, @APassword[1], length(APassword) * 2, 0) then RaiseLastOSError;
             //LogHashInfo(hash);
             {создаем ключ на основании пароля для потокового шифра RC4}
             if not CryptDeriveKey(hProv, AAlgCrypt, hash, 0, @key) then RaiseLastOSError;
@@ -528,8 +415,9 @@ begin
         {создаем хеш-объект}
         if not CryptCreateHash(hProv, AAlgHash, 0, 0, @hash)then RaiseLastOSError;
         {хешируем пароль}
-        if not CryptHashData(hash, @APassword[1], length(APassword), 0) then
+        if not CryptHashData(hash, @APassword[1], length(APassword) * 2, 0) then
         RaiseLastOSError;
+        LogHashInfo(Hash);
         {создаем ключ на основании пароля для потокового шифра RC4}
         if not CryptDeriveKey(hProv, AAlgCrypt, hash, 0, @key) then RaiseLastOSError;
         lBufSize:= ABufferSize div 2;

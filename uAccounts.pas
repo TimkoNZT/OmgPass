@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  StdCtrls, Vcl.CategoryButtons,
+  StdCtrls, Vcl.CategoryButtons, ShellAPI,
   Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs, Vcl.ImgList,
   Vcl.Imaging.pngimage, Vcl.ToolWin;
 
@@ -20,12 +20,10 @@ type
     txtNewPass: TEdit;
     Label2: TLabel;
     chkShowPass: TCheckBox;
-    CheckBox1: TCheckBox;
     tsOpen: TTabSheet;
     imlAccounts: TImageList;
     lvFiles: TListView;
     Label1: TLabel;
-    chkShowMainPass: TCheckBox;
     Label6: TLabel;
     btnGeneratePass: TSpeedButton;
     btnNewBase: TSpeedButton;
@@ -33,7 +31,6 @@ type
     txtPass: TEdit;
     btnClose: TButton;
     btnOK: TButton;
-    Memo1: TMemo;
     lblNoFiles: TStaticText;
     imgNotShallPass: TImage;
     txtNewBase: TEdit;
@@ -43,6 +40,7 @@ type
     btnNew: TSpeedButton;
     btnCreateNewBase: TButton;
     btnDelete: TSpeedButton;
+    chkShowMainPass: TCheckBox;
     constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure btnNextClick(Sender: TObject);
     procedure chkShowPassClick(Sender: TObject);
@@ -63,6 +61,7 @@ type
     procedure btnAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure txtPassChange(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
@@ -88,7 +87,7 @@ implementation
 
 {$R *.dfm}
 
-uses uMain, uGenerator, Logic, uSettings, uStrings, uLog, uMD5;
+uses uMain, uGenerator, Logic, uSettings, uStrings, uLog;
 
 constructor TfrmAccounts.Create(AOwner: TComponent; isChange: Boolean = False);
 begin
@@ -144,16 +143,16 @@ var i: Integer;
 begin
     lvFiles.Items.Clear;
     lblNoFiles.Visible:=(lsStoredDocs.Count = 0);
-    if lsStoredDocs.Count = 0 then Exit;
     for i := 0 to lsStoredDocs.Count - 1 do
         lvFiles.AddItem(lsStoredDocs[i], nil);
-    lvFiles.ItemIndex:=0;
-    OpenPreCheck;
+    if lsStoredDocs.Count <> 0 then lvFiles.ItemIndex:=0;
+    if Self.Visible then OpenPreCheck;
 end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
+OpenPreCheck;
 end;
 //Precheck
 function TfrmAccounts.OpenPreCheck(AlertMsg: Boolean = False): Boolean;
@@ -161,8 +160,10 @@ begin
     Result:= False;
     txtPass.Enabled:=False;
     txtPass.Text:='';
+    txtPass.PasswordChar:=#0;
     txtPass.Font.Style:= [fsItalic];
     imgNotShallPass.Visible:=True;
+    if lvFiles.Selected = nil then Exit;
     FFileName:=lvFiles.Selected.Caption;
     if not FileExists(FFileName) then begin      //Where is the file?
         txtPass.Text:=rsTxtPassFileNotFound;
@@ -186,21 +187,23 @@ begin
             lvFiles.Selected.ImageIndex:=8;
         end
     else
-        case DocumentPreOpenCrypted(FFileName, txtPass.Text, AlertMsg) of
+        case DocumentPreOpenCrypted(FFileName, fPassword, AlertMsg) of
         idOk: begin
-//            if txtPass.Text = '' then begin
-//                txtPass.Text:=rsTxtPassPassEmpty
-//            end else begin
+            if txtPass.Text = '' then begin
+                txtPass.Text:=rsTxtPassPassEmpty
+            end else begin
                 txtPass.Enabled:=True;
-                txtPass.Font.Style:= [];
+                if not chkShowMainPass.Checked then txtPass.PasswordChar:=#149;
+                txtPass.Font.Style:= [fsBold];
                 if Self.Visible = True then txtPass.SetFocus;
-//            end;
+            end;
             imgNotShallPass.Visible:=False;
             Result:=True;
             end;
         idTryAgain: begin
             txtPass.Enabled:=True;
-            txtPass.Font.Style:= [];
+            if not chkShowMainPass.Checked then txtPass.PasswordChar:=#149;
+            txtPass.Font.Style:= [fsBold];
             if Self.Visible = True then txtPass.SetFocus;
             end;
         idCancel: begin
@@ -250,7 +253,6 @@ end;
 procedure TfrmAccounts.txtPassChange(Sender: TObject);
 begin
 if not txtPass.Enabled then Exit;
-Log(uMD5.MD5String(txtPass.Text).ToHexString);
 imgNotShallPass.Visible:= (DocumentPreOpenCrypted(FFileName, txtPass.Text) <> idOk);
 end;
 
@@ -279,11 +281,44 @@ procedure TfrmAccounts.btnCreateNewBaseClick(Sender: TObject);
 var i: Integer;
 begin
     if txtNewBase.Text = '' then Exit;
-    if FileExists(txtNewBase.Text) then DeleteFile(txtNewBase.Text);
-    CreateNewBase(txtNewBase.Text);
+    //if FileExists(txtNewBase.Text) then
+    if not CreateNewBase(txtNewBase.Text, txtNewPass.Text) then Exit;
     ReloadStoredDocs(txtNewBase.Text);
-    LoadLvFiles;
     pcAccounts.Pages[tsOpen.PageIndex].Show;
+    LoadLvFiles;
+end;
+
+procedure TfrmAccounts.btnDeleteClick(Sender: TObject);
+function Recycle(FileName: string; Wnd: HWND = 0): Boolean;
+var
+  FileOp: TSHFileOpStruct;
+begin
+  FillChar(FileOp, SizeOf(FileOp), 0);
+  if Wnd = 0 then
+    Wnd := Application.Handle;
+  FileOp.Wnd := Wnd;
+  FileOp.wFunc := FO_DELETE;
+  FileOp.pFrom := PChar(FileName + #0#0);
+  FileOp.fFlags := FOF_ALLOWUNDO or FOF_NOERRORUI or FOF_SILENT;
+  Result := (SHFileOperation(FileOp) = 0) and (not
+    FileOp.fAnyOperationsAborted);
+end;
+
+begin
+try
+    if lvFiles.Selected = nil then Exit;
+//    if MessageBox(Self.Handle,
+//       PWideChar(Format(rsDeletingDocument, [lvFiles.Selected.Caption])),
+//       PWideChar(rsDeletingDocumentTitle),
+//       MB_OKCANCEL + MB_DEFBUTTON3 + MB_APPLMODAL + MB_ICONWARNING) = idOK then
+            if Recycle(lvFiles.Selected.Caption, Self.Handle) then begin
+                RemoveStoredDocs(lvFiles.Selected.Caption);
+                LoadLvFiles;
+            end;
+except
+    on e: Exception do ErrorLog(e, 'DeletingDocument');
+end;
+
 end;
 
 procedure TfrmAccounts.btnGeneratePassClick(Sender: TObject);
@@ -348,7 +383,7 @@ if chkShowPass.Checked then begin
 end else begin
   txtPassConfirm.PasswordChar:= #149;
   txtNewPass.PasswordChar:= #149;
-  txtPass.PasswordChar:=#149;
+  if txtPass.Enabled then txtPass.PasswordChar:=#149;
 end;
 
 end;
@@ -358,13 +393,14 @@ procedure TfrmAccounts.btnOKClick(Sender: TObject);
 begin
     if lvFiles.Selected = nil then Exit;
     FFileName:=lvFiles.Selected.Caption;
+    if txtPass.Enabled then FPassword:=txtPass.Text;
     if not FileExists(FFileName) then
         if MessageBox(Self.Handle,
             PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
             rsFileNotFoundMsgTitle,
             MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL) = ID_CANCEL
             then Exit
-            else CreateNewBase(FFileName);
+            else CreateNewBase(FFileName, '');
     if OpenPrecheck(True) then begin
         ReloadStoredDocs(FFileName);
         Self.ModalResult:=mrOK;

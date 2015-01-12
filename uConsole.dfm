@@ -3,8 +3,8 @@ object frmLog: TfrmLog
   Top = 0
   BorderStyle = bsNone
   Caption = #1051#1086#1075
-  ClientHeight = 400
-  ClientWidth = 582
+  ClientHeight = 422
+  ClientWidth = 544
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object frmLog: TfrmLog
   object Shape1: TShape
     Left = 0
     Top = 0
-    Width = 582
-    Height = 380
+    Width = 544
+    Height = 402
     Align = alClient
     Pen.Color = clBtnShadow
     ExplicitLeft = 104
@@ -33,11 +33,12 @@ object frmLog: TfrmLog
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 576
-    Height = 374
+    Width = 538
+    Height = 396
     Align = alClient
+    Color = clHotLight
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clWindow
     Font.Height = -13
     Font.Name = 'Consolas'
     Font.Style = []
@@ -46,13 +47,14 @@ object frmLog: TfrmLog
     TabOrder = 0
     StyleElements = [seFont, seClient]
     OnMouseDown = lbLogMouseDown
-    ExplicitWidth = 394
+    ExplicitWidth = 576
+    ExplicitHeight = 374
   end
   object StatusBar1: TStatusBar
     AlignWithMargins = True
     Left = 3
-    Top = 380
-    Width = 576
+    Top = 402
+    Width = 538
     Height = 17
     Margins.Top = 0
     Panels = <
@@ -65,7 +67,8 @@ object frmLog: TfrmLog
         Text = 'Lines Count:'
         Width = 90
       end>
-    ExplicitWidth = 394
+    ExplicitTop = 380
+    ExplicitWidth = 576
   end
   object tmrLog: TTimer
     Enabled = False
