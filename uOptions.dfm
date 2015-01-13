@@ -2,9 +2,9 @@ object frmOptions: TfrmOptions
   Left = 618
   Top = 279
   BorderStyle = bsDialog
-  Caption = 'frmOptions'
-  ClientHeight = 219
-  ClientWidth = 307
+  Caption = 'Options'
+  ClientHeight = 246
+  ClientWidth = 320
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,4 +16,11 @@ object frmOptions: TfrmOptions
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object Label1: TLabel
+    Left = 120
+    Top = 104
+    Width = 76
+    Height = 13
+    Caption = 'Not realised yet'
+  end
 end

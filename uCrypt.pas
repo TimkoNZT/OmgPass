@@ -8,13 +8,15 @@ AProvFlag = CRYPT_VERIFYCONTEXT;
 AAlgHash  = CALG_MD5;
 AAlgCrypt = CALG_RC4;
 
+exSesKeyHeader: array[0..11] of byte = ($01, $02, $00, $00, $01, $68, $00, $00, $00, $A4, $00, $00);
+
 exPublicKey: array[0..83] of byte = ($06, $02, $00, $00, $00, $A4, $00, $00, $52, $53, $41, $31, $00, $02, $00, $00,
                                     $01, $00, $01, $00, $1F, $7F, $4F, $80, $3A, $B8, $91, $6B, $9F, $9B, $F5, $39, $12,
                                     $45, $A2, $A6, $D0, $3F, $E4, $6A, $58, $F7, $5C, $9B, $88, $7A, $43, $67, $22, $7F,
                                     $12, $92, $CA, $C4, $62, $F3, $1D, $37, $47, $4E, $22, $4F, $9E, $21, $33, $4F, $46,
                                     $D5, $D1, $5B, $6F, $DC, $BE, $6C, $C3, $C8, $C0, $A9, $CC, $56, $ED, $8D, $12, $D6);
 
-{exPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $A4, $00, $00, $52, $53, $41, $32, $00, $02, $00, $00,
+exPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $A4, $00, $00, $52, $53, $41, $32, $00, $02, $00, $00,
                                     $01, $00, $01, $00, $1F, $7F, $4F, $80, $3A, $B8, $91, $6B, $9F, $9B, $F5, $39, $12,
                                     $45, $A2, $A6, $D0, $3F, $E4, $6A, $58, $F7, $5C, $9B, $88, $7A, $43, $67, $22, $7F,
                                     $12, $92, $CA, $C4, $62, $F3, $1D, $37, $47, $4E, $22, $4F, $9E, $21, $33, $4F, $46,
@@ -33,32 +35,6 @@ exPublicKey: array[0..83] of byte = ($06, $02, $00, $00, $00, $A4, $00, $00, $52
                                     $33, $73, $2B, $29, $BE, $0F, $27, $4A, $9E, $DB, $FE, $42, $55, $38, $5A, $C7, $BC,
                                     $16, $59, $08, $36, $0B, $C0, $CF, $FD, $34, $A7, $A3, $43, $E8, $34, $14, $88, $E3,
                                     $04, $26, $5E);
-
-sigPublicKey: array[0..83] of byte = ($06, $02, $00, $00, $00, $24, $00, $00, $52, $53, $41, $31, $00, $02, $00, $00,
-                                    $01, $00, $01, $00, $43, $2F, $3E, $45, $C4, $99, $75, $5E, $64, $7C, $D0, $4E, $45,
-                                    $B7, $D6, $E9, $3D, $E4, $2F, $23, $26, $B4, $B3, $64, $E5, $07, $D3, $18, $B1, $AA,
-                                    $D9, $CB, $E5, $2D, $F5, $AE, $C5, $71, $EC, $F8, $6D, $2C, $27, $27, $A2, $D6, $2F,
-                                    $84, $4E, $CD, $24, $74, $77, $D0, $59, $B3, $5C, $05, $4D, $CC, $E6, $08, $B9, $C0);
-
-sigPrivateKey: array[0..307] of byte = ($07, $02, $00, $00, $00, $24, $00, $00, $52, $53, $41, $32, $00, $02, $00, $00,
-                                    $01, $00, $01, $00, $43, $2F, $3E, $45, $C4, $99, $75, $5E, $64, $7C, $D0, $4E, $45,
-                                    $B7, $D6, $E9, $3D, $E4, $2F, $23, $26, $B4, $B3, $64, $E5, $07, $D3, $18, $B1, $AA,
-                                    $D9, $CB, $E5, $2D, $F5, $AE, $C5, $71, $EC, $F8, $6D, $2C, $27, $27, $A2, $D6, $2F,
-                                    $84, $4E, $CD, $24, $74, $77, $D0, $59, $B3, $5C, $05, $4D, $CC, $E6, $08, $B9, $C0,
-                                    $01, $F7, $F5, $B9, $EF, $36, $D3, $4B, $8A, $E7, $8E, $FD, $B3, $F9, $D4, $1B, $E3,
-                                    $BF, $78, $AE, $C6, $68, $4A, $C6, $5C, $3D, $E0, $02, $AB, $05, $9A, $F8, $43, $8A,
-                                    $B8, $7A, $48, $A6, $4C, $D0, $9D, $BF, $A4, $6B, $72, $97, $3F, $55, $7E, $83, $0B,
-                                    $34, $86, $AD, $F1, $B8, $97, $65, $99, $A9, $54, $4C, $75, $C6, $01, $F3, $8A, $C0,
-                                    $68, $B8, $8A, $C2, $9B, $0C, $36, $36, $65, $AF, $15, $27, $A3, $C1, $DB, $1F, $7E,
-                                    $32, $42, $63, $43, $B9, $64, $A3, $0D, $7D, $A7, $29, $89, $DF, $27, $C2, $E7, $16,
-                                    $B9, $D5, $D7, $68, $E6, $60, $C2, $DA, $06, $41, $23, $02, $DD, $DD, $2C, $10, $5A,
-                                    $0C, $44, $06, $84, $48, $8F, $30, $F8, $8A, $79, $3C, $11, $DA, $4C, $A0, $5A, $94,
-                                    $75, $D5, $2B, $92, $20, $F7, $C9, $4C, $63, $CA, $C4, $4F, $EF, $C6, $56, $A9, $56,
-                                    $75, $47, $8F, $41, $12, $76, $06, $01, $B4, $F9, $38, $88, $CE, $F9, $C2, $A3, $77,
-                                    $B7, $4F, $ED, $50, $F5, $F2, $30, $9C, $C7, $46, $F3, $B5, $3C, $A6, $9D, $8E, $F6,
-                                    $12, $A4, $5D, $65, $0E, $67, $CF, $EB, $95, $06, $55, $4A, $69, $A6, $1D, $57, $B5,
-                                    $6A, $1C, $CA, $8C, $4A, $FD, $F9, $A5, $16, $2F, $43, $AD, $2E, $38, $4A, $35, $4B,
-                                    $82, $17, $74); }
 
 procedure EnumProviders;
 procedure LogHashInfo(Hash: HCRYPTHASH);
@@ -79,6 +55,9 @@ function CryptStream(ASourceStream, ADestStream: TMemoryStream;
 function UnCryptStream(ASourceStream, ADestStream: TMemoryStream;
                     APassword: string;
                     ABufferSize: Integer): Boolean;
+
+function UnCryptStreamByKey(ASourceStream, ADestStream: TMemoryStream;
+                        xKey: array of byte; ABufferSize: Integer): Boolean;
 
 implementation
 uses uLog;
@@ -417,7 +396,7 @@ begin
         {хешируем пароль}
         if not CryptHashData(hash, @APassword[1], length(APassword) * 2, 0) then
         RaiseLastOSError;
-        LogHashInfo(Hash);
+        //LogHashInfo(Hash);
         {создаем ключ на основании пароля для потокового шифра RC4}
         if not CryptDeriveKey(hProv, AAlgCrypt, hash, 0, @key) then RaiseLastOSError;
         lBufSize:= ABufferSize div 2;
@@ -444,6 +423,56 @@ begin
         CryptReleaseContext(hProv, 0);
     end;
 end;
+
+function UnCryptStreamByKey(ASourceStream, ADestStream: TMemoryStream;
+                        xKey: array of byte; ABufferSize: Integer): Boolean;
+var
+    data: PByte;
+    hProv: HCRYPTPROV;
+    hash: HCRYPTHASH;
+    aKey, pKey: HCRYPTKEY;
+    lBufLen, lDataLen: DWORD;
+    lBufSize: Integer;
+    lisEnd: Boolean;
+    sKeyData: array[0..75] of byte;
+begin
+    try
+        try
+        {выделяем место для буфера}
+        GetMem(data, ABufferSize);
+        {получаем контекст криптопровайдера}
+        if not CryptAcquireContext(@hProv, nil, nil, AProvType, AProvFlag) then RaiseLastOSError;
+
+        CopyMemory(@sKeyData, @exSesKeyHeader, SizeOf(exSesKeyHeader));
+        CopyMemory(@sKeyData[12], @xKey, SizeOf(xKey));
+        {получить ключ}
+        if not CryptImportKey(hProv, @exPrivateKey, SizeOf(exPrivateKey), 0, 0, @pKey) then RaiseLastOSError;
+        if not CryptImportKey(hProv, @sKeyData, SizeOf(sKeyData), pKey, 0, @aKey) then RaiseLastOSError;
+        lBufSize:= ABufferSize div 2;
+        ASourceStream.Position:= 0; ADestStream.Position:= 0;
+        {шифруем данные}
+        repeat
+            lisEnd:= ASourceStream.Position >= ASourceStream.Size;
+            lBufLen:= ASourceStream.Read(data^, lBufSize);
+            if not CryptDecrypt(Akey, 0, lisEnd, 0, (data), @lBufLen) then RaiseLastOSError;
+            ADestStream.Write(data^, lBufLen);
+        until lisEnd;
+        ASourceStream.Position:= 0; ADestStream.Position:= 0;
+        Result:=True;
+        except on e: Exception do begin
+            ErrorLog(e, 'DecryptStreamByKey');
+            end;
+        end;
+    finally
+        {очишаем память от буфера}
+        FreeMem(data, ABufferSize);
+        {уничтожаем хеш-объект}
+        CryptDestroyHash(hash);
+        {освобождаем контекст криптопровайдера}
+        CryptReleaseContext(hProv, 0);
+    end;
+end;
+
 
 function CryptStr(ASourceStr, APassword: string;  ABuffSize: integer): string;
 var

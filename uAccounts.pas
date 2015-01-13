@@ -259,7 +259,7 @@ end;
 procedure TfrmAccounts.btnAddClick(Sender: TObject);
 begin
     With OpenDialog do begin
-        DefaultExt:=strDefaultExt;
+        DefaultExt:=strCryptedExt;
         Title:=rsOpenDialogTitle;
         Filter:=rsOpenDialogFilter;
         if Execute then begin;

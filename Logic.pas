@@ -3,6 +3,7 @@ interface
 
 uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
   StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin, ClipBrd, Vcl.Buttons,
+  Vcl.Dialogs,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
@@ -88,9 +89,11 @@ function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
 
 function DocumentOpen(Path: String; Pass: String): Boolean;
+procedure DocumentOpenByPass;
 procedure DocumentClose;
 
 function MessageIsEmptyDoc: Boolean;
+function GetAppVersion:string;
 
 implementation
 uses uMain, uConsole, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uLog;
@@ -994,7 +997,7 @@ begin
 	Log('Инициализация...');
     uCrypt.EnumProviders;
     LoadSettings;
-    //LoadThemes;
+    LoadThemes;
     if not DocManager then begin
         Result:=False;
         Exit
@@ -1130,7 +1133,9 @@ function MessageIsEmptyDoc: Boolean;
 
 begin
     Result:= omgDoc.IsEmpty;
-    if Result then
+    if Result then begin
+        if not frmMain.Visible then frmMain.Show;
+
         if (MessageBox(frmMain.Handle,
                 PWideChar(rsDocumentIsEmpty),
                 PWideChar(rsDocumentIsEmptyTitle),
@@ -1143,32 +1148,25 @@ begin
                     frmMain.tvMain.Items[0].Selected:=True;
                     Result:=False;
                 end;
+    end;
 end;
 function DocManager(Reopen: Boolean = False): Boolean;
-//var Accept: Boolean;
 //Загрузка документа
 //Вызывается менеджер документов
 begin
-    //Accept:=False;
     if (not Assigned(frmAccounts)) then
         frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
-//    while not Accept do begin
     if frmAccounts.ShowModal = mrOK then begin
             Log ('frmAccounts: mrOK');
-            //Accept:=True;
-            //frmAccounts.Hide;
             if DocumentOpen(frmAccounts.FFileName, frmAccounts.FPassword) then begin
                 Result:=True;
                 if not Reopen then frmMain.Show;    //Принудительно
             end;
         end else begin
             Log ('frmAccounts: mrCancel');
-            //Accept:=True;
             Result:=False;
         end;
-//    end;
     FreeAndNil(frmAccounts);
-    //ShowWindow(Application.Handle, SW_RESTORE);
 end;
 function DocumentOpen(Path: String; Pass: String): Boolean;
 var
@@ -1189,6 +1187,34 @@ begin
         end;
     end;
     tmpDoc:=nil;
+end;
+procedure DocumentOpenByPass;
+var
+    OpenDialog: TOpenDialog;
+    tempDoc: TOmgDocument;
+begin
+try
+    OpenDialog:=TOpenDialog.Create(Application.MainForm);
+    With OpenDialog do begin
+        DefaultExt:=strDefaultExt;
+        Title:=rsOpenDialogTitle;
+        Filter:=rsOpenDialogFilterCryptedOnly;
+        if not Execute then Exit;
+        tempDoc:=TOmgDocument.Create;
+        if tempDoc.OpenByPass(FileName) then begin
+            omgDoc.Save;
+            omgDoc.Close;
+            omgDoc.Free;
+            omgDoc:=tempDoc;
+            tempDoc:=nil;
+            frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
+            LoadDocSettings;
+            MessageIsEmptyDoc;
+        end;
+    end;
+except
+    on e: Exception do ErrorLog(e, 'The gods were overthrown!');
+end;
 end;
 procedure DocumentClose;
 begin
@@ -1269,4 +1295,28 @@ begin
         FreeAndNil(fStream);
     end;
 end;
+function GetAppVersion:string;
+type
+  TVerInfo=packed record
+    Nevazhno: array[0..47] of byte; // ненужные нам 48 байт
+    Minor,Major,Build,Release: word; // а тут версия
+  end;
+var
+  s:TResourceStream;
+  v:TVerInfo;
+begin
+  result:='';
+  try
+    s:=TResourceStream.Create(HInstance,'#1',RT_VERSION); // достаём ресурс
+    if s.Size>0 then begin
+      s.Read(v,SizeOf(v)); // читаем нужные нам байты
+      result:=IntToStr(v.Major)+'.'+IntToStr(v.Minor)+'.'+ // вот и версия...
+              IntToStr(v.Release)+'.'+IntToStr(v.Build);
+    end;
+   s.Free;
+  except; end;
+end;
+
+
+
 end.

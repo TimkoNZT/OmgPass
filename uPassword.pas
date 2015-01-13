@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.Imaging.pngimage, Vcl.ImgList,
-  uDocument;
+  uDocument, Logic;
 
 type
   TfrmPassword = class(TForm)
@@ -25,6 +25,7 @@ type
     procedure txtOldPassChange(Sender: TObject);
     procedure txtNewPassChange(Sender: TObject);
     procedure txtConfirmPassChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     fDoc: TOmgDocument;
     function CheckOldPass(Msg: Boolean): Boolean;
@@ -46,6 +47,11 @@ constructor TfrmPassword.Create(AOwner: TComponent; Document: TOmgDocument);
 begin
     inherited Create(AOwner);
     fDoc:=Document;
+end;
+
+procedure TfrmPassword.FormShow(Sender: TObject);
+begin
+WindowsOnTop(bWindowsOnTop, Self);
 end;
 
 {проверка соответствия старого пароля}

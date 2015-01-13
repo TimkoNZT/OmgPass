@@ -11,7 +11,7 @@ const
     strItemNode = 'Item';
     strDefItemNode = 'DefItem';
     strConfigFile = 'config.xml';
-    strLink = 'https://cloud.mail.ru/public/86079c1768cf/OmgPass/';
+    strLink = 'https://github.com/Mrgnstrn/OmgPass/releases/';
 
 resourcestring
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
@@ -122,13 +122,14 @@ resourcestring
     //frmAccounts
     rsSaveDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml';
     rsOpenDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml|All files|*.*';
+    rsOpenDialogFilterCryptedOnly = 'Omg!Pass Crypted (*.opwd)|*.opwd';
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          CrLf + 'Would you like to create a new document' +
                          CrLf + '%s ?';
     rsFileNotFoundMsgTitle = 'File not found';
     rsSaveDialogFileExists = 'You have selected an existing file:' + CrLf + '%s' + CrLf+ 'Overwrite it?';
-    rsSaveDialogTitle = 'Save new database as...';
-    rsOpenDialogTitle = 'Open database...';
+    rsSaveDialogTitle = 'Save new document as...';
+    rsOpenDialogTitle = 'Open docyment...';
     rsOpenDocumentError = 'Can''t open %s' + CrLf + 'Please, make sure it is the correct file.';
     rsOpenDocumentErrorTitle = 'Open document error';
     rsWrongPasswordError = 'Wrong or incorrect password! You can try again.' + CrLf + ' Please, check CapsLock and see on hint image';
@@ -142,7 +143,10 @@ resourcestring
     rsTxtPassAlrOpened = 'File already opened';
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
-
+    rsAbout = 'OmgPass ver. %s' + CrLf +'An simple app for store and managment yours passwords' + CrLF +
+                'Copyright by Nazarov Timur (vk.com/id1669165)'+ CrLf +
+                'Boomy icons by Milosz Wlazlo (miloszwl.deviantart.com)';
+    rsAboutTitle = 'About...';
     //frmPassword
     rsWrongOldPassword = 'Wrong old password';
     rsWrongOldPasswordTitle = 'Error';

@@ -3,7 +3,7 @@ interface
 uses SysUtils, Classes, Variants, Vcl.Forms, Windows;
 
 var
-LogList: TStringList;           //Переменная для логирования
+LogList: TStringList;  //Лист для логирования
 
 procedure Log(Val: Integer); overload;
 procedure Log(Text: String); overload;
@@ -12,7 +12,7 @@ procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
 procedure Log(Arr: array of byte; Count: Integer = 0; Msg: String = ''); overload;
 procedure Log(Stream: TStream; Count: Integer = 0; Msg: String = ''); overload;
-function ErrorLog(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+function ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False): Boolean;
 
 implementation
 uses uConsole;
@@ -89,7 +89,7 @@ procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
 end;
-function ErrorLog(e: Exception; Method: String = ''; isFatal: Boolean = False): Boolean;
+function ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False): Boolean;
 //Логирование ошибок
 //Параметр isFatal немедленно завершает программу
 begin
@@ -99,6 +99,10 @@ begin
     Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
     LogList.SaveToFile('log.txt');
     if isFatal then Application.Terminate;
+    if ShowMsg then MessageBox(Application.Handle, PWideChar('I''m so sorry, but error occured!' + #13#10 +
+                                                    'Method: ' + Method + #13#10 +
+                                                    'Message: ' + e.Message + #13#10 +
+                                                    'Address: ' + IntToHex(Integer(ExceptAddr), 8)), 'Error', MB_OK + MB_ICONWARNING);
 end;
 {$ENDREGION}
 end.

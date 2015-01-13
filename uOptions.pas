@@ -7,6 +7,7 @@ Windows, SysUtils, Classes, Controls, Forms, StdCtrls;
 
 type
   TfrmOptions = class(TForm)
+    Label1: TLabel;
     procedure FormShow(Sender: TObject);
   private
     { Private declarations }

@@ -41,7 +41,7 @@ public
     constructor CreateNew(FilePath: String; dType: tOmgDocType; Password: String = ''); overload;
     destructor Destroy; override;
     function Open(Path: String; Password: String): Boolean;
-    //static function Enrypt(_in: TStream, _out:)
+    function OpenByPass(FilePath: String): Boolean;
     function Save: Boolean;
     function Close: Boolean;
     function GetProperty(PropertyName: String; DefValue: Variant): Variant;
@@ -75,6 +75,7 @@ constructor TOmgDocument.CreateNew(filePath: String; dType: tOmgDocType; Passwor
 //var
 //    fStream: TFileStream;
 begin
+try
     Self.Create;
     fileStream:= TFileStream.Create(FilePath, fmOpenReadWrite or fmCreate);
     Self.docFilePath:= filePath;
@@ -85,6 +86,9 @@ begin
     end;
     XML.LoadFromXML(EmptyXML);
     XML.Active:=True;
+except
+    on e: Exception do ErrorLog(e, 'Document.CreateNew');
+end;
 end;
 
 function TOmgDocument.Open(Path: String; Password: String): Boolean;
@@ -277,6 +281,30 @@ except
 end;
 end;
 
+function TOmgDocument.OpenByPass(FilePath: String): Boolean;
+var
+    tempStream: TFileStream;
+    cStream, xStream: TMemoryStream;
+begin
+try
+    tempStream:= TFileStream.Create(FilePath, fmOpenReadWrite);
+    tempStream.Read(docHeader, SizeOf(TCryFileHeader));
+    cStream:=TMemoryStream.Create;
+    xStream:=TMemoryStream.Create;
+    cStream.CopyFrom(tempStream, tempStream.Size - SizeOf(TCryFileHeader));
+    UnCryptStreamByKey(cStream, xStream, docHeader.secondHeader, $400);
+    Result:= Self.OpenXmlfromStream(xStream);
+    docFilePath:=ChangeFileExt(FilePath, strDefaultExt);
+    fileStream:= TFileStream.Create(docFilePath, fmCreate);
+    docType:=dtXML;
+    Self.Save;
+    XML.Active:=True;
+    except
+        on e: exception do begin ErrorLog(e, 'Document.OpenByPass');
+        Result:=False;
+        end;
+    end;
+end;
 {$REGION '#DocProperty'}
 function TOmgDocument.GetProperty(PropertyName: String; DefValue: Variant): Variant;
 //Установка и чтение свойств документа

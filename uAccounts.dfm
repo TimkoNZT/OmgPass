@@ -473,9 +473,9 @@ object frmAccounts: TfrmAccounts
         TabOrder = 1
       end
       object chkShowPass: TCheckBox
-        Left = 212
+        Left = 200
         Top = 62
-        Width = 81
+        Width = 93
         Height = 16
         Alignment = taLeftJustify
         Anchors = [akTop, akRight]
@@ -537,7 +537,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 320
     Bitmap = {
-      494C01010B001C03240416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B001C032C0416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       011800101768000A0F5400000012000000030000000000000000000000000000
@@ -1295,6 +1295,7 @@ object frmAccounts: TfrmAccounts
       000000000000000000000000000000000000000000000000000000000000}
   end
   object SaveDialog: TSaveDialog
+    Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
     Left = 16
     Top = 320
   end

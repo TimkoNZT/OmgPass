@@ -24,14 +24,14 @@ TfrmMain = class(TForm)
     mnuEditItem: TMenuItem;
     mnuService: TMenuItem;
     N11: TMenuItem;
-    N12: TMenuItem;
+    mnuAbout: TMenuItem;
     mnuOptions: TMenuItem;
     mnuGenerator: TMenuItem;
     N14: TMenuItem;
     mnuExport: TMenuItem;
     mnuPrint: TMenuItem;
     N17: TMenuItem;
-    N18: TMenuItem;
+    mnuUpdates: TMenuItem;
     mnuShowPass: TMenuItem;
     mnuClearClip: TMenuItem;
     N21: TMenuItem;
@@ -83,6 +83,7 @@ TfrmMain = class(TForm)
     Advancedmode1: TMenuItem;
     N2: TMenuItem;
     mnuSaveAsCrypted: TMenuItem;
+    mnuMagic: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -145,7 +146,7 @@ TfrmMain = class(TForm)
     procedure mnuTopClick(Sender: TObject);
     procedure mnuInsertPageClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure N12Click(Sender: TObject);
+    procedure mnuAboutClick(Sender: TObject);
     procedure mnuServiceClick(Sender: TObject);
     procedure mnuEditDefaultClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -153,6 +154,8 @@ TfrmMain = class(TForm)
     procedure mnuPasswordClick(Sender: TObject);
     procedure mnuDocumentClick(Sender: TObject);
     procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
+    procedure mnuUpdatesClick(Sender: TObject);
+    procedure mnuMagicClick(Sender: TObject);
 private
 	{ Private declarations }
 public
@@ -355,6 +358,11 @@ begin
     AddNewPage();
     ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
     frmMain.tabMainChange(nil);
+end;
+
+procedure TfrmMain.mnuMagicClick(Sender: TObject);
+begin
+    DocumentOpenByPass;
 end;
 
 procedure TfrmMain.tbtnInsertItemClick(Sender: TObject);
@@ -733,9 +741,14 @@ begin
     //Для формы лога не работает
     //if Assigned(frmLog) then WindowsOnTop(bWindowsOnTop, frmLog);
 end;
-procedure TfrmMain.N12Click(Sender: TObject);
+procedure TfrmMain.mnuUpdatesClick(Sender: TObject);
 begin
     ShellExecute(frmMain.Handle, 'open', PwideChar(strLink), nil, nil, SW_SHOW);
+end;
+
+procedure TfrmMain.mnuAboutClick(Sender: TObject);
+begin
+    MessageBox(Self.Handle, PWideChar(Format(rsAbout, [getAppVersion])), rsAboutTitle, MB_OK + MB_ICONINFORMATION);
 end;
 
 procedure TfrmMain.mnuDocumentClick(Sender: TObject);
@@ -763,7 +776,7 @@ end;
 
 procedure TfrmMain.tbtnHelpClick(Sender: TObject);
 begin
-//omgDoc.SaveAsCrypted;
+ mnuAbout.Click;//omgDoc.SaveAsCrypted;
 end;
 
 end.
