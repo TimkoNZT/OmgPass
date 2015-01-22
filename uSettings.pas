@@ -10,7 +10,7 @@ Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc;
 
 const
     strDefConfigSection = 'Main';
-    strPosConfigSection = 'Position';
+    //strPosConfigSection = 'Position';
 
 type TSettings = class(TPersistent)
 private
@@ -22,8 +22,14 @@ protected
     //
 public
     constructor Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
+
     function GetValue(OptionName: String; Default: Variant; Section: String = strDefConfigSection): Variant;
     procedure SetValue(OptionName: String; Value: Variant; Section: String = strDefConfigSection);
+
+    function DeleteSection(SectionName: String = strDefConfigSection): Boolean;
+    function DeleteOption(OptionName: String; Section: String = strDefConfigSection): Boolean;
+    function ClearSection(SectionName: String = strDefConfigSection): Boolean;
+
     function HasOption(OptionName: String; Section: String = 'Main'): Boolean;
     function HasSection(Section: String): Boolean;
     procedure Save;
@@ -31,20 +37,20 @@ end;
 
 implementation
 
-uses Logic, uLog;
+uses uLog;
 
 constructor TSettings.Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
 begin
     sXML:=TXMLDocument.Create(nil);
-    sXML.Options :=[doNodeAutoIndent, doAttrNull, doAutoSave];
+    sXML.Options :=[doNodeAutoIndent, doAttrNull];
     sXML.Active:=True;
     try
         if FileExists(XMLFilePath) then begin
             sXML.LoadFromFile(XMLFilePath);
             RootNode:=sXML.ChildNodes[RootNodeName];
         end else begin
-            sXML.Encoding := 'UTF-8';
-            sXML.Version := '1.0';
+            //sXML.Encoding := 'UTF-8';
+            //sXML.Version := '1.0';
             sXML.FileName:= XMLFilePath;
             RootNode:=sXML.Node.AddChild(RootNodename);
         end;
@@ -89,4 +95,24 @@ begin
     sXML.SaveToFile(sXML.FileName);
 end;
 
+function TSettings.DeleteSection(SectionName: String = strDefConfigSection): Boolean;
+begin
+    if RootNode.ChildNodes.FindNode(SectionName) = nil then Exit;
+    Result:= (RootNode.ChildNodes.Remove(RootNode.ChildNodes.FindNode(SectionName)) <> -1);
+end;
+
+function TSettings.ClearSection(SectionName: String = strDefConfigSection): Boolean;
+begin
+    if RootNode.ChildNodes.FindNode(SectionName) = nil then Exit;
+    RootNode.ChildNodes.FindNode(SectionName).ChildNodes.Clear;
+end;
+
+function TSettings.DeleteOption(OptionName: String; Section: String = strDefConfigSection): Boolean;
+begin
+    if not HasOption(OptionName, Section) then Exit;
+    Result:= (RootNode.ChildNodes[Section].ChildNodes.Remove
+    (
+        RootNode.ChildNodes[Section].ChildNodes.FindNode(OptionName)
+    ) <> -1)
+end;
 end.

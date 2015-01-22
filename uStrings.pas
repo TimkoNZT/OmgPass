@@ -55,7 +55,7 @@ resourcestring
     rsDocumentIsEmpty = 'Hmm, it looks like your document is empty!' + CrLf +
                         'Before working with the document,' + CrLf +
                         'you must add at least one page.' + CrLf + CrLf +
-                        'Would you like to add new page?';
+                        'Would you like to do this?';
     rsDocumentIsEmptyTitle = 'Ooops!';
     //
     //

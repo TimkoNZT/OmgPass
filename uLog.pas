@@ -97,8 +97,10 @@ begin
     if Method<>'' then Log('    Procedure: ' + Method);
     Log('    Error Message: ' + e.Message);
     Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
-    LogList.SaveToFile('log.txt');
-    if isFatal then Application.Terminate;
+    if isFatal then begin
+        LogList.SaveToFile('log_'+ DateToStr(now) +'.txt');
+        Application.Terminate;
+    end;
     if ShowMsg then MessageBox(Application.ActiveFormHandle, PWideChar('I''m sorry, but error occured!' + #13#10 +
                                                     'Code:' + e.ClassName + #13#10 +
                                                     'Method: ' + Method + #13#10 +

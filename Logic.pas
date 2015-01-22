@@ -818,24 +818,25 @@ procedure SaveSettings;
 begin
     if xmlCfg = nil then Exit;
     //Прочие настройки сохраняются в файл настроек
-    if frmMain.WindowState = wsNormal then begin
-         xmlCfg.SetValue('Left', frmMain.Left, 'Position');
-         xmlCfg.SetValue('Top', frmMain.Top, 'Position');
-         xmlCfg.SetValue('Width', frmMain.Width, 'Position');
-         xmlCfg.SetValue('Height', frmMain.Height, 'Position');
-         xmlCfg.SetValue('ShowLog', BoolToStr(Assigned(frmLog), True));
+    if frmMain.Visible then begin
+        if frmMain.WindowState = wsNormal then begin
+             xmlCfg.SetValue('Left', frmMain.Left, 'Position');
+             xmlCfg.SetValue('Top', frmMain.Top, 'Position');
+             xmlCfg.SetValue('Width', frmMain.Width, 'Position');
+             xmlCfg.SetValue('Height', frmMain.Height, 'Position');
+             xmlCfg.SetValue('ShowLog', BoolToStr(Assigned(frmLog), True));
+        end;
+        xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
+        //xmlCfg.SetValue('Page', intCurrentPage, 'Position');
+        xmlCfg.SetValue('TreeWidth', frmMain.pnlTree.Width, 'Position');
+        xmlCfg.SetValue('Theme', intThemeIndex);
     end;
-    xmlCfg.SetValue('Window', frmMain.WindowState, 'Position');
-    //xmlCfg.SetValue('Page', intCurrentPage, 'Position');
-    xmlCfg.SetValue('TreeWidth', frmMain.pnlTree.Width, 'Position');
-    xmlCfg.SetValue('Theme', intThemeIndex);
     xmlCfg.SetValue('ShowPasswords', BoolToStr(bShowPasswords, True));
     xmlCfg.SetValue('WindowOnTop', BoolToStr(bWindowsOnTop, True));
     //SaveStoredDocs;
     xmlCfg.Save;
 end;
 procedure SaveDocSettings;
-{$ENDREGION 'Настройки'}
 begin
     //Номер выбранного элемента и страницы сохраняется в документ
     //Если вдруг режим поиска, то записываем сохраненное значение
@@ -847,8 +848,8 @@ begin
         omgDoc.CurrentRecord:= frmMain.tvMain.Selected.AbsoluteIndex
     else
         omgDoc.CurrentRecord:= 0;
-//    omgDoc.CurrentPage:= Хехехе
 end;
+{$ENDREGION 'Настройки'}
 procedure LoadThemes;
 var
   	i:Integer;
@@ -1039,43 +1040,8 @@ try
 finally
     newDoc.Free;
 end;
-//        xmlTemp:=TXMLDocument.Create(nil);
-//        xmlTemp.Active:=True;
-////        xmlTemp.LoadFromXML('<?xml version="1.0" encoding="UTF-8"?>' + #10#10 + '<Root><Header/><Data/></Root>');
-//        Log('Create new base!');
-//        xmlTemp.FileName:=fPath;
-////        xmlTemp.Encoding := 'UTF-8';
-////        xmlTemp.Version := '1.0';
-//        With xmlTemp.AddChild('Root') do begin
-//            AddChild('Header');
-//            AddChild('Data');
-//        end;
-//        xmlTemp.SaveToFile(fPath);
-////        FreeAndNil(xmlTemp);
-///
 end;
-{$REGION '#DocProperty'}
-{function GetDocProperty(PropertyName: String; DefValue: Variant): Variant;
-//Установка и чтение свойств документа
-//Все свойства хранятся в ntHeader
-//Функции удаления нет.. нужна
-begin
-if (omgDoc.XML.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode) = nil)
-or (omgDoc.XML.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildNodes.FindNode(PropertyName) = nil)
-        then Result:=DefValue
-    else Result:=omgDoc.XML.ChildNodes[strRootNode].ChildNodes[strHeaderNode].ChildValues[PropertyName];;
-end;
-function SetDocProperty(PropertyName: String; Value: Variant): Boolean;
-var hNode: IXMLNode;
-begin
-    hNode:= omgDoc.XML.ChildNodes[strRootNode].ChildNodes.FindNode(strHeaderNode);
-    if hNode = nil then
-        hNode:=omgDoc.XML.ChildNodes[strRootNode].AddChild(strHeaderNode);
-    if hNode.ChildNodes.FindNode(PropertyName) = nil then
-        hNode.AddChild(PropertyName);
-    hNode.ChildValues[PropertyName]:=Value;
-end;        }
-{$ENDREGION}
+
 {$REGION '#StoredDocs'}
 function LoadStoredDocs(): TStringList;
 //Загружаем список известных файлов из конфига в список
@@ -1105,11 +1071,11 @@ function SaveStoredDocs: Boolean;
 //Сохраняем список файлов в конфиг
 var i: Integer;
 begin
+    xmlCfg.ClearSection('Files');
     xmlCfg.SetValue('Count', lsStoredDocs.Count, 'Files');
     for i := 0 to lsStoredDocs.Count - 1 do begin
         xmlCfg.SetValue('File_' + IntToStr(i), lsStoredDocs.Strings[i], 'Files');
     end;
-//    xmlCfg.Save;
 end;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
 //Удаление файла из списка сохраненных по индексу или имени
@@ -1241,7 +1207,7 @@ begin
                         Result:=True;
         except
             on e: Exception do begin
-                //ErrorLog(e, 'DocumentPreOpen');       //It's not error, it's bad document
+                ErrorLog(e, 'DocumentPreOpen', False);       //It's not error, it's bad document
                 if AlertMsg then
                     MessageBox(frmAccounts.Handle,
                     PWideChar(Format(rsOpenDocumentError, [frmAccounts.FFileName, e.ClassName])),
@@ -1280,7 +1246,7 @@ begin
             end;
         except
             on e: Exception do begin
-                //ErrorLog(e, 'DocumentPreOpenCrypted');
+                ErrorLog(e, 'DocumentPreOpenCrypted', False);
                 if AlertMsg then
                     MessageBox(frmAccounts.Handle,
                     PWideChar(Format(rsOpenDocumentError, [frmAccounts.FFileName, e.ClassName])),

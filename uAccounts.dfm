@@ -362,13 +362,13 @@ object frmAccounts: TfrmAccounts
         OnChange = txtPassChange
       end
       object lblNoFiles: TStaticText
-        Left = 22
-        Top = 79
-        Width = 283
-        Height = 17
+        Left = 68
+        Top = 69
+        Width = 195
+        Height = 33
         Alignment = taCenter
         AutoSize = False
-        Caption = 'Stored files not found'
+        Caption = 'Stored files not found, you can make new file or add existing'
         Color = clBtnHighlight
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clGrayText
@@ -537,7 +537,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 320
     Bitmap = {
-      494C01010B001C03300416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B001C03340416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       011800101768000A0F5400000012000000030000000000000000000000000000

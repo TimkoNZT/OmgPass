@@ -447,7 +447,7 @@ begin
         CopyMemory(@sKeyData[12], @xKey, SizeOf(xKey));
         {получить ключ}
         if not CryptImportKey(hProv, @exPrivateKey, SizeOf(exPrivateKey), 0, 0, @pKey) then RaiseLastOSError;
-        if not CryptImportKey(hProv, @sKeyData, SizeOf(sKeyData), pKey, 0, @aKey) then RaiseLastOSError;
+        //if not CryptImportKey(hProv, @sKeyData, SizeOf(sKeyData), pKey, 0, @aKey) then RaiseLastOSError;
         lBufSize:= ABufferSize div 2;
         ASourceStream.Position:= 0; ADestStream.Position:= 0;
         {шифруем данные}
