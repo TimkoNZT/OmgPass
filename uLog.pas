@@ -99,10 +99,11 @@ begin
     Log('    Except Address: ', IntToHex(Integer(ExceptAddr), 8));
     LogList.SaveToFile('log.txt');
     if isFatal then Application.Terminate;
-    if ShowMsg then MessageBox(Application.Handle, PWideChar('I''m so sorry, but error occured!' + #13#10 +
+    if ShowMsg then MessageBox(Application.ActiveFormHandle, PWideChar('I''m sorry, but error occured!' + #13#10 +
+                                                    'Code:' + e.ClassName + #13#10 +
                                                     'Method: ' + Method + #13#10 +
                                                     'Message: ' + e.Message + #13#10 +
-                                                    'Address: ' + IntToHex(Integer(ExceptAddr), 8)), 'Error', MB_OK + MB_ICONWARNING);
+                                                    'Address: ' + IntToHex(Integer(ExceptAddr), 8)), 'Error', MB_APPLMODAL + MB_OK + MB_ICONERROR);
 end;
 {$ENDREGION}
 end.

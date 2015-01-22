@@ -151,6 +151,7 @@ end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
+Self.Show;
 WindowsOnTop(bWindowsOnTop, Self);
 OpenPreCheck;
 end;

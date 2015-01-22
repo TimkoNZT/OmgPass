@@ -419,9 +419,9 @@ object frmAccounts: TfrmAccounts
       object Label2: TLabel
         Left = 12
         Top = 64
-        Width = 50
+        Width = 75
         Height = 13
-        Caption = 'Password:'
+        Caption = 'Main password:'
       end
       object btnGeneratePass: TSpeedButton
         Left = 296
@@ -537,7 +537,7 @@ object frmAccounts: TfrmAccounts
     Left = 91
     Top = 320
     Bitmap = {
-      494C01010B001C032C0416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B001C03300416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000420000000100200000000000C05A
       0000000000000000000000000000000000000000000000000000000000000000
       011800101768000A0F5400000012000000030000000000000000000000000000

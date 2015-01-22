@@ -198,16 +198,13 @@ begin
                 StringReplace(VarToStr(nField.NodeValue),'|', sLineBreak, [rfReplaceAll]);
         end
             else textInfo.Text:=VarToStr(nField.NodeValue);
-        //Доступность текста для редактирования
-        textInfo.ReadOnly:=not IsEdit;
-        textInfo.Enabled:=isEdit;
         //Присваивание указателей
 		btnSmart.Tag:=NativeInt(textInfo);		        //Кнопки ссылаются на текстовое поле
         btnAdditional.Tag:=NativeInt(textInfo);
 		textInfo.Tag:=NativeInt(nField);                //Текст и рамка ссылаются на поле
 		Tag:=NativeInt(nField);
         //разная отрисовка при редактировании и обычной работе
-        if IsEdit=False then begin
+        if not IsEdit then begin
             //Показаны или скрыты пароли
             if (fieldFormat = ffPass) then
                 if bShowPasswords then
@@ -236,8 +233,9 @@ begin
                     SetButtonImg(btnSmart, frmMain.imlField, 0);
                 end; //case
             end; //if
-            //EnableWindow(textInfo.Handle, False);
-            //DisableTextFrame;
+            //Доступность текста для редактирования
+            textInfo.ReadOnly:=not IsEdit;
+            textInfo.Enabled:=isEdit;
         end else begin                                 //Режим редактирования
         	case fieldFormat of
                 ffPass: begin
@@ -1243,10 +1241,10 @@ begin
                         Result:=True;
         except
             on e: Exception do begin
-                ErrorLog(e, 'DocumentPreOpen');
+                //ErrorLog(e, 'DocumentPreOpen');       //It's not error, it's bad document
                 if AlertMsg then
                     MessageBox(frmAccounts.Handle,
-                    PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
+                    PWideChar(Format(rsOpenDocumentError, [frmAccounts.FFileName, e.ClassName])),
                     PWideChar(rsOpenDocumentErrorTitle),
                     MB_APPLMODAL + MB_ICONWARNING);
                 Result:=False;
@@ -1265,10 +1263,11 @@ var
 begin
     try
         try
+            fStream:=nil;
             fStream:=TFileStream.Create(Path, fmOpenRead);
             fStream.ReadBuffer(cryHeader, SizeOf(CryHeader));
             if cryHeader.Magic <> 'OMG!' then
-                raise Exception.Create('Wrong crypted signature');
+                raise Exception.Create('Wrong file signature');
             if CompareMem(GetHeader(TryPass).Memory, @CryHeader.firstHeader[0], $40) then
                 Result:=idOk
             else begin
@@ -1281,10 +1280,10 @@ begin
             end;
         except
             on e: Exception do begin
-                ErrorLog(e, 'DocumentPreOpenCrypted');
+                //ErrorLog(e, 'DocumentPreOpenCrypted');
                 if AlertMsg then
                     MessageBox(frmAccounts.Handle,
-                    PWideChar(Format(rsOpenDocumentError {+ CrLf + e.Message}, [frmAccounts.FFileName])),
+                    PWideChar(Format(rsOpenDocumentError, [frmAccounts.FFileName, e.ClassName])),
                     PWideChar(rsOpenDocumentErrorTitle),
                     MB_APPLMODAL + MB_ICONWARNING);
                 Result:=idCancel;
