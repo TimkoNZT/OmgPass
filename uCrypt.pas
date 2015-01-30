@@ -367,6 +367,8 @@ begin
     finally
         {очищаем память буфера}
         FreeMem(data, ABufferSize);
+        {уничтожаем ключи}
+        CryptDestroyKey(Key);
         {уничтожаем хеш-объект}
         CryptDestroyHash(hash);
         {освобождаем контекст криптопровайдера}
@@ -417,6 +419,8 @@ begin
     finally
         {очишаем память от буфера}
         FreeMem(data, ABufferSize);
+        {уничтожаем ключи}
+        CryptDestroyKey(Key);
         {уничтожаем хеш-объект}
         CryptDestroyHash(hash);
         {освобождаем контекст криптопровайдера}
@@ -466,6 +470,9 @@ begin
     finally
         {очишаем память от буфера}
         FreeMem(data, ABufferSize);
+        {уничтожаем ключи}
+        CryptDestroyKey(aKey);
+        CryptDestroyKey(pKey);
         {уничтожаем хеш-объект}
         CryptDestroyHash(hash);
         {освобождаем контекст криптопровайдера}

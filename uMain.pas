@@ -748,7 +748,7 @@ end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
 begin
-    MessageBox(Self.Handle, PWideChar(Format(rsAbout, [getAppVersion])), rsAboutTitle, MB_OK + MB_ICONINFORMATION);
+    MessageBox(Self.Handle, PWideChar(Format(rsAbout, [getAppVersion])), PWideChar(rsAboutTitle), MB_OK + MB_ICONINFORMATION);
 end;
 
 procedure TfrmMain.mnuDocumentClick(Sender: TObject);

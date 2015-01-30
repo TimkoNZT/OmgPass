@@ -12,6 +12,38 @@ const
     strDefItemNode = 'DefItem';
     strConfigFile = 'config.xml';
     strLink = 'https://github.com/Mrgnstrn/OmgPass/releases/';
+    strSaveDialogDefFileName = 'NewCryptedBase';
+
+const arrFieldFormats: array[0..8] of String = ('title',
+                                                'text',
+                                                'pass',
+                                                'web',
+                                                'comment',
+                                                'date',
+                                                'mail',
+                                                'file',
+                                                '');
+
+const arrNodeTypes: array[0..9] of String = ('root',
+                                                'header',
+                                                'data',
+                                                'page',
+                                                'folder',
+                                                'deffolder',
+                                                'item',
+                                                'defitem',
+                                                'field',
+                                                '');
+
+const arrDefFieldNames: array[0..8] of String = ('Title',
+                                                    'Login',
+                                                    'Password',
+                                                    'Website',
+                                                    'Comment',
+                                                    'Date',
+                                                    'Mail',
+                                                    'File',
+                                                    'Text or Login');
 
 resourcestring
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
@@ -58,37 +90,6 @@ resourcestring
                         'Would you like to do this?';
     rsDocumentIsEmptyTitle = 'Ooops!';
     //
-    //
-    const arrFieldFormats: array[0..8] of String = ('title',
-                                                'text',
-                                                'pass',
-                                                'web',
-                                                'comment',
-                                                'date',
-                                                'mail',
-                                                'file',
-                                                '');
-
-    const arrNodeTypes: array[0..9] of String = ('root',
-                                                'header',
-                                                'data',
-                                                'page',
-                                                'folder',
-                                                'deffolder',
-                                                'item',
-                                                'defitem',
-                                                'field',
-                                                '');
-
-    const arrDefFieldNames: array[0..8] of String = ('Title',
-                                                    'Login',
-                                                    'Password',
-                                                    'Website',
-                                                    'Comment',
-                                                    'Date',
-                                                    'Mail',
-                                                    'File',
-                                                    'Text or Login');
     //Window captions
     //Заголовки окошек
     rsFrmAccountsCaption = ' welcomes you!';
@@ -120,8 +121,8 @@ resourcestring
     rsHintAddFile = 'Add file(s)';
 
     //frmAccounts
-    rsSaveDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml';
-    rsOpenDialogFilter = 'Omg!Pass Crypted (*.opwd)|*.opwd|Omg!Pass XML (*.xml)|*.xml|All files|*.*';
+    rsSaveDialogFilter = 'Omg!Pass Crypted files (*.opwd)|*.opwd|Omg!Pass XML files (*.xml)|*.xml';
+    rsOpenDialogFilter = 'Omg!Pass Crypted files (*.opwd)|*.opwd|Omg!Pass XML files (*.xml)|*.xml|All files|*.*';
     rsOpenDialogFilterCryptedOnly = 'Omg!Pass Crypted (*.opwd)|*.opwd';
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          CrLf + 'Would you like to create a new document' +

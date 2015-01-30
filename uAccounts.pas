@@ -340,6 +340,7 @@ With SaveDialog do begin
     DefaultExt:=strDefaultExt;
     Title:= rsSaveDialogTitle;
     Filter:= rsSaveDialogFilter;
+    FileName:=strSaveDialogDefFileName;
     Accept:=False;
     while not Accept do begin
         SaveDialog.Execute;
@@ -398,7 +399,7 @@ begin
     if not FileExists(FFileName) then
         if MessageBox(Self.Handle,
             PWideChar(Format(rsFileNotFoundMsg,[FFileName])),
-            rsFileNotFoundMsgTitle,
+            PWideChar(rsFileNotFoundMsgTitle),
             MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2 + MB_APPLMODAL) = ID_CANCEL
             then Exit
             else CreateNewBase(FFileName, '');
