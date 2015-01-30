@@ -159,6 +159,9 @@ resourcestring
     rsWrongConfirmPasswordTitle = 'Error';
     rsPasswordChanged = 'Password has been succesfully changed!';
     rsPasswordChangedTitle = 'Excellent news';
+    //frmGenerator
+    rsGeneratorError = 'Selected set of characters and settings are not compatible!';
+    rsGeneratorErrorTitle = 'Warning';
 
 implementation
 end.

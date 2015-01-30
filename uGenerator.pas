@@ -79,7 +79,7 @@ var
     newChar: Char;
 begin
 i:=0;
-lblResult.Caption:= 'Omg!Pass';
+lblResult.Caption:= Application.Title;
 Pass:='';
 CheckMe(nil);
 Randomize;
@@ -87,8 +87,9 @@ While i < UpDown.Position do
 begin
     len:= length(resString);
     if len=0 then begin
-        MessageBox(Handle, 'Текущий набор символов и настройки несовместимы!', 'Внимание', MB_ICONWARNING);
+        MessageBox(Handle, PWideChar(rsGeneratorError), PWideChar(rsGeneratorErrorTitle), MB_ICONWARNING);
         chkDntRe.Checked:=False;
+        btnGenerateClick(nil);
         Exit;
     end;
     NewChar:= ResString[random(len)+1];
