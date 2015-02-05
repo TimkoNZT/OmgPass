@@ -600,10 +600,10 @@ begin
             if MessageIsEmptyDoc then Exit     //Во избежание
             else treeNode:=frmMain.tvMain.Selected;
 
-    if LimitItems(NodeByPath(omgDoc.XML, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
-        MessageBox(Application.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR);
-        Exit;
-    end;
+//    if LimitItems(NodeByPath(omgDoc.XML, 'Root|Data'), true) >= (Byte.MaxValue div 10) then begin
+//        MessageBox(frmMain.Handle, PWideChar(rsDemo), PWideChar(Application.Title), MB_ICONERROR + MB_APPLMODAL);
+//        Exit;
+//    end;
 
 	destNode:=IXMLNode(treeNode.Data);
 	LogNodeInfo(destNode, 'InsertItem');

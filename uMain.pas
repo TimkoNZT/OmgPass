@@ -263,6 +263,7 @@ procedure TfrmMain.mnuOptionsClick(Sender: TObject);
 begin
 if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(Self);
 frmOptions.ShowModal;
+//frmOptions.Hide;
 FreeAndNil(frmOptions);
 end;
 procedure TfrmMain.mnuPasswordClick(Sender: TObject);

@@ -110,8 +110,8 @@ begin
     Log('frmEditItem: SaveValues');
     for i := 0 to fpEdit.ControlCount - 1 do begin
 		With (fpEdit.Controls[i] as TFieldFrame) do begin
-        //Log(GetNodeValue(IXMLNode(Tag)));
-        //Log(StringReplace(textInfo.Text, CrLf, '|', [rfReplaceAll]));
+            //Log(GetNodeValue(IXMLNode(Tag)));
+            //Log(StringReplace(textInfo.Text, CrLf, '|', [rfReplaceAll]));
             if GetNodeValue(IXMLNode(Tag)) <> StringReplace(textInfo.Text, CrLf , '|', [rfReplaceAll]) then begin
                 SetNodeValue(IXMLNode(Tag), StringReplace(textInfo.Text, CrLf, '|', [rfReplaceAll]));
                 //MakeUndoPoint;
@@ -206,6 +206,7 @@ begin
         MB_ICONQUESTION + MB_OKCANCEL + MB_DEFBUTTON2 + MB_SYSTEMMODAL)
         = ID_CANCEL then Exit;
     Log('Deleting field: Confirmed');
+    SaveValues;
     fItem.ChildNodes.Remove(delField);
     GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
 end;
