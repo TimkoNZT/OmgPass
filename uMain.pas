@@ -214,7 +214,7 @@ begin
 end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-	//tvMain.Width:= frmMain.ClientWidth div 5 * 2;
+    pnlTree.Width:= frmMain.ClientWidth div 5 * 2;
     //tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;              //WTF?
     lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,

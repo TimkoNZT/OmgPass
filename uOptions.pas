@@ -25,6 +25,7 @@ type
     CheckBox7: TCheckBox;
     CheckBox8: TCheckBox;
     ImageList1: TImageList;
+    CheckBox9: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

@@ -147,7 +147,7 @@ object frmOptions: TfrmOptions
       end
       object CheckBox7: TCheckBox
         Left = 16
-        Top = 87
+        Top = 88
         Width = 281
         Height = 17
         Caption = 'Minimize  program on link opening'
@@ -161,14 +161,18 @@ object frmOptions: TfrmOptions
         Caption = 'Edit records in advansed mode'
         TabOrder = 4
       end
+      object CheckBox9: TCheckBox
+        Left = 16
+        Top = 136
+        Width = 281
+        Height = 17
+        Caption = 'Auto resize tree area'
+        TabOrder = 5
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Security'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 24
-      ExplicitWidth = 0
-      ExplicitHeight = 203
       object CheckBox5: TCheckBox
         Left = 16
         Top = 40
@@ -189,10 +193,6 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Backups'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 29
-      ExplicitWidth = 0
-      ExplicitHeight = 203
       DesignSize = (
         316
         170)
@@ -224,9 +224,9 @@ object frmOptions: TfrmOptions
       end
       object UpDown1: TUpDown
         Left = 270
-        Top = 85
+        Top = 87
         Width = 24
-        Height = 23
+        Height = 21
         Associate = Edit1
         Min = 3
         Max = 20
@@ -237,7 +237,7 @@ object frmOptions: TfrmOptions
         Left = 237
         Top = 87
         Width = 33
-        Height = 20
+        Height = 21
         TabOrder = 2
         Text = '5'
       end
@@ -262,7 +262,7 @@ object frmOptions: TfrmOptions
     Left = 72
     Top = 208
     Bitmap = {
-      494C010103000800180016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103000800200016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000002000000020000
