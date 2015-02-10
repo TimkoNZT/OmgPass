@@ -26,7 +26,7 @@ type
     procedure btnOKClick(Sender: TObject);
     constructor Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False); reintroduce; overload;
     procedure FormShow(Sender: TObject);
-    procedure cmbFieldTypeChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     fNode: IXMLNode;
     { Private declarations }
@@ -58,11 +58,6 @@ begin
     Self.ModalResult:=mrOk;
 end;
 
-procedure TfrmEditField.cmbFieldTypeChange(Sender: TObject);
-begin
-    //
-end;
-
 constructor TfrmEditField.Create(AOwner: TComponent; var Node: IXMLNode; isNew: Boolean = False);
 var i: Integer;
 begin
@@ -77,6 +72,12 @@ begin
     cmbFieldType.ItemIndex:=Ord(GetFieldFormat(fNode));
     for I := 0 to cmbFieldType.Items.Count - 1 do cmbFieldType.ItemsEx[i].ImageIndex:=i;
     chkShowButton.Checked:= not (LowerCase(GetAttribute(fNode, 'button')) = 'false');
+end;
+
+procedure TfrmEditField.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    Self.BorderIcons:=[];
+    Self.Caption:='';
 end;
 
 procedure TfrmEditField.FormShow(Sender: TObject);

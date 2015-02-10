@@ -287,7 +287,7 @@ function ParsePagesToTabs(x:IXMLDocument; tabControl: TTabControl) : IXMLNodeLis
 //Рисование страниц из документа в TtabControl
 var i: Integer;
 tabList: TStringList;
-RootNode: IXMLNode;
+//RootNode: IXMLNode;
 begin
     intExpandFlag:=1;
     //intCurrentPage:=-1;
@@ -520,7 +520,6 @@ function CreateClearPage(): IXMLNode;
 var
     newPageNode: IXMLNode; //okay?
     dItem: IXMLNode;       //defitem
-    tField: IXMLNode;      //tempfield..okay?
 begin
     newPageNode:=omgDoc.XML.CreateNode('Page');
     newPageNode.Text:=rsNewPageTitle +'_'+ DateToStr(now);
@@ -574,6 +573,7 @@ var
 function LimitItems(Node: IXMLNode; Full: Boolean): Integer;
 var i: Integer;
 begin
+    Result:=0;
     for i:= 0 to Node.ChildNodes.Count - 1 do begin
         if GetNodeType(Node.ChildNodes[i]) = ntItem then
             inc(result);
@@ -659,9 +659,9 @@ begin
 
 end;
 function GetItemTitlesCount(Item: IXMLNode): Integer;
-var i, Count: Integer;
+var i: Integer;
 begin
-    //Result:=0;
+    Result:=0;
     for i := 0 to Item.ChildNodes.Count - 1 do begin
 		if GetNodeType(Item.ChildNodes[i]) = ntField then
             if GetFieldFormat(Item.ChildNodes[i]) = ffTitle then
@@ -903,18 +903,17 @@ begin
     Log('Form ' + Form.Name + ' topmost:', Flag);
     with Form do
         if Flag then
-            SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW)
+            SetWindowPos(Form.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE)
         else
-            SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE or SWP_SHOWWINDOW);
+            SetWindowPos(Form.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
 end;
 function GetFolderInformation(Node: IXMLNode): String;
 //Формирование строки информации о папке или странице
-var
-    FoldersCount, ItemsCount: Integer;
 //Осторожно!Вложенные функции!
 function IterateFolders(Node: IXMLNode; Full: Boolean): Integer;
 var i: Integer;
 begin
+    Result:=0;
     for i:= 0 to Node.ChildNodes.Count - 1 do
         if GetNodeType(Node.ChildNodes[i]) = ntFolder then begin
             inc(result);
@@ -925,6 +924,7 @@ end;
 function IterateItems(Node: IXMLNode; Full: Boolean): Integer;
 var i: Integer;
 begin
+    Result:=0;
     for i:= 0 to Node.ChildNodes.Count - 1 do begin
         if GetNodeType(Node.ChildNodes[i]) = ntItem then
             inc(result);
@@ -1008,6 +1008,7 @@ var
     newDoc: TOmgDocument;
     docType: TOmgDocument.tOmgDocType;
 begin
+newDoc:=nil;
 try
     try
         if ExtractFileExt(fPath) = strDefaultExt then
@@ -1063,6 +1064,7 @@ begin
     for i := 0 to lsStoredDocs.Count - 1 do begin
         xmlCfg.SetValue('File_' + IntToStr(i), lsStoredDocs.Strings[i], 'Files');
     end;
+    Result:=True;
 end;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
 //Удаление файла из списка сохраненных по индексу или имени
@@ -1074,7 +1076,7 @@ begin
     if (Index > -1) and (Index < lsStoredDocs.Count) then begin
         lsStoredDocs.Delete(Index);
         Result:= not (Index = -1);
-    end;
+    end else Result:=False;
     SaveStoredDocs;
 end;
 {$ENDREGION}
@@ -1108,15 +1110,15 @@ begin
     if (not Assigned(frmAccounts)) then
         frmAccounts:=  TfrmAccounts.Create(frmMain, Reopen);
     if frmAccounts.ShowModal = mrOK then begin
-            Log ('frmAccounts: mrOK');
-            if DocumentOpen(frmAccounts.FFileName, frmAccounts.FPassword) then begin
-                Result:=True;
-                if not Reopen then frmMain.Show;    //Принудительно
-            end;
-        end else begin
-            Log ('frmAccounts: mrCancel');
-            Result:=False;
-        end;
+        Log ('frmAccounts: mrOK');
+        if DocumentOpen(frmAccounts.FFileName, frmAccounts.FPassword) then begin
+            Result:=True;
+            if not Reopen then frmMain.Show;    //Принудительно
+        end else Result:=False;
+    end else begin
+        Log ('frmAccounts: mrCancel');
+        Result:=False;
+    end;
     FreeAndNil(frmAccounts);
 end;
 function DocumentOpen(Path: String; Pass: String): Boolean;
@@ -1137,7 +1139,7 @@ begin
             Result:=False;
         end;
     end;
-    tmpDoc:=nil;
+    //tmpDoc:=nil;
 end;
 procedure DocumentOpenByPass;
 var
@@ -1157,7 +1159,7 @@ try
             omgDoc.Close;
             omgDoc.Free;
             omgDoc:=tempDoc;
-            tempDoc:=nil;
+            //tempDoc:=nil;
             frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
             LoadDocSettings;
             MessageIsEmptyDoc;
@@ -1180,6 +1182,7 @@ function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 var
     xmlTemp: TXMLDocument;
 begin
+    Result:=False;
     try
         try
             xmlTemp:=TXMLDocument.Create(Application);
@@ -1214,6 +1217,7 @@ var
     fStream: TFileStream;
     cryHeader: TOmgDocument.TCryFileHeader;
 begin
+    Result:= idCancel;
     try
         try
             fStream:=nil;
@@ -1247,6 +1251,7 @@ begin
         FreeAndNil(fStream);
     end;
 end;
+
 function GetAppVersion:string;
 type
   TVerInfo=packed record

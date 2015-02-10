@@ -119,6 +119,10 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object chkGenNewPass: TCheckBox
         Left = 16
         Top = 16
@@ -192,6 +196,10 @@ object frmOptions: TfrmOptions
     object TabSheet3: TTabSheet
       Caption = 'Security'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object chkReaskPass: TCheckBox
         Left = 16
         Top = 40
@@ -218,6 +226,10 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Backups'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         333
         169)
@@ -279,6 +291,10 @@ object frmOptions: TfrmOptions
     object TabSheet4: TTabSheet
       Caption = 'System'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object btnOK: TButton
@@ -310,7 +326,7 @@ object frmOptions: TfrmOptions
     Left = 56
     Top = 216
     Bitmap = {
-      494C010104000800380016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104000800400016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

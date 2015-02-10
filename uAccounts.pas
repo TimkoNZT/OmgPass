@@ -106,8 +106,11 @@ end;
 
 procedure TfrmAccounts.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-    if Self.ModalResult <> mrOK then
-        btnClose.Click;
+    Self.BorderIcons:=[];
+    Self.Caption:='';
+    //Это жжж неспроста, по нажатию кнопки Exit
+    //главная форма мимимизируется, чтобы не мимимигать
+    if Self.ModalResult <> mrOK then btnClose.Click;
 end;
 
 procedure TfrmAccounts.CreateParams(var Params: TCreateParams);
@@ -151,7 +154,7 @@ end;
 
 procedure TfrmAccounts.FormShow(Sender: TObject);
 begin
-Self.Show;
+//Self.Show;
 WindowsOnTop(bWindowsOnTop, Self);
 OpenPreCheck;
 end;
@@ -279,7 +282,6 @@ Self.ModalResult:=mrCancel;
 end;
 
 procedure TfrmAccounts.btnCreateNewBaseClick(Sender: TObject);
-var i: Integer;
 begin
     if txtNewBase.Text = '' then Exit;
     //if FileExists(txtNewBase.Text) then

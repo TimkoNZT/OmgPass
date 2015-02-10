@@ -12,14 +12,13 @@ procedure Log(Text: String; Val: variant); overload;
 procedure Log(Strs: TStrings); overload;
 procedure Log(Arr: array of byte; Count: Integer = 0; Msg: String = ''); overload;
 procedure Log(Stream: TStream; Count: Integer = 0; Msg: String = ''); overload;
-function ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False): Boolean;
+procedure ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False);
 
 implementation
 uses uConsole;
 
 {$REGION 'Логирование'}
 procedure Log(Text: String);
-var myThread: TThread;
 begin
 	LogList.Add({TimeToStr(Now) +}'> '+ Text);
     if Assigned(frmLog) then begin
@@ -89,7 +88,7 @@ procedure Log(Text: String; Val: variant);
 begin
 	Log(Text + ' ' + VarToStr(Val));
 end;
-function ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False): Boolean;
+procedure ErrorLog(e: Exception; Method: String = ''; ShowMsg: Boolean = True; isFatal: Boolean = False);
 //Логирование ошибок
 //Параметр isFatal немедленно завершает программу
 begin

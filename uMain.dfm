@@ -2,11 +2,11 @@ object frmMain: TfrmMain
   Left = 397
   Top = 326
   Caption = 'Omg!Pass'
-  ClientHeight = 424
-  ClientWidth = 528
+  ClientHeight = 402
+  ClientWidth = 533
   Color = clBtnFace
   Constraints.MinHeight = 330
-  Constraints.MinWidth = 388
+  Constraints.MinWidth = 430
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -36,7 +36,7 @@ object frmMain: TfrmMain
   object ToolBarMain: TToolBar
     Left = 0
     Top = 0
-    Width = 528
+    Width = 533
     Height = 54
     AutoSize = True
     ButtonHeight = 54
@@ -110,6 +110,7 @@ object frmMain: TfrmMain
       Top = 0
       Caption = 'tbtnGenerator'
       ImageIndex = 8
+      Visible = False
       OnClick = ToolButton1Click
     end
     object ToolButton9: TToolButton
@@ -119,6 +120,7 @@ object frmMain: TfrmMain
       Caption = 'ToolButton9'
       ImageIndex = 7
       Style = tbsSeparator
+      Visible = False
     end
     object tbtnLog: TToolButton
       Left = 411
@@ -140,8 +142,8 @@ object frmMain: TfrmMain
     AlignWithMargins = True
     Left = 1
     Top = 55
-    Width = 526
-    Height = 349
+    Width = 531
+    Height = 327
     Margins.Left = 1
     Margins.Top = 1
     Margins.Right = 1
@@ -154,10 +156,10 @@ object frmMain: TfrmMain
     OnMouseDown = tabMainMouseDown
     OnMouseLeave = tabMainMouseLeave
     DesignSize = (
-      526
-      349)
+      531
+      327)
     object btnAddPage: TSpeedButton
-      Left = 498
+      Left = 503
       Top = 0
       Width = 26
       Height = 26
@@ -171,7 +173,7 @@ object frmMain: TfrmMain
       ExplicitLeft = 458
     end
     object btnDeletePage: TSpeedButton
-      Left = 470
+      Left = 475
       Top = 0
       Width = 26
       Height = 26
@@ -182,7 +184,7 @@ object frmMain: TfrmMain
       ExplicitLeft = 430
     end
     object btnTheme: TSpeedButton
-      Left = 441
+      Left = 446
       Top = 0
       Width = 26
       Height = 26
@@ -193,25 +195,27 @@ object frmMain: TfrmMain
       ExplicitLeft = 595
     end
     object Splitter: TSplitter
-      Left = 230
+      Left = 201
       Top = 6
       Width = 7
-      Height = 339
+      Height = 317
       Hint = 'DblClick for restore position'
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
       Margins.Bottom = 2
-      Beveled = True
-      MinSize = 1
+      AutoSnap = False
+      MinSize = 10
       ResizeStyle = rsUpdate
+      ExplicitLeft = 230
+      ExplicitHeight = 339
     end
     object fpMain: TScrollBox
       AlignWithMargins = True
-      Left = 237
+      Left = 208
       Top = 6
-      Width = 283
-      Height = 338
+      Width = 317
+      Height = 316
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 2
@@ -231,18 +235,19 @@ object frmMain: TfrmMain
     object pnlTree: TPanel
       Left = 4
       Top = 6
-      Width = 226
-      Height = 339
+      Width = 197
+      Height = 317
       Align = alLeft
       BevelOuter = bvNone
+      Constraints.MinWidth = 150
       ParentBackground = False
       ParentColor = True
       TabOrder = 1
       object tvMain: TTreeView
         Left = 0
         Top = 34
-        Width = 226
-        Height = 305
+        Width = 197
+        Height = 283
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -273,7 +278,7 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 0
         Top = 5
-        Width = 226
+        Width = 197
         Height = 24
         Margins.Left = 0
         Margins.Top = 5
@@ -309,8 +314,8 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 405
-    Width = 528
+    Top = 383
+    Width = 533
     Height = 19
     Margins.Left = 2
     Margins.Top = 2
@@ -510,7 +515,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 192
     Bitmap = {
-      494C010109001800F00230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109001800FC0230003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4090,7 +4095,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 192
     Bitmap = {
-      494C01010D002401FC0317001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D002401080417001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5199,7 +5204,7 @@ object frmMain: TfrmMain
     Left = 203
     Top = 112
     Bitmap = {
-      494C010103003400300216001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C0101030034003C0216001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5454,7 +5459,7 @@ object frmMain: TfrmMain
     Left = 347
     Top = 192
     Bitmap = {
-      494C01015D005803EC0316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015D005803F80316001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -11517,7 +11522,7 @@ object frmMain: TfrmMain
     Left = 411
     Top = 304
     Bitmap = {
-      494C01010500F001140416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010500F001200416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -12044,7 +12049,7 @@ object frmMain: TfrmMain
     Left = 259
     Top = 70
     Bitmap = {
-      494C0101030008008C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103000800980110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000E00121B78002B

@@ -34,7 +34,6 @@ private
     procedure SavePosition;
     function OpenXMLfromStream(xmlMainStream: TStream): Boolean;
     function OpenCrypted(Password: String): Boolean;
-    function SaveCrypted(): Boolean;
 public
     constructor Create; overload;
     constructor Create(FilePath: String; Password: String); overload;
@@ -151,11 +150,6 @@ begin
     end;
 end;
 
-function TOmgDocument.SaveCrypted(): Boolean;
-begin
-    //
-end;
-
 procedure TOmgDocument.SaveAsCrypted();
 var fName: String;
     Header: TCryFileHeader;
@@ -189,35 +183,51 @@ function TOmgDocument.Save: Boolean;
 var
     xStream, cStream: TMemoryStream;
 begin
-    Self.SavePosition;
-    xStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
-    Self.XML.SaveToStream(xStream);
-    xStream.Position:=0;
-    fileStream.Position:=0;
-    if Self.docType = dtCrypted then begin
-        cStream:=TMemoryStream.Create;
-        fileStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
-        cryptStream(xStream, cStream, docPassword, $100);
-        fileStream.CopyFrom(cStream, cStream.Size);
-        fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
-    end else begin
-        xStream.SaveToStream(fileStream);
-        fileStream.Size:= xStream.Size;
+    try
+        Self.SavePosition;
+        xStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
+        Self.XML.SaveToStream(xStream);
+        xStream.Position:=0;
+        fileStream.Position:=0;
+        if Self.docType = dtCrypted then begin
+            cStream:=TMemoryStream.Create;
+            fileStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
+            cryptStream(xStream, cStream, docPassword, $100);
+            fileStream.CopyFrom(cStream, cStream.Size);
+            fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
+        end else begin
+            xStream.SaveToStream(fileStream);
+            fileStream.Size:= xStream.Size;
+        end;
+        Result:=True;
+    except
+        on e: Exception do begin
+            ErrorLog(e, 'TOmgDocument.Save');
+            Result:=False;
+        end;
     end;
 end;
 
-function TOmgDocument.Close: Boolean;
+function TOmgDocument.Close;
 begin
-    docFilePath:='';
-    docType:=dtXML;
-    docPages:=nil;
-    XML.XML.Clear;
-    XML.Active:=False;
-    docPassword:='';
-    CurrentPage:=0;                   //Текущая страничка
-    CurrentRecord:=0;
-    ZeroMemory(@docHeader, SizeOf(TCryFileHeader));
-    FreeAndNil(fileStream);
+    try
+        docFilePath:='';
+        docType:=dtXML;
+        docPages:=nil;
+        XML.XML.Clear;
+        XML.Active:=False;
+        docPassword:='';
+        CurrentPage:=0;                   //Текущая страничка
+        CurrentRecord:=0;
+        ZeroMemory(@docHeader, SizeOf(TCryFileHeader));
+        FreeAndNil(fileStream);
+        Result:=True;
+    except
+        on e: Exception do begin
+            ErrorLog(e, 'TOmgDocument.Close');
+            Result:=False;
+        end;
+    end;
 end;
 
 destructor TOmgDocument.Destroy;
@@ -244,9 +254,6 @@ begin
 end;
 
 class function TOmgDocument.CreateHeader(sPassword: String): TCryFileHeader;
-var
-    Head: TCryFileHeader;
-    Data: array of byte;
 begin
     with Result do begin
         Magic:= 'OMG!';
@@ -266,7 +273,10 @@ begin
     try
         Result:= CompareMem(GetHeader(Password).Memory, @docHeader.firstHeader[0], $40);
     except
-        on e: Exception do ErrorLog(e, 'CheckPassword');
+        on e: Exception do begin
+            ErrorLog(e, 'TOmgDocument.CheckPassword');
+            Result:=False;
+        end;
     end;
 end;
 
@@ -275,9 +285,12 @@ begin
 try
     Self.docHeader:=CreateHeader(Password);
     Self.docPassword:=Password;
-    Self.Save;
+    Result:= Self.Save;
 except
-    on e: Exception do ErrorLog(e, 'ChangePassword');
+    on e: Exception do begin
+        ErrorLog(e, 'TOmgDocument.ChangePassword');
+        Result:=False;
+    end;
 end;
 end;
 
@@ -325,6 +338,7 @@ begin
     if hNode.ChildNodes.FindNode(PropertyName) = nil then
         hNode.AddChild(PropertyName);
     hNode.ChildValues[PropertyName]:=Value;
+    Result:=True;
 end;
 {$ENDREGION}
 

@@ -12,7 +12,7 @@ unit uCustomSplitter;
 interface
 
 uses
-  ExtCtrls;
+  ExtCtrls, Messages, Classes;
 
 //------------------------------------------------------------------------------
 //
@@ -21,8 +21,10 @@ uses
 //------------------------------------------------------------------------------
 type
 TSplitter = class(ExtCtrls.TSplitter)
-    protected
+protected
     procedure Paint; override;
+public
+    property OnDblClick;
 end;
 
 const DotsCount: Integer = 12;
@@ -30,7 +32,7 @@ const DotsCount: Integer = 12;
 implementation
 
 uses
-Windows, Graphics, Controls, Classes;
+Windows, Graphics, Controls;
 
 //------------------------------------------------------------------------------
 //
@@ -78,5 +80,6 @@ begin
         Brush.Free;
     end;
 end;
+
 
 end.

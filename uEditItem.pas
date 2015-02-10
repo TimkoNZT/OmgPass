@@ -47,15 +47,16 @@ type
     procedure tbtnDelFieldClick(Sender: TObject);
     procedure mnuFastFieldClick(Sender: TObject);
     procedure tbtnAdvancedClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FItem: IXMLNode;
-    UndoList: IXMLNodeList;
-    UndoDoc: IXMLDocument;
+//    UndoList: IXMLNodeList;
+//    UndoDoc: IXMLDocument;
     intFocused: Integer;
-    intUndo: Integer;
+//    intUndo: Integer;
     bAdvancedEdit: Boolean;
     procedure SaveValues;
-    procedure MakeUndoPoint;
+//    procedure MakeUndoPoint;
     function GetActiveField(): IXMLNode;
     { Private declarations }
   public
@@ -85,11 +86,11 @@ begin
     else
         Self.Caption:=rsFrmEditItemCaption;
     //Ундо-лист
-    UndoDoc:=TXMLDocument.Create(nil);
-    UndoDoc.Active:=True;
-    UndoList:=UndoDoc.AddChild('Undo').ChildNodes;
-    //Запоминаем первоначальное состояние входящей ноды
-    MakeUndoPoint;
+//    UndoDoc:=TXMLDocument.Create(nil);
+//    UndoDoc.Active:=True;
+//    UndoList:=UndoDoc.AddChild('Undo').ChildNodes;
+//    //Запоминаем первоначальное состояние входящей ноды
+//    MakeUndoPoint;
 end;
 
 procedure TfrmEditItem.btnCloseClick(Sender: TObject);
@@ -140,11 +141,17 @@ begin
     end;
 end;
 
+procedure TfrmEditItem.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    Self.BorderIcons:=[];
+    Self.Caption:='';
+end;
+
 procedure TfrmEditItem.FormShow(Sender: TObject);
 begin
-WindowsOnTop(bWindowsOnTop, Self);
 if fpEdit.ControlCount<>0 then
     TFieldFrame(fpEdit.Controls[fpEdit.ControlCount - 1]).textInfo.SetFocus;
+WindowsOnTop(bWindowsOnTop, Self);
 end;
 
 procedure TfrmEditItem.StartEditField(Sender: TObject);
@@ -262,44 +269,44 @@ begin
 end;
 
 {$REGION '#Ундо-редо'}
-procedure TfrmEditItem.MakeUndoPoint;
-var i: integer;
-begin
-    Log('Make undo point...');
-    //Чистим всё, что в ундо-листе после текущей позиции
-    for i := intUndo + 1 to UndoList.Count - 1 do
-        UndoList.Delete(i);
-    //Сохраняем новый вид записи
-    UndoList.Add(fItem.CloneNode(True));
-    //Ставим указатель списка ундо на последний элемент
-    intUndo:=UndoList.Count - 1;
-    Log('Make undo Ok. Undo count = ', UndoList.Count);
-end;
+//procedure TfrmEditItem.MakeUndoPoint;
+//var i: integer;
+//begin
+//    Log('Make undo point...');
+//    //Чистим всё, что в ундо-листе после текущей позиции
+//    for i := intUndo + 1 to UndoList.Count - 1 do
+//        UndoList.Delete(i);
+//    //Сохраняем новый вид записи
+//    UndoList.Add(fItem.CloneNode(True));
+//    //Ставим указатель списка ундо на последний элемент
+//    intUndo:=UndoList.Count - 1;
+//    Log('Make undo Ok. Undo count = ', UndoList.Count);
+//end;
 
 procedure TfrmEditItem.tbtnFieldRedoClick(Sender: TObject);
 begin
-Log('btnRedo!');
-Log ('intUndo: ', intUndo);
-Log ('UndoCount = ', UndoList.Count);
-if intUndo <> UndoList.Count - 1 then begin;
-    Inc(intUndo);
-    fItem:= UndoList[intUndo];
-end;
-GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
+//Log('btnRedo!');
+//Log ('intUndo: ', intUndo);
+//Log ('UndoCount = ', UndoList.Count);
+//if intUndo <> UndoList.Count - 1 then begin;
+//    Inc(intUndo);
+//    fItem:= UndoList[intUndo];
+//end;
+//GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
 end;
 
 procedure TfrmEditItem.tbtnFieldUndoClick(Sender: TObject);
 begin
-Log ('btnUndo!');
-Log ('intUndo: ', intUndo);
-Log ('UndoCount = ', UndoList.Count);
-//if intUndo = UndoList.Count - 1 then
-//    SaveValues;
-if intUndo <> 0 then begin
-    Dec(intUndo);
-    fItem:= UndoList[intUndo];
-end;
-GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
+//Log ('btnUndo!');
+//Log ('intUndo: ', intUndo);
+//Log ('UndoCount = ', UndoList.Count);
+////if intUndo = UndoList.Count - 1 then
+////    SaveValues;
+//if intUndo <> 0 then begin
+//    Dec(intUndo);
+//    fItem:= UndoList[intUndo];
+//end;
+//GeneratePanel(fItem, fpEdit, True, False, bAdvancedEdit);
 end;
 
 {$ENDREGION '#Ундо-редо'}

@@ -163,6 +163,7 @@ TfrmMain = class(TForm)
     procedure mnuWidthIncrease(Sender: TObject; ACanvas: TCanvas; var Width,
       Height: Integer);
     procedure ShowLog1Click(Sender: TObject);
+    procedure SplitterDblClick(Sender: TObject);
 private
 	{ Private declarations }
 public
@@ -211,7 +212,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION '#Прилипание формы лога к краю основной'}
+{$REGION '#Прилипание формы лога к краю основной и всяческие ресайзы'}
 procedure TfrmMain.OnMove(var Msg: TWMMove);
 begin
     if Assigned(frmLog) {and bLogDocked} then
@@ -221,18 +222,31 @@ procedure TfrmMain.ShowLog1Click(Sender: TObject);
 begin
 tbtnLogClick(nil);
 end;
+procedure TfrmMain.SplitterDblClick(Sender: TObject);
+begin
+    //По двойному щелчку панель переходит
+    //из любого состояния в отношение 2:5
+    //А если она уже в нём, то скрывается вправо
+    if (pnlTree.Width <> tabMain.ClientWidth div 5 * 2) then
+        pnlTree.Width:= tabMain.ClientWidth div 5 * 2
+    else
+        pnlTree.Width:= tabMain.ClientWidth - 17;
+end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
     if Boolean(xmlCfg.GetValue('AutoResizeTree', True)) then
-        pnlTree.Width:= frmMain.ClientWidth div 5 * 2;
-    //tvMain.Align:=alLeft;
-    Splitter.Left:=tvMain.Width;              //WTF?
+        pnlTree.Width:= tabMain.ClientWidth div 5 * 2
+    else if Splitter.Left > tabMain.ClientWidth - 14 then
+         pnlTree.Width:= tabMain.ClientWidth - 17;
+    pnlTree.Align:=alLeft;
+    Splitter.Left:=pnlTree.Width;              //WTF?
     lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
                         (Height - lblEmpty.Height) div 2,
                          lblEmpty.Width,
                          lblEmpty.Height);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
+Log(Self.Width);
 end;
 procedure TfrmMain.WMSysCommand;
 begin
@@ -285,8 +299,14 @@ end;
 procedure TfrmMain.tvMainDblClick(Sender: TObject);
 //Здесь просто
 begin
-	if not tvMain.Selected.HasChildren or tvMain.Selected.IsFirstNode then
-		EditNode(tvMain.Selected);
+//Было просто =(
+    //Даблклик на папке или корне не вызывает редактирование
+	if tvMain.Selected.HasChildren or tvMain.Selected.IsFirstNode then Exit;
+    //Область просмотра может быть скрыта, проверяем
+    if (fpMain.Width = 0) and (tvMain.Selected.ImageIndex = 1) then
+        SplitterDblClick(nil)
+    else
+   	    EditNode(tvMain.Selected)
 end;
 procedure TfrmMain.mnuEditDefaultClick(Sender: TObject);
 begin
@@ -728,10 +748,14 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+    //Назначаем лже-сплиттеру действие на даблклик, в дизайнере нельзя
+    Splitter.OnDblClick:= SplitterDblClick;
+    //Эта процедура устраняет мерцание при ресайзе формы
     SetWindowLongPtr(tabMain.Handle, GWL_EXSTYLE,
     GetWindowLongPtr(tabMain.Handle, GWL_EXSTYLE) or WS_EX_COMPOSITED);
     if not InitGlobal then
         frmMain.Close;
+    //Задаём внешний вид меню
     RyMenu.MinWidth:=200;
     RyMenu.Add(menuMain, nil);
     RyMenu.Add(menuTreePopup, nil);

@@ -95,6 +95,7 @@ object frmEditField: TfrmEditField
     162E8001002F80010613C0070F14E00F3311FFFF002F}
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnClose = FormClose
   OnShow = FormShow
   DesignSize = (
     291
@@ -155,7 +156,6 @@ object frmEditField: TfrmEditField
     Anchors = [akLeft, akTop, akRight]
     Color = clBtnFace
     TabOrder = 1
-    OnChange = cmbFieldTypeChange
     Images = imlTypes
   end
   object btnOK: TButton
@@ -212,7 +212,7 @@ object frmEditField: TfrmEditField
     Left = 16
     Top = 176
     Bitmap = {
-      494C010108005000540010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108005000580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

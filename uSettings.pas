@@ -97,18 +97,22 @@ end;
 
 function TSettings.DeleteSection(SectionName: String = strDefConfigSection): Boolean;
 begin
+    Result:=False;
     if RootNode.ChildNodes.FindNode(SectionName) = nil then Exit;
     Result:= (RootNode.ChildNodes.Remove(RootNode.ChildNodes.FindNode(SectionName)) <> -1);
 end;
 
 function TSettings.ClearSection(SectionName: String = strDefConfigSection): Boolean;
 begin
+    Result:= False;
     if RootNode.ChildNodes.FindNode(SectionName) = nil then Exit;
     RootNode.ChildNodes.FindNode(SectionName).ChildNodes.Clear;
+    Result:= True;
 end;
 
 function TSettings.DeleteOption(OptionName: String; Section: String = strDefConfigSection): Boolean;
 begin
+    Result:=False;
     if not HasOption(OptionName, Section) then Exit;
     Result:= (RootNode.ChildNodes[Section].ChildNodes.Remove
     (

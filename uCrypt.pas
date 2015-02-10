@@ -219,7 +219,7 @@ procedure EnumProviders;
 
 var
     dwIndex: Integer;
-    dwProvType, DataLen, impType: DWord;
+    dwProvType, DataLen: DWord;
     provName: String;
 {вспомогательная функция, преобразующая тип провайдера в строку}
 function ProvTypeToStr(provType: DWORD): string;
@@ -262,11 +262,11 @@ function GetHeader(Password: string): TMemoryStream;
 var
     InStream: TMemoryStream;
 begin
+    InStream:= TMemoryStream.Create;
+    Result:= TMemoryStream.Create;
     try
         try
-            InStream:= TMemoryStream.Create;
             InStream.Write(@exPublicKey[20], $40);
-            Result:= TMemoryStream.Create;
             if not CryptStream(InStream, Result, Password, $40) then RaiseLastOSError;
         except on e: Exception do begin
             ErrorLog(e, 'GetHeaderFirst');
@@ -278,13 +278,14 @@ begin
 end;
 function GetSecondHeader(Password: string): TMemoryStream;
 var
-    data: PByte;
     hProv: HCRYPTPROV;
     hash: HCRYPTHASH;
     pKey, uKey: HCRYPTKEY;
-    lBufLen, lDataLen: DWORD;
+    lBufLen: DWORD;
     Stream: TMemoryStream;
 begin
+    Stream:=TMemoryStream.Create;
+    Result:=TMemoryStream.Create;
     try
         try
             {получаем контекст криптопровайдера}
@@ -298,8 +299,6 @@ begin
             {импортируем ключ =)}
             if not CryptImportKey(hProv, @exPublicKey, SizeOf(exPublicKey), 0, 0, @pKey) then RaiseLastOSError;
             {готовим потоки, и выделяем место}
-            Stream:=TMemoryStream.Create;
-            Result:=TMemoryStream.Create;
             if not CryptExportKey(uKey, pKey, SIMPLEBLOB, 0, nil, @lBufLen)  then RaiseLastOSError;
             Stream.SetSize(lBufLen);
             if not CryptExportKey(uKey, pKey, SIMPLEBLOB, 0, PByte(Stream.Memory), @lBufLen) then RaiseLastOSError;
@@ -326,11 +325,15 @@ var
     hProv: HCRYPTPROV;
     hash: HCRYPTHASH;
     key: HCRYPTKEY;
-    lBufLen, lDataLen: DWORD;
+    lBufLen: DWORD;
     lBufSize: Integer;
     lisEnd: Boolean;
-    lStr: string;
 begin
+    data:=nil;
+    hProv:=0;
+    hash:=0;
+    Result:=False;
+    key:=0;
     try
         try
             //Log('CryptStream----------------------------------------------------');
@@ -383,10 +386,15 @@ var
     hProv: HCRYPTPROV;
     hash: HCRYPTHASH;
     key: HCRYPTKEY;
-    lBufLen, lDataLen: DWORD;
+    lBufLen: DWORD;
     lBufSize: Integer;
     lisEnd: Boolean;
 begin
+    data:=nil;
+    hProv:=0;
+    hash:=0;
+    Result:=False;
+    key:=0;
     try
         try
         {выделяем место для буфера}
@@ -435,11 +443,17 @@ var
     hProv: HCRYPTPROV;
     hash: HCRYPTHASH;
     aKey, pKey: HCRYPTKEY;
-    lBufLen, lDataLen: DWORD;
+    lBufLen: DWORD;
     lBufSize: Integer;
     lisEnd: Boolean;
     sKeyData: array[0..75] of byte;
 begin
+    data:=nil;
+    hProv:=0;
+    hash:=0;
+    Result:=False;
+    aKey:=0;
+    pKey:=0;
     try
         try
         {выделяем место для буфера}

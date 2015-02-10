@@ -40,6 +40,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure UpDownClick(Sender: TObject; Button: TUDBtnType);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
 private
     { Private declarations }
 public
@@ -163,6 +164,12 @@ end;
 procedure TfrmGenerator.chkDntReClick(Sender: TObject);
 begin
     chkDntDouble.Enabled:=not chkDntRe.Checked;
+end;
+
+procedure TfrmGenerator.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    Self.BorderIcons:=[];
+    Self.Caption:='';
 end;
 
 procedure TfrmGenerator.FormCreate(Sender: TObject);

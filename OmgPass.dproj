@@ -4,7 +4,7 @@
         <MainSource>OmgPass.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <TargetedPlatforms>3</TargetedPlatforms>
+        <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
         <ProjectVersion>16.0</ProjectVersion>
@@ -282,7 +282,7 @@
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
+                <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment>
                 <DeployFile LocalName="Win32\Debug\OmgPass.exe" Configuration="Debug" Class="ProjectOutput">

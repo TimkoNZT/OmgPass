@@ -26,6 +26,7 @@ type
     procedure txtNewPassChange(Sender: TObject);
     procedure txtConfirmPassChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     fDoc: TOmgDocument;
     function CheckOldPass(Msg: Boolean): Boolean;
@@ -47,6 +48,12 @@ constructor TfrmPassword.Create(AOwner: TComponent; Document: TOmgDocument);
 begin
     inherited Create(AOwner);
     fDoc:=Document;
+end;
+
+procedure TfrmPassword.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    Self.BorderIcons:=[];
+    Self.Caption:='';
 end;
 
 procedure TfrmPassword.FormShow(Sender: TObject);

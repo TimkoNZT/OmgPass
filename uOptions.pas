@@ -38,7 +38,7 @@ type
   private
     { Private declarations }
     Cfg: TSettings;
-    function ReadConfiguration: Boolean;
+    procedure ReadConfiguration;
   public
     { Public declarations }
   end;
@@ -68,7 +68,8 @@ begin
     ReadConfiguration;
 end;
 
-function TfrmOptions.ReadConfiguration: Boolean;
+procedure TfrmOptions.ReadConfiguration;
+
 procedure ReadValues(Com: TComponent);
 begin
     if Com is TCheckBox then with (Com as TCheckBox) do
