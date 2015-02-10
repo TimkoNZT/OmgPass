@@ -47,6 +47,7 @@ const arrDefFieldNames: array[0..8] of String = ('Title',
 
 resourcestring
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
+    rsDefFieldNames = 'Title|Login|Password|Website|Comment|Date|Mail|File|Text or Login';
     rsTitleDefName = 'Title';
     rsTextDefName = 'Login';
     rsPassDefName = 'Password';
@@ -131,7 +132,7 @@ resourcestring
     rsSaveDialogFileExists = 'You have selected an existing file:' + CrLf + '%s' + CrLf+ 'Overwrite it?';
     rsSaveDialogTitle = 'Save new document as...';
     rsOpenDialogTitle = 'Open docyment...';
-    rsOpenDocumentError = 'Can''t open %s' + CrLf + 'Please, make sure it is the correct file' + CrLf + '(Error class: %s)';
+    rsOpenDocumentError = 'Can''t open file' + CrLf + '%s' + CrLf + 'Please, make sure it is the correct file' + CrLf + '(Error class: %s)';
     rsOpenDocumentErrorTitle = 'Open document error';
     rsWrongPasswordError = 'Wrong or incorrect password! You can try again.' + CrLf + ' Please, check CapsLock and see on hint image';
     rsWrongPasswordErrorTitle = 'Wrong password';
@@ -144,7 +145,7 @@ resourcestring
     rsTxtPassAlrOpened = 'File already opened';
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
-    rsAbout = 'OmgPass ver. %s' + CrLf +'An simple app for store and managment yours passwords' + CrLF +
+    rsAbout = '%s ver. %s' + CrLf +'An simple app for store and managment yours passwords' + CrLF +
                 'Copyright by Nazarov Timur (vk.com/id1669165)'+ CrLf +
                 'Boomy icons by Milosz Wlazlo (miloszwl.deviantart.com)';
     rsAboutTitle = 'About...';

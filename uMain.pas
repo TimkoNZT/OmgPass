@@ -4,13 +4,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
-  StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin,
-  Vcl.DBCtrls, Vcl.Mask, Vcl.Samples.Spin, ShellApi,
-  Vcl.ButtonGroup, Vcl.Buttons,
+  StdCtrls, Forms, ImgList, Menus, ComCtrls, Vcl.ExtCtrls,
+  Vcl.DBCtrls, Vcl.Mask, ShellApi, Vcl.Buttons, Vcl.ToolWin,
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  Logic, uCustomEdit, uDocument;
+  Logic, uCustomEdit, uDocument, uCustomSplitter;
+
 type
 TfrmMain = class(TForm)
     menuMain: TMainMenu;
@@ -84,6 +84,9 @@ TfrmMain = class(TForm)
     N2: TMenuItem;
     mnuSaveAsCrypted: TMenuItem;
     mnuMagic: TMenuItem;
+    ToolButton1: TToolButton;
+    ToolButton3: TToolButton;
+    ShowLog1: TMenuItem;
     procedure mnuAccountsClick(Sender: TObject);
     procedure tbtnAccountsClick(Sender: TObject);
     procedure mnuGeneratorClick(Sender: TObject);
@@ -156,6 +159,10 @@ TfrmMain = class(TForm)
     procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
     procedure mnuUpdatesClick(Sender: TObject);
     procedure mnuMagicClick(Sender: TObject);
+    procedure ToolButton1Click(Sender: TObject);
+    procedure mnuWidthIncrease(Sender: TObject; ACanvas: TCanvas; var Width,
+      Height: Integer);
+    procedure ShowLog1Click(Sender: TObject);
 private
 	{ Private declarations }
 public
@@ -164,16 +171,14 @@ end;
 
 var
     frmMain: TfrmMain;
-resourcestring
-    rsAppname = 'OmgPass';
 
 {$R *.dfm}
 implementation
 
 
 
-uses uAccounts, uGenerator, uOptions, uProperties, uEditItem, uLog, uStrings,
-  uConsole, uPassword;
+uses uAccounts, uGenerator, uProperties, uEditItem, uLog, uStrings,
+  uConsole, uPassword, RyMenus, uOptions;
 {//////////////////////////////////////////////////////////////////////////////}
 
 {$REGION '#Форма логирования'}
@@ -212,16 +217,20 @@ begin
     if Assigned(frmLog) {and bLogDocked} then
       frmLog.tmrLog.OnTimer(nil);
 end;
+procedure TfrmMain.ShowLog1Click(Sender: TObject);
+begin
+tbtnLogClick(nil);
+end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-    pnlTree.Width:= frmMain.ClientWidth div 5 * 2;
+    if Boolean(xmlCfg.GetValue('AutoResizeTree', True)) then
+        pnlTree.Width:= frmMain.ClientWidth div 5 * 2;
     //tvMain.Align:=alLeft;
     Splitter.Left:=tvMain.Width;              //WTF?
     lblEmpty.SetBounds((Width - lblEmpty.Width) div 2,
                         (Height - lblEmpty.Height) div 2,
                          lblEmpty.Width,
                          lblEmpty.Height);
-    //Log(Sender.ToString);
     if Assigned(frmLog) and bLogDocked then
     	frmLog.tmrLog.OnTimer(nil);
 end;
@@ -242,6 +251,7 @@ procedure TfrmMain.mnuAccountsClick(Sender: TObject);
 begin
     DocManager(True);
 end;
+
 procedure TfrmMain.mnuBasePropertiesClick(Sender: TObject);
 begin
 if (not Assigned(frmProperties)) then frmProperties:= TfrmProperties.Create(Self);
@@ -261,10 +271,7 @@ mnuOptionsClick(nil);
 end;
 procedure TfrmMain.mnuOptionsClick(Sender: TObject);
 begin
-if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(Self);
-frmOptions.ShowModal;
-//frmOptions.Hide;
-FreeAndNil(frmOptions);
+ShowOptionsWindow;
 end;
 procedure TfrmMain.mnuPasswordClick(Sender: TObject);
 begin
@@ -350,10 +357,12 @@ begin
     selNode.Selected:=True;
 	InsertItem(selNode);
 end;
+
 procedure TfrmMain.mnuInsertItemClick(Sender: TObject);
 begin
 	InsertItem(tvMain.Selected);
 end;
+
 procedure TfrmMain.mnuInsertPageClick(Sender: TObject);
 begin
     AddNewPage();
@@ -431,7 +440,7 @@ begin
 end;
 procedure TfrmMain.mnuDeleteClick(Sender: TObject);
 begin
-	DeleteNode(tvMain.Selected);
+	DeleteNode(tvMain.Selected)
 end;
 procedure TfrmMain.mnuPopupDeleteClick(Sender: TObject);
 var selNode: TTreeNode;
@@ -447,7 +456,7 @@ end;
 {$REGION '#Клонирование овечек'}
 procedure TfrmMain.mnuPopupCloneItemClick(Sender: TObject);
     var selNode: TTreeNode;
-    begin
+begin
   	selNode:= tvMain.GetNodeAt(tvMain.ScreenToClient(menuTreePopup.PopupPoint).X,
       						tvMain.ScreenToClient(menuTreePopup.PopupPoint).Y);
     if selNode = nil then selNode:=tvMain.Selected;
@@ -505,10 +514,12 @@ begin
   		tmrRenameTab.Tag:=1;
         iSelected:=0;
     	CleaningPanel(fpMain, True);
+        LockWindowUpdate(tabmain.Handle);
         if bSearchMode then        
         	ParsePageToTree(tabMain.TabIndex, tvMain, txtSearch.Text)
         else
             ParsePageToTree(tabMain.TabIndex, tvMain);
+        LockWindowUpdate(0);
         tvMain.Items[0].Selected:=True;
 end;
 {$ENDREGION}
@@ -615,6 +626,11 @@ begin
         oldNode:= nodeToExpand;
     end;
 end;
+procedure TfrmMain.ToolButton1Click(Sender: TObject);
+begin
+mnuGenerator.Click;
+end;
+
 {$ENDREGION}
 
 {$Region '#Поиск'}
@@ -674,9 +690,9 @@ begin
         if Text <> '' then begin
             ParsePageToTree(omgDoc.CurrentPage, tvMain);
             tvMain.Items[iSelected].Selected:=True;
-            tvMain.SetFocus;
         end;
         Text:=rsSearchText;
+        tvMain.SetFocus;
         bSearchMode:=False;
     end;
 end;
@@ -712,8 +728,13 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+    SetWindowLongPtr(tabMain.Handle, GWL_EXSTYLE,
+    GetWindowLongPtr(tabMain.Handle, GWL_EXSTYLE) or WS_EX_COMPOSITED);
     if not InitGlobal then
         frmMain.Close;
+    RyMenu.MinWidth:=200;
+    RyMenu.Add(menuMain, nil);
+    RyMenu.Add(menuTreePopup, nil);
 end;
 
 procedure TfrmMain.ThemeMenuClick(Sender: TObject);
@@ -731,6 +752,7 @@ begin
     bShowPasswords:= mnuShowPass.Checked;
     ShowPasswords(bShowPasswords);
 end;
+
 //Поверх всех окон
 procedure TfrmMain.mnuTopClick(Sender: TObject);
 begin
@@ -749,7 +771,13 @@ end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
 begin
-    MessageBox(Self.Handle, PWideChar(Format(rsAbout, [getAppVersion])), PWideChar(rsAboutTitle), MB_OK + MB_ICONINFORMATION);
+    MessageBox(Self.Handle, PWideChar(Format(rsAbout, [Application.Title, getAppVersion])), PWideChar(rsAboutTitle), MB_OK + MB_ICONINFORMATION);
+end;
+
+procedure TfrmMain.mnuWidthIncrease(Sender: TObject; ACanvas: TCanvas;
+  var Width, Height: Integer);
+begin
+    Width:=200;
 end;
 
 procedure TfrmMain.mnuDocumentClick(Sender: TObject);
@@ -764,7 +792,7 @@ end;
 
 procedure TfrmMain.mnuServiceClick(Sender: TObject);
 begin
-Log('MenuDraw');
+//Log('MenuDraw');
 mnuClearClip.Enabled:= IsntClipboardEmpty;
 end;
 

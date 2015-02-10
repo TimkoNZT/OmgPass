@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls,
-  Vcl.ToolWin;
+  Vcl.ToolWin, ClipBrd;
 
 type
   TfrmLog = class(TForm)
@@ -19,6 +19,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure lbLogDblClick(Sender: TObject);
 private
   	procedure HitTest(var Msg: TWMNcHitTest); message WM_NCHITTEST;
 
@@ -48,6 +49,11 @@ begin
 if Ord(Key) = vk_Escape then begin
 	frmLog.Close;
 end;
+end;
+
+procedure TfrmLog.lbLogDblClick(Sender: TObject);
+begin
+Clipboard.AsText:= lbLog.Items.Text;
 end;
 
 procedure TfrmLog.lbLogMouseDown(Sender: TObject; Button: TMouseButton;

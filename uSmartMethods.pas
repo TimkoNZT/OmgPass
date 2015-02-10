@@ -5,8 +5,7 @@
 //
 unit uSmartMethods;
 interface
-uses  Windows, SysUtils, ClipBrd, Vcl.Buttons, Vcl.ComCtrls,
-	Vcl.Controls, ShellApi,
+uses  Windows, SysUtils, ClipBrd, Vcl.Buttons, Vcl.Controls, ShellApi,
     mmsystem;
 
 type clsSmartMethods= Class
@@ -24,7 +23,7 @@ function GetEditFromTag(Sender: TObject): String;
 implementation
 {$R sounds.res}
 
-uses uMain, uLog, uGenerator, Logic, uEditField, uEditItem, uCustomEdit;
+uses uMain, uLog, uGenerator, Logic, uCustomEdit;
 
 procedure clsSmartMethods.CopyToClipboard(Sender: TObject);
 begin
@@ -32,7 +31,8 @@ begin
         if GetEditFromTag(Sender) = '' then Exit;
         Clipboard.Clear;
         Clipboard.AsText:=GetEditFromTag(Sender);
-        PlaySound('zoom', hInstance, SND_ASYNC or SND_NODEFAULT or SND_RESOURCE);
+        if Boolean(xmlCfg.GetValue('PlaySounds', True)) then
+            PlaySound('zoom', hInstance, SND_ASYNC or SND_NODEFAULT or SND_RESOURCE);
     except
         on E : Exception do ErrorLog(e, 'SmartMethodCopyToClipboard');
     end;
@@ -49,7 +49,8 @@ log(GetEditFromTag(Sender));
         if not ((Pos('www', url) = 1) or
                 (Pos('http', url) = 1)) then url:= 'www.' + Url;
         ShellExecute(frmMain.Handle, '', PWideChar(url), nil, nil, SW_SHOW);
-        PlaySound('link', hInstance, SND_ASYNC or SND_NODEFAULT or SND_RESOURCE);
+        if Boolean(xmlCfg.GetValue('PlaySounds', True)) then
+            PlaySound('link', hInstance, SND_ASYNC or SND_NODEFAULT or SND_RESOURCE);
     except
         on E : Exception do ErrorLog(e, 'SmartMethodOpenURL');
     end;

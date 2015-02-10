@@ -15,10 +15,10 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 const
 	bShowLogAtStart: Boolean = True;
 var
-    omgDoc: TOmgDocument;           //Основной наш синглтон-документ
-	//xmlMain: TXMLDocument;          //Деприкейтед
+    omgDoc: TOmgDocument;           //Основной наш документ
+	  //xmlMain: TXMLDocument;        //Деприкейтед
     xmlCfg: TSettings;
-	//omgDoc.docPages: IXMLNodeList;      	//Список страниц
+	  //omgDoc.docPages: IXMLNodeList;//Список страниц
     //intCurrentPage: Integer;    	//Текущая страничка
     intThemeIndex: Integer;         //Номер выбранной темы
     intExpandFlag: Integer;    	    //Состояние программы
@@ -26,7 +26,7 @@ var
                                     //1 - загрузка страницы
     iSelected: Integer;             //Эппл подаст в суд
     bSearchMode: Boolean;           //Режим поиска
-	bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
+	  bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
     bShowPasswords: Boolean;        //Загадочная переменная
     bWindowsOnTop: Boolean;         //Ещё одна
@@ -94,9 +94,11 @@ procedure DocumentClose;
 
 function MessageIsEmptyDoc: Boolean;
 function GetAppVersion:string;
+procedure ShowOptionsWindow;
+
 
 implementation
-uses uMain, uConsole, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uLog;
+uses uMain, uConsole, uOptions, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uLog;
 
 function GeneratePassword(Len: Integer = 8): String;
 //Генерация пароля в строку нужной длины
@@ -243,7 +245,9 @@ begin
             		OnResize(nil);
                     btnAdditional.OnClick:= clsSmartMethods.Create.GeneratePass;
                     SetButtonImg(btnAdditional, frmMain.imlField, 5);
-                    if isNew then textInfo.Text:=GeneratePassword;
+                    if isNew then
+                        if Boolean(xmlCfg.GetValue('GenerateNewPasswords', True)) then
+                            textInfo.Text:=GeneratePassword;
                 end;
                 ffTitle: lblTitle.Font.Color:=clHotLight;
             end;
@@ -514,7 +518,7 @@ end;
 function CreateClearPage(): IXMLNode;
 //Непосредственно генератор чистой странички
 var
-	newPageNode: IXMLNode; //okay?
+    newPageNode: IXMLNode; //okay?
     dItem: IXMLNode;       //defitem
     tField: IXMLNode;      //tempfield..okay?
 begin
@@ -522,29 +526,12 @@ begin
     newPageNode.Text:=rsNewPageTitle +'_'+ DateToStr(now);
     newPageNode.SetAttributeNS('type', '', 'page');
     dItem:= newPageNode.AddChild('DefItem');
-//    dItem.SetAttributeNS('type', '' , 'defitem');
-//    dItem.SetAttributeNS('picture', '' , 'item');
-//    tField:= dItem.AddChild('Field');
-//    tField.SetAttributeNS('name', '', 'Название');
-//    tField.SetAttributeNS('format', '', 'title');
-    //tField.Text:='Новая запись';
-//    tField:= dItem.AddChild('Field');
-//    tField.SetAttributeNS('name', '', 'Логин');
-//    tField.SetAttributeNS('format', '', 'text');
-//    tField:= dItem.AddChild('Field');
-//    tField.SetAttributeNS('name', '', 'Пароль');
-//    tField.SetAttributeNS('format', '', 'pass');
-//    tField:= dItem.AddChild('Field');
-//    tField.SetAttributeNS('name', '', 'Комментарий');
-//    tField.SetAttributeNS('format', '', 'comment');
-//    SetNodeTitle(dItem, 'Новая запись');
     dItem.ChildNodes.Add(CreateNewField(ffTitle, rsNewItemTitle));
     dItem.ChildNodes.Add(CreateNewField(ffText));
     dItem.ChildNodes.Add(CreateNewField(ffPass));
     dItem.ChildNodes.Add(CreateNewField(ffWeb));
     dItem.ChildNodes.Add(CreateNewField(ffComment));
     result:=newPageNode;
-    //i like spagetti
 end;
 procedure InsertFolder(treeNode: TTreeNode);
 //Добавление новой папки
@@ -991,7 +978,7 @@ function InitGlobal: Boolean;
 //Запуск программы
 begin
 	LogList:= TStringList.Create;
-    xmlCfg:=TSettings.Create();
+    xmlCfg:=TSettings.Create(strConfigFile);
     lsStoredDocs:= LoadStoredDocs;
 	Log('Инициализация...');
     uCrypt.EnumProviders;
@@ -1282,6 +1269,22 @@ begin
   except; end;
 end;
 
-
+procedure ShowOptionsWindow;
+var
+    tempCfg: TSettings;
+begin
+    tempCfg:= TSettings.Create;
+    tempCfg.Assign(xmlCfg);
+    if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(frmMain, tempCfg);
+    if frmOptions.ShowModal = mrOk then
+        xmlCfg.Assign(tempCfg);     //Вариант с копированием
+//    begin                         //Вариант с присвоением ссылки
+//        xmlCfg.Free;
+//        xmlCfg:=tempCfg;
+//    end else
+//        tempCfg.Free;
+    tempCfg.Free;
+    FreeAndNil(frmOptions);
+end;
 
 end.

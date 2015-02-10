@@ -46,9 +46,8 @@ object frmLog: TfrmLog
     ParentFont = False
     TabOrder = 0
     StyleElements = [seFont, seClient]
+    OnDblClick = lbLogDblClick
     OnMouseDown = lbLogMouseDown
-    ExplicitWidth = 576
-    ExplicitHeight = 374
   end
   object StatusBar1: TStatusBar
     AlignWithMargins = True
@@ -59,16 +58,14 @@ object frmLog: TfrmLog
     Margins.Top = 0
     Panels = <
       item
-        Text = 'Esc - Close, Right Click - Clear'
-        Width = 200
+        Text = 'Esc - Close, Right Click - Clear, DblClick - Copy all'
+        Width = 300
       end
       item
         Alignment = taRightJustify
         Text = 'Lines Count:'
         Width = 90
       end>
-    ExplicitTop = 380
-    ExplicitWidth = 576
   end
   object tmrLog: TTimer
     Enabled = False

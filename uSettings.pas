@@ -10,41 +10,43 @@ Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc;
 
 const
     strDefConfigSection = 'Main';
-    //strPosConfigSection = 'Position';
 
 type TSettings = class(TPersistent)
 private
-//    FXMLFilePath: string;
-//    FVersion: byte;
     sXML: IXMLDocument;
     RootNode: IXMLNode;
 protected
     //
 public
-    constructor Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
-
+    constructor Create; overload;
+    constructor Create(const XMLFilePath: string; RootNodeName: string = 'Config'); overload;
     function GetValue(OptionName: String; Default: Variant; Section: String = strDefConfigSection): Variant;
     procedure SetValue(OptionName: String; Value: Variant; Section: String = strDefConfigSection);
-
     function DeleteSection(SectionName: String = strDefConfigSection): Boolean;
     function DeleteOption(OptionName: String; Section: String = strDefConfigSection): Boolean;
     function ClearSection(SectionName: String = strDefConfigSection): Boolean;
-
     function HasOption(OptionName: String; Section: String = 'Main'): Boolean;
     function HasSection(Section: String): Boolean;
     procedure Save;
+    procedure Assign(Source: TPersistent); override;
 end;
 
 implementation
 
 uses uLog;
 
-constructor TSettings.Create(const XMLFilePath: string = 'Config.xml'; RootNodeName: string = 'Config');
+constructor TSettings.Create();
 begin
+    inherited Create;
     sXML:=TXMLDocument.Create(nil);
     sXML.Options :=[doNodeAutoIndent, doAttrNull];
     sXML.Active:=True;
+end;
+
+constructor TSettings.Create(const XMLFilePath: string; RootNodeName: string = 'Config');
+begin
     try
+        Self.Create;
         if FileExists(XMLFilePath) then begin
             sXML.LoadFromFile(XMLFilePath);
             RootNode:=sXML.ChildNodes[RootNodeName];
@@ -82,13 +84,11 @@ begin
     Result:= (RootNode.ChildNodes.FindNode(Section) <> nil);
 end;
 
-
 function TSettings.HasOption(OptionName: String; Section: String = 'Main'): Boolean;
 begin
     Result:= (RootNode.ChildNodes.FindNode(Section) <> nil) and
     (RootNode.ChildNodes[Section].ChildNodes.FindNode(OptionName) <> nil);
 end;
-
 
 procedure TSettings.Save;
 begin
@@ -115,4 +115,14 @@ begin
         RootNode.ChildNodes[Section].ChildNodes.FindNode(OptionName)
     ) <> -1)
 end;
+
+procedure TSettings.Assign(Source: TPersistent);
+begin
+    if not (Source is TSettings) then Exit;
+    sXML.XML.Text:= (Source as TSettings).sXML.XML.Text;
+    sXML.Active:=True;
+    sXML.FileName:= (Source as TSettings).sXML.FileName;
+    RootNode:=sXML.ChildNodes[(Source as TSettings).RootNode.NodeName];
+end;
+
 end.

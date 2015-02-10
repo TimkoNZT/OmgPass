@@ -2,14 +2,20 @@ program OmgPass;
 
 
 
+
+
+
+
+
+
 uses
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
+  uAccounts in 'uAccounts.pas' {frmAccounts},
   uMain in 'uMain.pas' {frmMain},
   Logic in 'Logic.pas',
   uOptions in 'uOptions.pas' {frmOptions},
-  uAccounts in 'uAccounts.pas' {frmAccounts},
   uGenerator in 'uGenerator.pas' {frmGenerator},
   XMLutils in 'XMLutils.pas',
   VersionUtils in 'VersionUtils.pas',
@@ -28,13 +34,15 @@ uses
   uCrypt in 'uCrypt.pas',
   WCrypt2 in 'WCrypt2.pas',
   uLog in 'uLog.pas',
-  uPassword in 'uPassword.pas' {frmPassword};
+  uPassword in 'uPassword.pas' {frmPassword},
+  uCustomSplitter in 'uCustomSplitter.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  Application.Title := 'Omg!Pass';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
 end.

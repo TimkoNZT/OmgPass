@@ -64,7 +64,6 @@
         <VerInfo_MajorVer>0</VerInfo_MajorVer>
         <VerInfo_MinorVer>5</VerInfo_MinorVer>
         <DCC_OutputDRCFile>true</DCC_OutputDRCFile>
-        <VCL_Custom_Styles>&quot;Amethyst Kamri|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Light Slate|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\AquaLightSlate.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\EmeraldLightSlate.vsf&quot;;Light|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\Light.vsf;&quot;Metropolis UI Green|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\MetropolisUIGreen.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\SapphireKamri.vsf&quot;;Silver|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\Silver.vsf;&quot;Smokey Quartz Kamri|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\15.0\Styles\SmokeyQuartzKamri.vsf&quot;</VCL_Custom_Styles>
         <SanitizedProjectName>OmgPass</SanitizedProjectName>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <DCC_ExeOutput>$(Platform)\$(Config)\</DCC_ExeOutput>
@@ -90,6 +89,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=0.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_ExeOutput>$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
         <DCC_DebugInformation>0</DCC_DebugInformation>
@@ -97,8 +97,7 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Icon_MainIcon>OmgPass_Icon.ico</Icon_MainIcon>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BRCC_CompilerToUse>rc</BRCC_CompilerToUse>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=0.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=0.5.0.0;Comments=</VerInfo_Keys>
         <DCC_ExeOutput>D:\Progs\OmgPass\</DCC_ExeOutput>
     </PropertyGroup>
@@ -109,6 +108,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Icon_MainIcon>..\..\Projects\OmgPass\Boomy\ICO\Full ico\windowb.ico</Icon_MainIcon>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
@@ -119,13 +119,12 @@
         <Icon_MainIcon>..\..\Projects\OmgPass\Boomy\ICO\Full ico\windowb.ico</Icon_MainIcon>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_ExeOutput>D:\Progs\OmgPass\</DCC_ExeOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_MinorVer>0</VerInfo_MinorVer>
         <DCC_DcuOutput>$(Platform)\$(Config)\</DCC_DcuOutput>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_ExeOutput>$(Platform)\$(Config)\</DCC_ExeOutput>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -134,15 +133,15 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="uAccounts.pas">
+            <Form>frmAccounts</Form>
+        </DCCReference>
         <DCCReference Include="uMain.pas">
             <Form>frmMain</Form>
         </DCCReference>
         <DCCReference Include="Logic.pas"/>
         <DCCReference Include="uOptions.pas">
             <Form>frmOptions</Form>
-        </DCCReference>
-        <DCCReference Include="uAccounts.pas">
-            <Form>frmAccounts</Form>
         </DCCReference>
         <DCCReference Include="uGenerator.pas">
             <Form>frmGenerator</Form>
@@ -189,6 +188,7 @@
             <Form>frmPassword</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uCustomSplitter.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -251,20 +251,23 @@
                     <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k210.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp210.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
                 <Language>
                     <Language Name="ProjectLang">$00000409</Language>
                     <Language Name="ActiveLang">RUS</Language>
                 </Language>
+                <Resource_DLL_Projects>
+                    <Resource_DLL_Projects Name="Item0">Русский (Россия)*$00000419*RUS*RUS</Resource_DLL_Projects>
+                </Resource_DLL_Projects>
                 <RDP_Source_Files>
                     <RDP_Source_Files Name="Item0">uLog.dfm</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item1">Win32\Release\OmgPass.drc</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item2">Win32\Debug\OmgPass.drc</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item3">uMain.dfm</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item4">uOptions.dfm</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item5">uAccounts.dfm</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item1">Win32\Debug\OmgPass.drc</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item2">..\..\..\Progs\OmgPass\OmgPass.drc</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item3">uAccounts.dfm</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item4">uMain.dfm</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item5">uOptions.dfm</RDP_Source_Files>
                     <RDP_Source_Files Name="Item6">uGenerator.dfm</RDP_Source_Files>
                     <RDP_Source_Files Name="Item7">uProperties.dfm</RDP_Source_Files>
                     <RDP_Source_Files Name="Item8">uFieldFrame.dfm</RDP_Source_Files>
@@ -274,7 +277,7 @@
                     <RDP_Source_Files Name="Item12">uFolderFrame.dfm</RDP_Source_Files>
                     <RDP_Source_Files Name="Item13">uFolderFrameInfo.dfm</RDP_Source_Files>
                     <RDP_Source_Files Name="Item14">uPassword.dfm</RDP_Source_Files>
-                    <RDP_Source_Files Name="Item15">..\..\..\Progs\OmgPass\OmgPass.drc</RDP_Source_Files>
+                    <RDP_Source_Files Name="Item15">Win32\Release\OmgPass.drc</RDP_Source_Files>
                 </RDP_Source_Files>
             </Delphi.Personality>
             <Platforms>
@@ -285,7 +288,6 @@
                 <DeployFile LocalName="Win32\Debug\OmgPass.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>OmgPass.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployClass Required="true" Name="DependencyPackage">

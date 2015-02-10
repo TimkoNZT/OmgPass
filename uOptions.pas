@@ -3,7 +3,8 @@ unit uOptions;
 interface
 
 uses
-Windows, SysUtils, Classes, Controls, Forms, StdCtrls, Vcl.ComCtrls, Vcl.ImgList;
+Windows, SysUtils, Classes, Controls, Forms, StdCtrls, Vcl.ComCtrls, Vcl.ImgList,
+uSettings, uLog;
 
 type
   TfrmOptions = class(TForm)
@@ -11,26 +12,33 @@ type
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     btnOK: TButton;
-    CheckBox1: TCheckBox;
-    UpDown1: TUpDown;
-    Label1: TLabel;
-    Edit1: TEdit;
-    Label2: TLabel;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
+    chkMakeBackups: TCheckBox;
+    udBackupsCount: TUpDown;
+    lblBackups: TLabel;
+    txtBackupsCount: TEdit;
+    lblBackupsCount: TLabel;
+    chkGenNewPass: TCheckBox;
+    chkPlaySounds: TCheckBox;
     TabSheet3: TTabSheet;
-    CheckBox5: TCheckBox;
-    CheckBox4: TCheckBox;
-    CheckBox6: TCheckBox;
-    CheckBox7: TCheckBox;
-    CheckBox8: TCheckBox;
-    ImageList1: TImageList;
-    CheckBox9: TCheckBox;
+    chkReaskPass: TCheckBox;
+    chkClearClipOnMin: TCheckBox;
+    chkMinOnCopy: TCheckBox;
+    chkMinOnLink: TCheckBox;
+    chkAnvansedEdit: TCheckBox;
+    imlOptions: TImageList;
+    chkResizeTree: TCheckBox;
+    TabSheet4: TTabSheet;
+    btnCancel: TButton;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    constructor Create(AOwner: TComponent; tempSettings: TSettings); reintroduce;
+    procedure ChangeValue(Sender: TObject);
+    procedure udBackupsCountClick(Sender: TObject; Button: TUDBtnType);
   private
     { Private declarations }
+    Cfg: TSettings;
+    function ReadConfiguration: Boolean;
   public
     { Public declarations }
   end;
@@ -42,22 +50,62 @@ implementation
 uses Logic;
 {$R *.dfm}
 
+procedure TfrmOptions.ChangeValue(Sender: TObject);
+begin
+    if not Self.Visible then Exit;
+    if (Sender is TCheckBox) then
+        with (Sender as TCheckBox) do Cfg.SetValue(Hint, BoolToStr(Checked, True));
+    if (Sender is TEdit) then
+        with (Sender as TEdit) do Cfg.SetValue(Hint, Text);
+    if (Sender is TUpDown) then
+        with (Sender as TUpDown) do Cfg.SetValue(Hint, Position);
+end;
+
+constructor TfrmOptions.Create(AOwner: TComponent; tempSettings: TSettings);
+begin
+    inherited Create(AOwner);
+    Cfg:= tempSettings;
+    ReadConfiguration;
+end;
+
+function TfrmOptions.ReadConfiguration: Boolean;
+procedure ReadValues(Com: TComponent);
+begin
+    if Com is TCheckBox then with (Com as TCheckBox) do
+        if Cfg.HasOption(Hint) then
+            Checked:= Boolean(Cfg.GetValue(Hint, False));
+    if Com is TEdit then with (Com as TEdit) do
+        if Cfg.HasOption(Hint) then
+            Text:= String(Cfg.GetValue(Hint, ''));
+    if Com is TUpDown then with (Com as TUpDown) do
+        if Cfg.HasOption(Hint) then
+            Position:= Integer(Cfg.GetValue(Hint, Min));
+end;
+var i: Integer;
+begin
+    //Заполняем чекбоксы в соответствии с текущими настройками.
+    for i := 0 to Self.ComponentCount - 1 do ReadValues(Self.Components[i]);
+end;
+
+procedure TfrmOptions.udBackupsCountClick(Sender: TObject; Button: TUDBtnType);
+begin
+    ChangeValue(Sender);
+end;
+
 procedure TfrmOptions.btnOKClick(Sender: TObject);
 begin
-Self.BorderIcons:=[];
-Self.Caption:='';
-Self.ModalResult:=mrOk;
+    Self.ModalResult:=mrOk;
 end;
 
 procedure TfrmOptions.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-
-    //Self.ModalResult:=mrCancel;
+    Self.BorderIcons:=[];
+    Self.Caption:='';
 end;
 
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
-WindowsOnTop(bWindowsOnTop, Self);
+    WindowsOnTop(bWindowsOnTop, Self);
 end;
 
 end.

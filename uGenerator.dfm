@@ -3,7 +3,7 @@ object frmGenerator: TfrmGenerator
   Top = 266
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Passwords generator'
+  Caption = 'Password generator'
   ClientHeight = 272
   ClientWidth = 409
   Color = clBtnFace
