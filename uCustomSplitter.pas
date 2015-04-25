@@ -27,7 +27,7 @@ public
     property OnDblClick;
 end;
 
-const DotsCount: Integer = 12;
+const DotsCount: Integer = 16;
 
 implementation
 
@@ -55,9 +55,9 @@ begin
     Y := (R.Top+R.Bottom) div 2;
     if (Align in [alLeft, alRight]) then
     begin
-        DX := 0; DY := 5;
+        DX := 0; DY := 4;
     end else begin
-        DX := 5; DY := 0;
+        DX := 4; DY := 0;
     end;
     dec(X, DX*(DotsCount div 2));
     dec(Y, DY*(DotsCount div 2));
@@ -65,14 +65,14 @@ begin
     Brush := TBitmap.Create;
     try
         Brush.SetSize(2, 2);
-        Brush.Canvas.Pixels[1, 1] := clBtnText;
+        Brush.Canvas.Pixels[1, 1] := clBtnShadow;  //clBtnText
         Brush.Canvas.Pixels[0, 0] := clBtnHighlight;
         Brush.Canvas.Pixels[0, 1] := clBtnShadow;
         Brush.Canvas.Pixels[1, 0] := clBtnShadow;
         for i := 0 to DotsCount do
         begin
-          Canvas.Draw(X - 2, Y, Brush);
-          Canvas.Draw(X + 1, Y, Brush);
+          Canvas.Draw(X - 1, Y, Brush);
+          Canvas.Draw(X + 2, Y, Brush);
           inc(X, DX);
           inc(Y, DY);
         end;

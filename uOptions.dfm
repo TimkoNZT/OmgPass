@@ -4,7 +4,7 @@ object frmOptions: TfrmOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Preferences'
-  ClientHeight = 266
+  ClientHeight = 286
   ClientWidth = 356
   Color = clBtnFace
   DockSite = True
@@ -100,7 +100,7 @@ object frmOptions: TfrmOptions
   OnShow = FormShow
   DesignSize = (
     356
-    266)
+    286)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
@@ -108,7 +108,7 @@ object frmOptions: TfrmOptions
     Left = 8
     Top = 7
     Width = 341
-    Height = 204
+    Height = 224
     Margins.Left = 8
     Margins.Top = 7
     Margins.Right = 7
@@ -119,10 +119,13 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      object Label1: TLabel
+        Left = 257
+        Top = 161
+        Width = 39
+        Height = 13
+        Caption = 'seconds'
+      end
       object chkGenNewPass: TCheckBox
         Left = 16
         Top = 16
@@ -192,6 +195,40 @@ object frmOptions: TfrmOptions
         TabOrder = 5
         OnClick = ChangeValue
       end
+      object CheckBox1: TCheckBox
+        Left = 16
+        Top = 159
+        Width = 185
+        Height = 17
+        Hint = 'AutoLogin'
+        Caption = 'Auto login with right password in'
+        Checked = True
+        State = cbChecked
+        TabOrder = 6
+        OnClick = ChangeValue
+      end
+      object udAutoLoginTime: TUpDown
+        Left = 230
+        Top = 157
+        Width = 21
+        Height = 21
+        Hint = 'AutoLoginTime'
+        Associate = txtAutoLoginCount
+        Max = 15
+        Position = 5
+        TabOrder = 7
+      end
+      object txtAutoLoginCount: TEdit
+        Left = 197
+        Top = 157
+        Width = 33
+        Height = 21
+        Hint = 'AutoLoginTime'
+        NumbersOnly = True
+        TabOrder = 8
+        Text = '5'
+        OnChange = ChangeValue
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Security'
@@ -232,7 +269,7 @@ object frmOptions: TfrmOptions
       ExplicitHeight = 0
       DesignSize = (
         333
-        169)
+        189)
       object lblBackups: TLabel
         Left = 16
         Top = 39
@@ -286,6 +323,7 @@ object frmOptions: TfrmOptions
         ReadOnly = True
         TabOrder = 2
         Text = '5'
+        OnChange = ChangeValue
       end
     end
     object TabSheet4: TTabSheet
@@ -299,7 +337,7 @@ object frmOptions: TfrmOptions
   end
   object btnOK: TButton
     Left = 252
-    Top = 219
+    Top = 239
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -310,7 +348,7 @@ object frmOptions: TfrmOptions
   end
   object btnCancel: TButton
     Left = 162
-    Top = 219
+    Top = 239
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -323,10 +361,10 @@ object frmOptions: TfrmOptions
     DrawingStyle = dsTransparent
     Height = 22
     Width = 22
-    Left = 56
-    Top = 216
+    Left = 32
+    Top = 240
     Bitmap = {
-      494C010104000800400016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104000800500016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

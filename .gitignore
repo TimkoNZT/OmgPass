@@ -51,6 +51,7 @@
 
 # Delphi history and backups
 __history/
+Boomy/
 *.~*
 
 # =========================
@@ -99,5 +100,5 @@ $RECYCLE.BIN/
 *.msp
 *.xml
 *.bat
-
+Boomy\
 *.dproj

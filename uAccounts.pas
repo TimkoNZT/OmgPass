@@ -6,8 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   StdCtrls, Vcl.CategoryButtons, ShellAPI,
-  Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs, Vcl.ImgList,
-  Vcl.Imaging.pngimage, Vcl.ToolWin;
+  Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs,
+  Vcl.ToolWin, Vcl.ImgList, System.ImageList;
 
 type
   TfrmAccounts = class(TForm)
@@ -41,6 +41,7 @@ type
     btnCreateNewBase: TButton;
     btnDelete: TSpeedButton;
     chkShowMainPass: TCheckBox;
+    tmrEnter: TTimer;
     constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure btnNextClick(Sender: TObject);
     procedure chkShowPassClick(Sender: TObject);
@@ -62,14 +63,13 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure txtPassChange(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
+    procedure tmrEnterTimer(Sender: TObject);
+    procedure btnOKExit(Sender: TObject);
 private
     fIsChange: Boolean;
     procedure LoadLvFiles;
     function OpenPreCheck(AlertMsg: Boolean = False): Boolean;
-//    FShowHoriz: Boolean;
-//    FShowVert: Boolean;
-//    FListViewWndProc: TWndMethod;
-//    procedure ListViewWndProc(var Msg: TMessage);
+
 protected
     procedure CreateParams(var Params: TCreateParams); override;
 
@@ -77,9 +77,8 @@ public
     FFileName: String;
     FPassword: String;
     fNewFile: Boolean;
-
-
 end;
+
 var
     frmAccounts: TfrmAccounts;
 
@@ -240,6 +239,15 @@ else
     btnOk.Click;
 end;
 
+procedure TfrmAccounts.tmrEnterTimer(Sender: TObject);
+begin
+    tmrEnter.Tag:= tmrEnter.Tag - 1;
+    if tmrEnter.Tag = 0 then
+        btnOk.Click
+    else
+        btnOk.Caption:= rsOpen + '[' + IntToStr(tmrEnter.Tag) + ']';
+end;
+
 procedure TfrmAccounts.tsNewShow(Sender: TObject);
 begin
     //
@@ -255,9 +263,21 @@ begin
 end;
 
 procedure TfrmAccounts.txtPassChange(Sender: TObject);
+var
+    RightPass: Boolean;
 begin
-if not txtPass.Enabled then Exit;
-imgNotShallPass.Visible:= (DocumentPreOpenCrypted(FFileName, txtPass.Text) <> idOk);
+    if not txtPass.Enabled then Exit;
+    RightPass:= (DocumentPreOpenCrypted(FFileName, txtPass.Text) = idOk);
+    imgNotShallPass.Visible:= not RightPass;
+    if RightPass and xmlCfg.GetValue('AutoLogin', True) then begin
+        tmrEnter.Tag:= xmlCfg.GetValue('AutoLoginTime', 5);
+        if tmrEnter.Tag = 0 then
+            btnOk.Click
+        else
+            btnOk.Caption:= rsOpen + '[' + IntToStr(tmrEnter.Tag) + ']';
+        btnOk.SetFocus;
+        tmrEnter.Enabled:= True;
+    end;
 end;
 
 procedure TfrmAccounts.btnAddClick(Sender: TObject);
@@ -409,6 +429,12 @@ begin
         ReloadStoredDocs(FFileName);
         Self.ModalResult:=mrOK;
     end;
+end;
+
+procedure TfrmAccounts.btnOKExit(Sender: TObject);
+begin
+    btnOK.Caption:= rsOpen;
+    tmrEnter.Enabled:= False;
 end;
 
 procedure TfrmAccounts.btnRemoveClick(Sender: TObject);

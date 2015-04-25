@@ -1,10 +1,14 @@
+{На каждый чекбокс или другой элемент опций вешается процедура,
+которая записывает его состояние во временный конфиг
+Запись имён опций ведется по хинту с валидным для ini именем опции}
+
 unit uOptions;
 
 interface
 
 uses
-Windows, SysUtils, Classes, Controls, Forms, StdCtrls, Vcl.ComCtrls, Vcl.ImgList,
-uSettings, uLog;
+Windows, SysUtils, Classes, Controls, Forms, StdCtrls, Vcl.ComCtrls,
+uSettings, uLog, System.ImageList, Vcl.ImgList;
 
 type
   TfrmOptions = class(TForm)
@@ -29,6 +33,10 @@ type
     chkResizeTree: TCheckBox;
     TabSheet4: TTabSheet;
     btnCancel: TButton;
+    CheckBox1: TCheckBox;
+    Label1: TLabel;
+    udAutoLoginTime: TUpDown;
+    txtAutoLoginCount: TEdit;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -82,6 +90,7 @@ begin
         if Cfg.HasOption(Hint) then
             Position:= Integer(Cfg.GetValue(Hint, Min));
 end;
+
 var i: Integer;
 begin
     //Заполняем чекбоксы в соответствии с текущими настройками.

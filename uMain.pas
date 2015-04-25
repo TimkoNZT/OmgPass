@@ -9,7 +9,7 @@ uses
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
   {My modules}
-  Logic, uCustomEdit, uDocument, uCustomSplitter;
+  Logic, uCustomEdit, uDocument, uCustomSplitter, System.ImageList;
 
 type
 TfrmMain = class(TForm)
