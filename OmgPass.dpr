@@ -42,6 +42,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Amethyst Kamri');
   Application.Title := 'Omg!Pass';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;

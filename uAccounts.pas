@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   StdCtrls, Vcl.CategoryButtons, ShellAPI,
   Vcl.ExtCtrls, Vcl.Buttons, ComCtrls, Vcl.DBCtrls, Vcl.Tabs,
-  Vcl.ToolWin, Vcl.ImgList, System.ImageList;
+  Vcl.ToolWin, Vcl.ImgList, System.ImageList, VirtualTrees;
 
 type
   TfrmAccounts = class(TForm)
@@ -162,7 +162,7 @@ function TfrmAccounts.OpenPreCheck(AlertMsg: Boolean = False): Boolean;
 begin
     Result:= False;
     txtPass.Enabled:=False;
-    txtPass.Text:='';
+//    txtPass.Text:='';
     txtPass.PasswordChar:=#0;
     txtPass.Font.Style:= [fsItalic];
     imgNotShallPass.Visible:=True;
@@ -176,6 +176,7 @@ begin
     if omgDoc<> nil then
         if FFilename = omgDoc.docFilePath then begin
             txtPass.Text := rsTxtPassAlrOpened;
+            imgNotShallPass.Visible:=False;
             Result:=False;
             if AlertMsg then Self.Close;
             Exit;
@@ -222,10 +223,13 @@ const LastSelected: Integer = 0;
 {$J-}
 begin
     if lvFiles.Items.Count = 0 then Exit;
-    if lvFiles.Selected = nil then
-        lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
-    if lvFiles.ItemIndex <> LastSelected then
-        txtPass.Text:='';
+    if lvFiles.Selected = nil then lvFiles.Items[lvFiles.Items.Count - 1].Selected:=True;
+    if lvFiles.ItemIndex = LastSelected then begin
+        if txtPass.Enabled then txtPass.SetFocus;
+        Exit;
+    end;
+    fPassword:='';
+    txtPass.Text:='';
     LastSelected:= lvFiles.ItemIndex;
     OpenPreCheck;
 end;
