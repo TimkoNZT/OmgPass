@@ -7,8 +7,9 @@ unit uOptions;
 interface
 
 uses
-Windows, SysUtils, Classes, Controls, Forms, StdCtrls, Vcl.ComCtrls,
-uSettings, uLog, System.ImageList, Vcl.ImgList;
+Windows, SysUtils, Classes, FileCtrl, Controls, Forms, StdCtrls, Vcl.ComCtrls,
+uSettings, uLog, System.ImageList, Vcl.ImgList, Vcl.Buttons, Vcl.Menus,
+  Vcl.Imaging.pngimage, Vcl.ExtCtrls;
 
 type
   TfrmOptions = class(TForm)
@@ -17,10 +18,6 @@ type
     TabSheet2: TTabSheet;
     btnOK: TButton;
     chkMakeBackups: TCheckBox;
-    udBackupsCount: TUpDown;
-    lblBackups: TLabel;
-    txtBackupsCount: TEdit;
-    lblBackupsCount: TLabel;
     chkGenNewPass: TCheckBox;
     chkPlaySounds: TCheckBox;
     TabSheet3: TTabSheet;
@@ -37,12 +34,28 @@ type
     Label1: TLabel;
     udAutoLoginTime: TUpDown;
     txtAutoLoginCount: TEdit;
+    lblBackupsCount: TLabel;
+    udBackupsCount: TUpDown;
+    txtBackupsCount: TEdit;
+    txtBackupFolder: TEdit;
+    lblBackupFolder: TLabel;
+    btnSelBackupFolder: TSpeedButton;
+    btnBackupNow: TButton;
+    Label2: TLabel;
+    imgBackup: TImage;
+    bhBackup: TBalloonHint;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     constructor Create(AOwner: TComponent; tempSettings: TSettings); reintroduce;
     procedure ChangeValue(Sender: TObject);
     procedure udBackupsCountClick(Sender: TObject; Button: TUDBtnType);
+    procedure btnSelBackupFolderClick(Sender: TObject);
+    procedure chkMakeBackupsClick(Sender: TObject);
+    procedure btnBackupNowClick(Sender: TObject);
+    procedure txtBackupFolderExit(Sender: TObject);
+    procedure txtBackupFolderChange(Sender: TObject);
+    procedure imgBackupClick(Sender: TObject);
   private
     { Private declarations }
     Cfg: TSettings;
@@ -55,8 +68,17 @@ var
   frmOptions: TfrmOptions;
 
 implementation
-uses Logic;
+uses Logic, uStrings, RyMenus;
 {$R *.dfm}
+
+procedure TfrmOptions.btnSelBackupFolderClick(Sender: TObject);
+var
+    ChosenDir: String;
+begin
+    //ChosenDir:= ExtractFilePath(Application.ExeName);
+    if SelectDirectory(rsSelectBackupDirectoryDialog, '', ChosenDir) then
+        txtBackupFolder.Text:=ChosenDir;
+end;
 
 procedure TfrmOptions.ChangeValue(Sender: TObject);
 begin
@@ -67,6 +89,17 @@ begin
         with (Sender as TEdit) do Cfg.SetValue(Hint, Text);
     if (Sender is TUpDown) then
         with (Sender as TUpDown) do Cfg.SetValue(Hint, Position);
+end;
+
+procedure TfrmOptions.chkMakeBackupsClick(Sender: TObject);
+begin
+    txtBackupFolder.Enabled:= chkMakeBackups.Checked;
+    btnSelBackupFolder.Enabled:= chkMakeBackups.Checked;
+    txtBackupsCount.Enabled:= chkMakeBackups.Checked;
+    udBackupsCount.Enabled:= chkMakeBackups.Checked;
+    lblBackupFolder.Enabled:= chkMakeBackups.Checked;
+    lblBackupsCount.Enabled:= chkMakeBackups.Checked;
+    ChangeValue(Sender);
 end;
 
 constructor TfrmOptions.Create(AOwner: TComponent; tempSettings: TSettings);
@@ -97,9 +130,53 @@ begin
     for i := 0 to Self.ComponentCount - 1 do ReadValues(Self.Components[i]);
 end;
 
+procedure TfrmOptions.txtBackupFolderChange(Sender: TObject);
+var
+    fullPath: String;
+begin
+    CheckBackupFolder(txtBackupFolder.Text, fullPath);
+    //btnSelBackupFolder.Hint:= 'Current path: ' + fullPath;
+    bhBackup.Description := fullPath;
+end;
+
+procedure TfrmOptions.txtBackupFolderExit(Sender: TObject);
+var
+    fullPath: String;
+begin
+    if not CheckBackupFolder(txtBackupFolder.Text, fullPath, True) then
+        case MessageBox(Self.Handle,
+                        PWideChar(Format(rsWrongBackupFolder, [fullPath])),
+                        PWideChar(rsWrongBackupFolderTitle),
+                        MB_YESNOCANCEL + MB_ICONWARNING) of
+        ID_NO: begin
+            txtBackupFolder.Show;
+            txtBackupFolder.SetFocus;
+        end;
+        ID_YES: begin
+            txtBackupFolder.Text:=constDefaultBackupFolder;
+//            txtBackupFolder.Show;
+//            txtBackupFolder.SetFocus;
+        end;
+        ID_CANCEL:begin
+            txtBackupFolder.Text:=xmlCfg.GetValue('BackupFolder', constDefaultBackupFolder);
+//            txtBackupFolder.Show;
+//            txtBackupFolder.SetFocus;
+        end;
+        end;
+
+
+    ChangeValue(Sender);
+end;
+
 procedure TfrmOptions.udBackupsCountClick(Sender: TObject; Button: TUDBtnType);
 begin
     ChangeValue(Sender);
+end;
+
+procedure TfrmOptions.btnBackupNowClick(Sender: TObject);
+begin
+    MakeDocumentBackup;
+    Beep;
 end;
 
 procedure TfrmOptions.btnOKClick(Sender: TObject);
@@ -116,6 +193,25 @@ end;
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
     WindowsOnTop(bWindowsOnTop, Self);
+    SetButtonImg(btnSelBackupFolder, imlOptions, 4);
+    chkMakeBackupsClick(nil);                                                   //Для enable-disable зависимых контролов
+    txtBackupFolderChange(nil);                                                 //Для заполнения bhBackup
+end;
+
+procedure TfrmOptions.imgBackupClick(Sender: TObject);
+var
+    Point:TPoint;
+begin
+//    if bhBackup.ShowingHint then begin                                        //Нестабильно
+//        bhBackup.HideHint;
+//        Exit;
+//    end;
+    bhBackup.Title := rsBackupHintTitle;
+    bhBackup.ImageIndex:= 5;
+    point.X := txtBackupFolder.Width div 2;
+    point.Y := txtBackupFolder.Height;
+    bhBackup.ShowHint(txtBackupFolder.ClientToScreen(point));
+
 end;
 
 end.

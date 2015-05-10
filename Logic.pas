@@ -26,7 +26,7 @@ var
                                     //1 - загрузка страницы
     iSelected: Integer;             //Эппл подаст в суд
     bSearchMode: Boolean;           //Режим поиска
-	  bLogDocked: Boolean;            //Пристыкован ли Лог к основному окошку
+	  bLogDocked: Boolean;          //Пристыкован ли Лог к основному окошку
     DragGhostNode: TTreeNode;       //Призрачный узел
     bShowPasswords: Boolean;        //Загадочная переменная
     bWindowsOnTop: Boolean;         //Ещё одна
@@ -81,14 +81,17 @@ function CreateNewField(fFmt: eFieldFormat = ffNone; Value: String = ''): IXMLNo
 function CreateNewBase(fPath: String; Password: String): Boolean;
 
 function LoadStoredDocs(): TStringList;
-procedure ReloadStoredDocs(newFile: String);
+procedure AddReloadStoredDocs(newFile: String);
 function SaveStoredDocs: Boolean;
 function RemoveStoredDocs(DocPath: String = ''; Index: Integer = -1): Boolean;
 
 function DocumentPreOpenXML(Path: String; AlertMsg: Boolean = False): Boolean;
 function DocumentPreOpenCrypted(Path: String; TryPass: String; AlertMsg: Boolean = False): Integer;
-
 function DocumentOpen(Path: String; Pass: String): Boolean;
+
+function CheckBackupFolder(sBackupFolder: String; var FullPath: String; CreateFolder: Boolean = False): Boolean;
+procedure MakeDocumentBackup();
+
 procedure DocumentOpenByPass;
 procedure DocumentClose;
 
@@ -940,7 +943,6 @@ begin
             rsInfoSubItems + IntToStr(IterateItems(Node, False)) +  CrLf +
             rsInfoTotalItems + IntToStr(IterateItems(Node, True));
 end;
-
 procedure EditDefaultItem;
 //Вызов формы редактирования для записи по умолчанию
 var
@@ -1000,10 +1002,9 @@ begin
 //    SetButtonImg(btnTheme, imlTab, 41);
 //    end;
 end;
-
 function CreateNewBase(fPath: String; Password: String): Boolean;
 //Новый документ с нуля
-//Формируется файл по заданому пути
+//Формируется файл по заданому пути с заданным паролем
 var
     newDoc: TOmgDocument;
     docType: TOmgDocument.tOmgDocType;
@@ -1029,7 +1030,6 @@ finally
     newDoc.Free;
 end;
 end;
-
 {$REGION '#StoredDocs'}
 function LoadStoredDocs(): TStringList;
 //Загружаем список известных файлов из конфига в список
@@ -1041,7 +1041,7 @@ begin
         Log(Format('Stored Documents: Index %d = %s ', [i, Result[i]]));
     end;
 end;
-procedure ReloadStoredDocs(newFile: String);
+procedure AddReloadStoredDocs(newFile: String);
 //Добавляем файл в начало списка известных
 //Поднимаем его из середины списка если он там уже был
 var i: Integer;
@@ -1132,6 +1132,8 @@ begin
         frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
         LoadDocSettings;
         MessageIsEmptyDoc;
+        if Boolean(xmlCfg.GetValue('MakeBackups', False)) then
+            MakeDocumentBackup();
         Result:=True;
     except
         on e: Exception do begin
@@ -1167,6 +1169,65 @@ try
     end;
 except
     on e: Exception do ErrorLog(e, 'The gods were overthrown!');
+end;
+end;
+function CheckBackupFolder(sBackupFolder: String; var FullPath: String; CreateFolder: Boolean = False): Boolean;
+//Проверка папки для бэкапов
+//sBackupFolder передается по значению в виде полного или относительного пути
+//FullPath передается по ссылке для возврата полного пути папки
+//CreateFolder разрешает создать эту папку для проверки правильности имени
+begin
+    if ExtractFileDrive(sBackupFolder) = '' then
+        sBackupFolder:= GetCurrentDir() +'\' + sBackupFolder;
+    sBackupFolder:= ExpandFileName(sBackupFolder);
+    FullPath:=IncludeTrailingBackslash(sBackupFolder);
+    if CreateFolder then
+        if not DirectoryExists(FullPath) then
+            Result:= ForceDirectories(FullPath)
+        else
+            Result:=True;
+end;
+procedure MakeDocumentBackup();
+//Делаем бэкап в папку из настроек
+//Удаляем лишние бэкапы согласно настройкам
+function GetFileCount(Dir: String; var OldestFile : String): integer;
+//Подфункция выдаёт на выходе количество файлов в папке
+//а заодно, в параметре OldestFile вытаскивает самый старый файл из списка по дате изменения
+var
+    fs: TSearchRec;
+begin
+    Result:=0;
+    if FindFirst(Dir + '\Backup_*.*', faAnyFile - faDirectory - faVolumeID, fs) = 0 then begin
+        OldestFile := Dir + fs.Name;
+        repeat
+            inc(Result);
+            if FileAge(Dir + fs.Name) < FileAge(OldestFile)  then
+                OldestFile := Dir + fs.Name;
+        until FindNext(fs) <> 0;
+    end;
+    FindClose(fs);
+end;
+
+var
+    sBackupFolder, sBackupFile, formattedDT, sOldestFile: String;
+begin
+try
+    sBackupFolder:= xmlCfg.GetValue('BackupFolder', constDefaultBackupFolder);
+    if not CheckBackupFolder(sBackupFolder, sBackupFolder, True) then           //Разворачиваем путь и проверяем что папка существует
+        raise Exception.Create(rsCantCreateBackupFolder + sBackupFolder);
+
+    DateTimeToString(formattedDT, strBackupDTformat, Now);                      //Формируем строчку из даты-времени для названия бэкапа
+    sBackupFile:= sBackupFolder + strBackupFilePrefix + formattedDT + ExtractFileName(omgDoc.docFilePath);
+    if not omgDoc.Save(sBackupFile) then                                        //Сохранение силами класса TOmgDocument
+        raise Exception.Create(rsCantCreateBackup + sBackupFile);
+
+    while GetFileCount(sBackupFolder, sOldestFile) > xmlCfg.GetValue('BackupsCount', 5) do
+        DeleteFile(sOldestFile);                                                //Пока в папке лишние файлы, удаляем по одному самые старые
+
+except
+        on e: Exception do begin
+            ErrorLog(e, 'DocumentBackup');
+        end;
 end;
 end;
 procedure DocumentClose;
@@ -1251,7 +1312,6 @@ begin
         FreeAndNil(fStream);
     end;
 end;
-
 function GetAppVersion:string;
 type
   TVerInfo=packed record
@@ -1273,7 +1333,6 @@ begin
    s.Free;
   except; end;
 end;
-
 procedure ShowOptionsWindow;
 var
     tempCfg: TSettings;

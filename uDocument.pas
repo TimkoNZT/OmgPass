@@ -41,14 +41,14 @@ public
     destructor Destroy; override;
     function Open(Path: String; Password: String): Boolean;
     function OpenByPass(FilePath: String): Boolean;
-    function Save: Boolean;
+    //function Save: Boolean;
     function Close: Boolean;
     function GetProperty(PropertyName: String; DefValue: Variant): Variant;
     function SetProperty(PropertyName: String; Value: Variant): Boolean;
     function IsEmpty: Boolean;
-    class function CreateHeader(sPassword: String): TCryFileHeader;
+    class function CreateHeader(sPassword: String): TCryFileHeader;             //Аналог static в шарпе
     procedure SaveAsCrypted;
-    procedure SaveAs(FilePath: String; dType: tOmgDocType);
+    function Save(FilePath: String = ''): Boolean;
     function CheckThisPassword(Password: String): Boolean;
     function ChangePassword(Password: String): Boolean;
 end;
@@ -174,39 +174,75 @@ begin
     end;
 end;
 
-procedure TOmgDocument.SaveAs(FilePath: String; dType: tOmgDocType);
-begin
-    //
-end;
-
-function TOmgDocument.Save: Boolean;
+function TOmgDocument.Save(FilePath: String= ''): Boolean;
 var
-    xStream, cStream: TMemoryStream;
+    xStream, cStream, fStream: TMemoryStream;
 begin
     try
         Self.SavePosition;
+        fStream:=TMemoryStream.Create;
         xStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
         Self.XML.SaveToStream(xStream);
         xStream.Position:=0;
+        fStream.Position:=0;
         fileStream.Position:=0;
         if Self.docType = dtCrypted then begin
             cStream:=TMemoryStream.Create;
-            fileStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
+            fStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
             cryptStream(xStream, cStream, docPassword, $100);
-            fileStream.CopyFrom(cStream, cStream.Size);
-            fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
+            fStream.CopyFrom(cStream, cStream.Size);
+            fStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
+            cStream.Free;
         end else begin
-            xStream.SaveToStream(fileStream);
-            fileStream.Size:= xStream.Size;
+            xStream.SaveToStream(fStream);
+            fStream.Size:= xStream.Size;
+            xStream.Free;
         end;
+        if FilePath <> '' then
+            fStream.SaveToFile(FilePath)
+        else begin
+            fileStream.CopyFrom(fStream, 0);
+            fileStream.Size:= fStream.Size;
+        end;
+
+        fStream.Free;
         Result:=True;
     except
         on e: Exception do begin
-            ErrorLog(e, 'TOmgDocument.Save');
+            ErrorLog(e, 'TOmgDocument.SaveAs');
             Result:=False;
         end;
     end;
 end;
+
+//function TOmgDocument.Save: Boolean;
+//var
+//    xStream, cStream: TMemoryStream;
+//begin
+//    try
+//        Self.SavePosition;
+//        xStream:=TMemoryStream.Create; //Position:=0; xmlStream.Size:=0;
+//        Self.XML.SaveToStream(xStream);
+//        xStream.Position:=0;
+//        fileStream.Position:=0;
+//        if Self.docType = dtCrypted then begin
+//            cStream:=TMemoryStream.Create;
+//            fileStream.WriteBuffer(docHeader, sizeOf(TCryFileHeader));
+//            cryptStream(xStream, cStream, docPassword, $100);
+//            fileStream.CopyFrom(cStream, cStream.Size);
+//            fileStream.Size:= cStream.Size + sizeOf(TCryFileHeader);
+//        end else begin
+//            xStream.SaveToStream(fileStream);
+//            fileStream.Size:= xStream.Size;
+//        end;
+//        Result:=True;
+//    except
+//        on e: Exception do begin
+//            ErrorLog(e, 'TOmgDocument.Save');
+//            Result:=False;
+//        end;
+//    end;
+//end;
 
 function TOmgDocument.Close;
 begin

@@ -35,14 +35,14 @@ uses
   WCrypt2 in 'WCrypt2.pas',
   uLog in 'uLog.pas',
   uPassword in 'uPassword.pas' {frmPassword},
-  uCustomSplitter in 'uCustomSplitter.pas';
+  uCustomSplitter in 'uCustomSplitter.pas',
+  RyMenus in 'RyMenus.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  TStyleManager.TrySetStyle('Amethyst Kamri');
   Application.Title := 'Omg!Pass';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;

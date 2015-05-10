@@ -13,6 +13,9 @@ const
     strConfigFile = 'config.xml';
     strLink = 'https://github.com/Mrgnstrn/OmgPass/releases/';
     strSaveDialogDefFileName = 'NewCryptedBase';
+    strBackupFilePrefix = 'Backup_';
+    strBackupDTformat = 'yymmdd_hhmmss_';
+    constDefaultBackupFolder = '.\Backups';
 
 const arrFieldFormats: array[0..8] of String = ('title',
                                                 'text',
@@ -125,6 +128,10 @@ resourcestring
     rsSaveDialogFilter = 'Omg!Pass Crypted files (*.opwd)|*.opwd|Omg!Pass XML files (*.xml)|*.xml';
     rsOpenDialogFilter = 'Omg!Pass Crypted files (*.opwd)|*.opwd|Omg!Pass XML files (*.xml)|*.xml|All files|*.*';
     rsOpenDialogFilterCryptedOnly = 'Omg!Pass Crypted (*.opwd)|*.opwd';
+    rsCreateNewNeedFile = 'Please select location for new base' + CrLf + 'and type main password if it needed.';
+    rsCreateNewNeedFileTitle = 'Can''t create new base';
+    rsCreateNewWrongConfirm = 'Confirm field is not equal to password';
+    rsCreateNewWrongConfirmTitle = 'Can''t create new base';
     rsFileNotFoundMsg = 'File not found on the stored path!' +
                          CrLf + 'Would you like to create a new document' +
                          CrLf + '%s ?';
@@ -140,15 +147,28 @@ resourcestring
                             'Are you sure you want to delete the document' + CrLf + '%s ?';
     rsDeletingDocumentTitle = 'Deleting...';}
     rsTxtPassFileNotFound = 'File not found';
+    rsTxtPassFileNotSelected = 'File not selected';
     rsTxtPassFileIsBad = 'Bad or corupted file';
     rsTxtPassPassEmpty = 'Empty password used';
     rsTxtPassAlrOpened = 'File already opened';
     rsTxtPassPassNotReq = 'Not required';
     //frmMain
     rsAbout = '%s ver. %s' + CrLf +'An simple app for store and managment yours passwords' + CrLF +
-                'Copyright by Nazarov Timur (vk.com/id1669165)'+ CrLf +
-                'Boomy icons by Milosz Wlazlo (miloszwl.deviantart.com)';
+                'Copyright by Nazarov Timur (vk.com/id1669165)'+ CrLf + CrLf +
+                'Boomy icons by Milosz Wlazlo (miloszwl.deviantart.com)' + CrLf +
+                'Class TRyMenu by Alexey Rumyancev (skitl@mail.ru)';
     rsAboutTitle = 'About...';
+    //frmOptions
+    rsCantCreateBackupFolder = 'Can''t create backup folder ';
+    rsCantCreateBackup = 'Can''t create backup of ';
+    rsSelectBackupDirectoryDialog = 'Select folder for backups...';
+    rsWrongBackupFolderTitle = 'Wrong backup folder';
+    rsWrongBackupFolder = 'Can''t find or create folder' + CrLf + '%s' + CrLf +
+                          'Would you like set default folder?' + CrLf + CrLf +
+                          'Yes - set default value' + CrLf +
+                          'No - try another value' + CrLf +
+                          'Cancel - set previous value';
+    rsBackupHintTitle = 'Full path of backup folder:';
     //frmPassword
     rsWrongOldPassword = 'Wrong old password';
     rsWrongOldPasswordTitle = 'Error';
