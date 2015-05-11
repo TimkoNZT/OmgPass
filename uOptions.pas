@@ -44,6 +44,7 @@ type
     Label2: TLabel;
     imgBackup: TImage;
     bhBackup: TBalloonHint;
+    CheckBox2: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

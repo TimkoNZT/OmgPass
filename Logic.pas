@@ -307,6 +307,7 @@ begin
     else
        	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     intExpandFlag:=0;
+    tabControl.Tabs.Add('');
     Log('--------------------ParsePagesToTabs:End');
 end;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
@@ -736,13 +737,11 @@ end;
 procedure DragAndDropVisual(trgTreeNode: TTreeNode; selTreeNode:  TTreeNode);
 //Визуальное представление перетаскивания мышкой
 var
-//selNode: IXMLNode;
-trgNode: IXMLNode;
+    trgNode: IXMLNode;
 begin
     if trgTreeNode = DragGhostNode then Exit;
-    if DragGhostNode<> nil then frmMain.tvMain.Items.Delete(DragGhostNode);
+    if DragGhostNode <> nil then FreeAndNil(DragGhostNode);                     //Логичное использование Delete не обнуляет ссылку
     if (selTreeNode= nil) or (trgTreeNode=nil) then Exit;
-    //selNode:=IXMLNode(selTreeNode.Data);
     trgNode:=IXMLNode(trgTreeNode.Data);
     //if (selNode= nil) or (trgNode=nil) then Exit;
     case GetNodeType(trgNode) of

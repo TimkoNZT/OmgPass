@@ -507,6 +507,7 @@ procedure TfrmMain.tabMainMouseLeave(Sender: TObject);
 begin
 	tmrRenameTab.Enabled:=False;
 end;
+
 procedure TfrmMain.tmrRenameTabTimer(Sender: TObject);
 //Таймер срабатывает через секунду, если не уводить с таба мышь
 //Выделяется и редактируется нода соотв. странице.
@@ -574,7 +575,7 @@ procedure TfrmMain.tvMainDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   trgNode, selNode: TTreeNode;
 begin
-Log('Drop!');
+    Log('Drop!');
   	trgNode := tvMain.GetNodeAt(X, Y);
   	selNode := tvMain.Selected;
     //if trgNode = DragGhostNode then trgNode:= DragGhostNode.getNextSibling;
@@ -588,29 +589,31 @@ end;
 procedure TfrmMain.tvMainDragOver(Sender, Source: TObject; X, Y: Integer;
 State: TDragState; var Accept: Boolean);
 const
-  crDragCopy: Integer = -23;          //Кто бы мог подумать, уроды криворукие
+    crDragCopy: Integer = -23;  //Кто бы мог подумать, какие уроды криворукие сидят в бракодеро
 var
-  trgNode, selNode, tmpNode: TTreeNode;
+    trgNode, selNode, tmpNode: TTreeNode;
 begin
+    //Log('DragOver: ' + x.ToString() +',' + y.ToString() +', ' + tvMain.Width.ToString() + ', ' + tvMain.Height.ToString());
     if (GetKeyState(VK_CONTROL) AND 128) = 128 then
         tvMain.DragCursor:= crDragCopy
     else
         tvMain.DragCursor:= crDrag;
   	trgNode := tvMain.GetNodeAt(x, y);
   	selNode := tvMain.Selected;
-    nodeToExpand:=trgNode;                             
+    nodeToExpand:=trgNode;                                                      //Разворачиваем папки, если задержать мышь
     tmrTreeExpand.Enabled:=True;
     
-    if (trgNode=nil) or
-    (trgNode = selNode) or
-    //(trgNode = selNode.Parent) or
-    (selNode = nil) then begin
+    if (trgNode = nil) or
+    (selNode = trgNode) or                                                      //Не ожидал что при Drop-е State тоже встаёт в dsDragLeave
+    (selNode = nil) or                                                          //как и при уводе мыши за горизонт дерева, поэтому
+    ((State = dsDragLeave) and not //В принципе эта строка лишняя               //Отлавливаем увод мыши за пределы дерева
+    (PtInRect(tvMain.ClientRect, tvMain.ScreenToClient(Mouse.CursorPos))))      //чтобы удалить псевдоузел, чтобы он не залипал в дереве
+    then begin                                                                  //Причём MouseInClient нихрена не работает!!!
         Accept:=False;
         DragAndDropVisual(nil, nil);
         Exit;
     end;
-    
-    //Маленькая проверка на временные парадоксы
+    //Маленькая проверка на временные парадоксы c убийством дедушки
     tmpNode:=trgNode;
     while (tmpNode.Parent <> nil) do begin
         tmpNode := tmpNode.Parent;

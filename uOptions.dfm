@@ -229,6 +229,14 @@ object frmOptions: TfrmOptions
         Text = '5'
         OnChange = ChangeValue
       end
+      object CheckBox2: TCheckBox
+        Left = 208
+        Top = 111
+        Width = 57
+        Height = 17
+        Caption = 'ROwselect'
+        TabOrder = 9
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Security'
@@ -457,7 +465,7 @@ object frmOptions: TfrmOptions
     Left = 16
     Top = 240
     Bitmap = {
-      494C010106000001B00016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000001B40016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
