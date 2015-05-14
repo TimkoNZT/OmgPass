@@ -4,8 +4,8 @@ object frmOptions: TfrmOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Preferences'
-  ClientHeight = 287
-  ClientWidth = 359
+  ClientHeight = 295
+  ClientWidth = 348
   Color = clBtnFace
   DockSite = True
   Font.Charset = DEFAULT_CHARSET
@@ -99,21 +99,21 @@ object frmOptions: TfrmOptions
   OnClose = FormClose
   OnShow = FormShow
   DesignSize = (
-    359
-    287)
+    348
+    295)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
     AlignWithMargins = True
     Left = 8
     Top = 7
-    Width = 344
-    Height = 225
+    Width = 333
+    Height = 233
     Margins.Left = 8
     Margins.Top = 7
     Margins.Right = 7
     Margins.Bottom = 55
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alClient
     Images = imlOptions
     TabOrder = 0
@@ -121,7 +121,7 @@ object frmOptions: TfrmOptions
       Caption = 'General'
       object Label1: TLabel
         Left = 257
-        Top = 161
+        Top = 171
         Width = 39
         Height = 13
         Caption = 'seconds'
@@ -140,7 +140,7 @@ object frmOptions: TfrmOptions
       end
       object chkPlaySounds: TCheckBox
         Left = 16
-        Top = 40
+        Top = 38
         Width = 281
         Height = 17
         Hint = 'PlaySounds'
@@ -152,7 +152,7 @@ object frmOptions: TfrmOptions
       end
       object chkMinOnCopy: TCheckBox
         Left = 16
-        Top = 64
+        Top = 60
         Width = 281
         Height = 17
         Hint = 'MinimizeOnCopy'
@@ -163,7 +163,7 @@ object frmOptions: TfrmOptions
       end
       object chkMinOnLink: TCheckBox
         Left = 16
-        Top = 88
+        Top = 82
         Width = 281
         Height = 17
         Hint = 'MinimizeOnLink'
@@ -174,7 +174,7 @@ object frmOptions: TfrmOptions
       end
       object chkAnvansedEdit: TCheckBox
         Left = 16
-        Top = 112
+        Top = 104
         Width = 281
         Height = 17
         Hint = 'AdvancedEdit'
@@ -185,7 +185,7 @@ object frmOptions: TfrmOptions
       end
       object chkResizeTree: TCheckBox
         Left = 16
-        Top = 136
+        Top = 126
         Width = 281
         Height = 17
         Hint = 'AutoResizeTree'
@@ -197,7 +197,7 @@ object frmOptions: TfrmOptions
       end
       object CheckBox1: TCheckBox
         Left = 16
-        Top = 159
+        Top = 169
         Width = 185
         Height = 17
         Hint = 'AutoLogin'
@@ -209,7 +209,7 @@ object frmOptions: TfrmOptions
       end
       object udAutoLoginTime: TUpDown
         Left = 230
-        Top = 157
+        Top = 167
         Width = 21
         Height = 21
         Hint = 'AutoLoginTime'
@@ -220,7 +220,7 @@ object frmOptions: TfrmOptions
       end
       object txtAutoLoginCount: TEdit
         Left = 197
-        Top = 157
+        Top = 167
         Width = 33
         Height = 21
         Hint = 'AutoLoginTime'
@@ -229,21 +229,30 @@ object frmOptions: TfrmOptions
         Text = '5'
         OnChange = ChangeValue
       end
-      object CheckBox2: TCheckBox
-        Left = 208
-        Top = 111
-        Width = 57
+      object chkTreeRowSelect: TCheckBox
+        Left = 16
+        Top = 148
+        Width = 281
         Height = 17
-        Caption = 'ROwselect'
+        Hint = 'TreeRowSelect'
+        Caption = 'Full row select in tree'
         TabOrder = 9
+        OnClick = ChangeValue
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'Security'
       ImageIndex = 1
+      object Label3: TLabel
+        Left = 272
+        Top = 61
+        Width = 37
+        Height = 13
+        Caption = 'minutes'
+      end
       object chkReaskPass: TCheckBox
         Left = 16
-        Top = 40
+        Top = 38
         Width = 281
         Height = 17
         Hint = 'ReaskPassOnFocus'
@@ -263,31 +272,60 @@ object frmOptions: TfrmOptions
         TabOrder = 1
         OnClick = ChangeValue
       end
+      object CheckBox3: TCheckBox
+        Left = 16
+        Top = 60
+        Width = 201
+        Height = 17
+        Hint = 'ReaskPassOnFocus'
+        Caption = 'Close program if not active more than'
+        Enabled = False
+        TabOrder = 2
+        OnClick = ChangeValue
+      end
+      object Edit1: TEdit
+        Left = 217
+        Top = 58
+        Width = 33
+        Height = 21
+        Hint = 'AutoLoginTime'
+        NumbersOnly = True
+        TabOrder = 3
+        Text = '5'
+        OnChange = ChangeValue
+      end
+      object UpDown1: TUpDown
+        Left = 250
+        Top = 58
+        Width = 16
+        Height = 21
+        Hint = 'AutoLoginTime'
+        Associate = Edit1
+        Max = 15
+        Position = 5
+        TabOrder = 4
+      end
     end
     object TabSheet1: TTabSheet
       Caption = 'Backups'
       ImageIndex = 2
-      DesignSize = (
-        336
-        190)
       object lblBackupsCount: TLabel
         Left = 16
-        Top = 101
+        Top = 122
         Width = 207
         Height = 13
         Caption = 'Num of keeped backups for each document'
       end
       object lblBackupFolder: TLabel
         Left = 16
-        Top = 46
+        Top = 69
         Width = 172
         Height = 13
-        Anchors = [akLeft, akTop, akRight]
         Caption = 'Backups folder (full or relative path)'
       end
       object btnSelBackupFolder: TSpeedButton
-        Left = 289
-        Top = 60
+        Left = 262
+        Top = 83
         Width = 26
         Height = 26
         Flat = True
@@ -297,7 +335,7 @@ object frmOptions: TfrmOptions
       end
       object Label2: TLabel
         Left = 113
-        Top = 140
+        Top = 147
         Width = 176
         Height = 26
         Caption = 
@@ -314,8 +352,8 @@ object frmOptions: TfrmOptions
         WordWrap = True
       end
       object imgBackup: TImage
-        Left = 264
-        Top = 62
+        Left = 289
+        Top = 85
         Width = 22
         Height = 22
         Picture.Data = {
@@ -373,14 +411,14 @@ object frmOptions: TfrmOptions
         Top = 16
         Width = 278
         Height = 17
-        Hint = 'MakeBackups'
+        Hint = 'BackupsOnLogin'
         Caption = 'Make backups on each login'
         TabOrder = 0
         OnClick = chkMakeBackupsClick
       end
       object udBackupsCount: TUpDown
         Left = 260
-        Top = 97
+        Top = 118
         Width = 24
         Height = 21
         Hint = 'BackupsCount'
@@ -393,7 +431,7 @@ object frmOptions: TfrmOptions
       end
       object txtBackupsCount: TEdit
         Left = 227
-        Top = 97
+        Top = 118
         Width = 33
         Height = 21
         Hint = 'BackupsCount'
@@ -405,7 +443,7 @@ object frmOptions: TfrmOptions
       end
       object txtBackupFolder: TEdit
         Left = 16
-        Top = 62
+        Top = 85
         Width = 244
         Height = 22
         Hint = 'BackupFolder'
@@ -423,12 +461,24 @@ object frmOptions: TfrmOptions
       end
       object btnBackupNow: TButton
         Left = 16
-        Top = 140
+        Top = 147
         Width = 80
         Height = 35
         Caption = 'Backup now!'
         TabOrder = 4
         OnClick = btnBackupNowClick
+      end
+      object chkMakeBackupsCh: TCheckBox
+        Left = 16
+        Top = 38
+        Width = 278
+        Height = 17
+        Hint = 'BackupsOnChanges'
+        Caption = 'Make backups on each document change'
+        Checked = True
+        State = cbChecked
+        TabOrder = 5
+        OnClick = chkMakeBackupsClick
       end
     end
     object TabSheet4: TTabSheet
@@ -437,8 +487,8 @@ object frmOptions: TfrmOptions
     end
   end
   object btnOK: TButton
-    Left = 255
-    Top = 240
+    Left = 244
+    Top = 248
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -448,8 +498,8 @@ object frmOptions: TfrmOptions
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 165
-    Top = 240
+    Left = 154
+    Top = 248
     Width = 80
     Height = 35
     Anchors = [akRight, akBottom]
@@ -465,7 +515,7 @@ object frmOptions: TfrmOptions
     Left = 16
     Top = 240
     Bitmap = {
-      494C010106000001B40016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000001BC0016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -977,7 +1027,7 @@ object frmOptions: TfrmOptions
     Style = bhsStandard
     Delay = 0
     HideAfter = 3000
-    Left = 72
-    Top = 240
+    Left = 80
+    Top = 248
   end
 end

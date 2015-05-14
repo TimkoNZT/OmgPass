@@ -40,6 +40,7 @@ function InitGlobal: Boolean;
 function DocManager(Reopen: Boolean = False): Boolean;
 function CheckVersion: Boolean;
 function CheckUpdates: Boolean;
+procedure LoadInitialSettings;
 procedure LoadSettings;
 procedure LoadDocSettings;
 procedure SaveSettings;
@@ -91,6 +92,7 @@ function DocumentOpen(Path: String; Pass: String): Boolean;
 
 function CheckBackupFolder(sBackupFolder: String; var FullPath: String; CreateFolder: Boolean = False): Boolean;
 procedure MakeDocumentBackup();
+procedure MakeBackupOnChanges();
 
 procedure DocumentOpenByPass;
 procedure DocumentClose;
@@ -421,6 +423,7 @@ begin
         if not isNew then
             Node.ParentNode.ChildNodes.ReplaceNode(Node, tmpNode);
         Node:= tmpNode;
+        MakeBackupOnChanges();
         Result:=True;
     end else begin
         Log('frmEditItem: mrCancel');
@@ -462,6 +465,7 @@ procedure EditNodeTitle(Node: IXMLNode; Title: String);
 //Вызывается при редатировании TTreeView
 begin
 	SetNodeTitle(Node, Title);
+    MakeBackupOnChanges();
     case GetNodeType(Node) of
     ntItem:
 		GeneratePanel(Node, frmMain.fpMain);
@@ -509,13 +513,14 @@ begin
         ParsePagesToTabs(omgDoc.XML, frmMain.tabMain);
         frmMain.tabMainChange(nil);
     end else treeNode.Delete;
+    MakeBackupOnChanges();
 end;
 procedure AddNewPage();
 //Новая страничка
 begin
-if omgDoc.docPages.Count <> 0 then inc(omgDoc.CurrentPage);
-omgDoc.docPages.Insert(omgDoc.CurrentPage, CreateClearPage);
-
+    if omgDoc.docPages.Count <> 0 then inc(omgDoc.CurrentPage);
+    omgDoc.docPages.Insert(omgDoc.CurrentPage, CreateClearPage);
+    MakeBackupOnChanges();
 //    ParsePagesToTabs(xmlMain, frmMain.tabMain);
 //    frmMain.tabMainChange(nil);
 end;
@@ -563,6 +568,7 @@ begin
         Selected:=True;
 		EditText;
 	end;
+    //MakeBackupOnChanges();         //Не требуется после EditText;
 end;
 procedure InsertItem(treeNode: TTreeNode);
 //Добавление новой записи
@@ -636,7 +642,7 @@ begin
     Node:=IXMLNode(treeNode.Data);
     case GetNodeType(Node) of
     ntPage:
-        Log('Page clone not realised yet...');
+        Log('Page clone not realised yet...');                                  //Увы :(
     ntFolder: begin
             Log('Clone folder');
             DragAndDropVisual(treeNode.Parent, treeNode);
@@ -656,8 +662,8 @@ begin
                 SelectedIndex:=treeNode.SelectedIndex;
                 Selected:=True;
             end;}
-            DragAndDropVisual(treeNode, treeNode);
-            DragAndDrop(treeNode, treeNode, True);
+            DragAndDropVisual(treeNode, treeNode);                              //Хитрый китайский трюк
+            DragAndDrop(treeNode, treeNode, True);                              //Имитируем перетаскивание мышкой с копиованием
         end;
     end;
 
@@ -726,7 +732,7 @@ begin
     end;
     DragGhostNode:=nil;
     intExpandFlag:=0;
-
+    MakeBackupOnChanges();
     //Жалко, старый код полностью перерисовывал дерево
     //  IterateTree теперь не нужна... используем в поиске...
     {Logic.ParsePageToTree(Logic.intCurrentPage, frmMain.tvMain);
@@ -769,8 +775,8 @@ begin
     Log('IterateTree: End');
 end;
 {$REGION 'Настройки'}
-procedure LoadSettings;
-//Загрузка настроек программы
+procedure LoadInitialSettings;
+//Загрузка настроек программы при старте
 begin
     bShowPasswords:= xmlCfg.GetValue('ShowPasswords', True);
     bWindowsOnTop:= xmlCfg.GetValue('WindowOnTop', False);
@@ -790,6 +796,12 @@ begin
         //if xmlCfg.GetValue('TreeWidth', 0, 'Position') <> 0 then
         frmMain.pnlTree.Width:= xmlCfg.GetValue('TreeWidth', 200, 'Position');
     //end;
+end;
+procedure LoadSettings;
+//Загрузка настроек которые можно менять по ходу программы
+//Например настройка внешнего отображения или языка
+begin
+    frmMain.tvMain.RowSelect:= xmlCfg.GetValue('TreeRowSelect', False);
 end;
 procedure LoadDocSettings;
 //А здесь грузятся настройки документа и заодно документ выводится в форму
@@ -983,6 +995,7 @@ begin
     lsStoredDocs:= LoadStoredDocs;
 	Log('Инициализация...');
     uCrypt.EnumProviders;
+    LoadInitialSettings;
     LoadSettings;
     LoadThemes;
     if not DocManager then begin
@@ -1131,7 +1144,7 @@ begin
         frmMain.Caption:= Application.Title +' [' + omgDoc.docFilePath + ']';
         LoadDocSettings;
         MessageIsEmptyDoc;
-        if Boolean(xmlCfg.GetValue('MakeBackups', False)) then
+        if Boolean(xmlCfg.GetValue('BackupsOnLogin', False)) then
             MakeDocumentBackup();
         Result:=True;
     except
@@ -1185,6 +1198,13 @@ begin
             Result:= ForceDirectories(FullPath)
         else
             Result:=True;
+end;
+procedure MakeBackupOnChanges();
+//Процедура вызывается после любого изменения документа
+//И если разрешено настройкой, то выполняется бэкап
+begin
+    if Boolean(xmlCfg.GetValue('BackupsOnChanges', True)) then
+        MakeDocumentBackup;
 end;
 procedure MakeDocumentBackup();
 //Делаем бэкап в папку из настроек
@@ -1334,19 +1354,22 @@ begin
 end;
 procedure ShowOptionsWindow;
 var
-    tempCfg: TSettings;
+    tmpCfg: TSettings;
 begin
-    tempCfg:= TSettings.Create;
-    tempCfg.Assign(xmlCfg);
-    if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(frmMain, tempCfg);
-    if frmOptions.ShowModal = mrOk then
-        xmlCfg.Assign(tempCfg);     //Вариант с копированием
+    tmpCfg:= TSettings.Create;
+    tmpCfg.Assign(xmlCfg);
+    if (not Assigned(frmOptions)) then frmOptions:= TfrmOptions.Create(frmMain, tmpCfg);
+    if frmOptions.ShowModal = mrOk then begin
+        xmlCfg.Assign(tmpCfg);     //Вариант с копированием объекта
 //    begin                         //Вариант с присвоением ссылки
 //        xmlCfg.Free;
 //        xmlCfg:=tempCfg;
+//        tmpCfg:=nil;
 //    end else
-//        tempCfg.Free;
-    tempCfg.Free;
+//        tmpCfg.Free;
+        LoadSettings();
+    end;
+    tmpCfg.Free;
     FreeAndNil(frmOptions);
 end;
 

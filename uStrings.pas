@@ -138,7 +138,7 @@ resourcestring
     rsFileNotFoundMsgTitle = 'File not found';
     rsSaveDialogFileExists = 'You have selected an existing file:' + CrLf + '%s' + CrLf+ 'Overwrite it?';
     rsSaveDialogTitle = 'Save new document as...';
-    rsOpenDialogTitle = 'Open docyment...';
+    rsOpenDialogTitle = 'Open document...';
     rsOpenDocumentError = 'Can''t open file' + CrLf + '%s' + CrLf + 'Please, make sure it is the correct file' + CrLf + '(Error class: %s)';
     rsOpenDocumentErrorTitle = 'Open document error';
     rsWrongPasswordError = 'Wrong or incorrect password! You can try again.' + CrLf + ' Please, check CapsLock and see on hint image';

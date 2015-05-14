@@ -43,8 +43,13 @@ type
     btnBackupNow: TButton;
     Label2: TLabel;
     imgBackup: TImage;
+    chkTreeRowSelect: TCheckBox;
+    CheckBox3: TCheckBox;
+    Edit1: TEdit;
+    UpDown1: TUpDown;
+    Label3: TLabel;
+    chkMakeBackupsCh: TCheckBox;
     bhBackup: TBalloonHint;
-    CheckBox2: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -94,12 +99,12 @@ end;
 
 procedure TfrmOptions.chkMakeBackupsClick(Sender: TObject);
 begin
-    txtBackupFolder.Enabled:= chkMakeBackups.Checked;
-    btnSelBackupFolder.Enabled:= chkMakeBackups.Checked;
-    txtBackupsCount.Enabled:= chkMakeBackups.Checked;
-    udBackupsCount.Enabled:= chkMakeBackups.Checked;
-    lblBackupFolder.Enabled:= chkMakeBackups.Checked;
-    lblBackupsCount.Enabled:= chkMakeBackups.Checked;
+    txtBackupFolder.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
+    btnSelBackupFolder.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
+    txtBackupsCount.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
+    udBackupsCount.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
+    lblBackupFolder.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
+    lblBackupsCount.Enabled:= chkMakeBackups.Checked or chkMakeBackupsCh.Checked;
     ChangeValue(Sender);
 end;
 
