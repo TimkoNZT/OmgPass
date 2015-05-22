@@ -50,6 +50,8 @@ type
     Label3: TLabel;
     chkMakeBackupsCh: TCheckBox;
     bhBackup: TBalloonHint;
+    btnAssociateFiles: TButton;
+    Label4: TLabel;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -62,6 +64,7 @@ type
     procedure txtBackupFolderExit(Sender: TObject);
     procedure txtBackupFolderChange(Sender: TObject);
     procedure imgBackupClick(Sender: TObject);
+    procedure btnAssociateFilesClick(Sender: TObject);
   private
     { Private declarations }
     Cfg: TSettings;
@@ -159,12 +162,12 @@ begin
             txtBackupFolder.SetFocus;
         end;
         ID_YES: begin
-            txtBackupFolder.Text:=constDefaultBackupFolder;
+            txtBackupFolder.Text:=strDefaultBackupFolder;
 //            txtBackupFolder.Show;
 //            txtBackupFolder.SetFocus;
         end;
         ID_CANCEL:begin
-            txtBackupFolder.Text:=xmlCfg.GetValue('BackupFolder', constDefaultBackupFolder);
+            txtBackupFolder.Text:=xmlCfg.GetValue('BackupFolder', strDefaultBackupFolder);
 //            txtBackupFolder.Show;
 //            txtBackupFolder.SetFocus;
         end;
@@ -177,6 +180,11 @@ end;
 procedure TfrmOptions.udBackupsCountClick(Sender: TObject; Button: TUDBtnType);
 begin
     ChangeValue(Sender);
+end;
+
+procedure TfrmOptions.btnAssociateFilesClick(Sender: TObject);
+begin
+    AssociateFileTypes(True);
 end;
 
 procedure TfrmOptions.btnBackupNowClick(Sender: TObject);

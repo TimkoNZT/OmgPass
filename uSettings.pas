@@ -44,16 +44,23 @@ begin
 end;
 
 constructor TSettings.Create(const XMLFilePath: string; RootNodeName: string = 'Config');
+var
+    fullXMLFilePath: String;
 begin
     try
         Self.Create;
-        if FileExists(XMLFilePath) then begin
-            sXML.LoadFromFile(XMLFilePath);
+        if ExtractFilePath(XMLFilePath) = '' then
+            fullXMLFilePath := ExtractFilePath(Application.ExeName) + XMLFilePath
+        else
+            fullXMLFilePath := XMLFilePath;
+
+        if FileExists(fullXMLFilePath) then begin
+            sXML.LoadFromFile(fullXMLFilePath);
             RootNode:=sXML.ChildNodes[RootNodeName];
         end else begin
             //sXML.Encoding := 'UTF-8';
             //sXML.Version := '1.0';
-            sXML.FileName:= XMLFilePath;
+            sXML.FileName:= fullXMLFilePath;
             RootNode:=sXML.Node.AddChild(RootNodename);
         end;
     except

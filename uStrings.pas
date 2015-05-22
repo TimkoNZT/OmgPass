@@ -1,6 +1,7 @@
 unit uStrings;
 interface
 const
+    intFileIconIndex = 1;
     CrLf = sLineBreak;
     strDefaultExt = '.xml';
     strCryptedExt = '.opwd';
@@ -15,7 +16,9 @@ const
     strSaveDialogDefFileName = 'NewCryptedBase';
     strBackupFilePrefix = 'Backup_';
     strBackupDTformat = 'yymmdd_hhmmss_';
-    constDefaultBackupFolder = '.\Backups';
+    strDefaultBackupFolder = '.\Backups';
+    strAssociateParam = 'fa';
+    strDeassociateParam = 'dfa';
 
 const arrFieldFormats: array[0..8] of String = ('title',
                                                 'text',
@@ -49,6 +52,8 @@ const arrDefFieldNames: array[0..8] of String = ('Title',
                                                     'Text or Login');
 
 resourcestring
+    rsFileTypeDescription = 'OmgPass crypted container';                              //Описание для файловой ассоциации
+    rsFileTypeName = 'OmgPass.Crypted';
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
     rsDefFieldNames = 'Title|Login|Password|Website|Comment|Date|Mail|File|Text or Login';
     rsTitleDefName = 'Title';

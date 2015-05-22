@@ -8,6 +8,10 @@ program OmgPass;
 
 
 
+
+
+{$R *.dres}
+
 uses
   Vcl.Forms,
   Vcl.Themes,

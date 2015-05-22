@@ -3,7 +3,7 @@ interface
 
 uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
   StdCtrls, Forms, ImgList, Menus, ComCtrls, ExtCtrls, ToolWin, ClipBrd, Vcl.Buttons,
-  Vcl.Dialogs,
+  Vcl.Dialogs, Registry, ShlObj,
 	{XML}
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
@@ -100,7 +100,8 @@ procedure DocumentClose;
 function MessageIsEmptyDoc: Boolean;
 function GetAppVersion:string;
 procedure ShowOptionsWindow;
-
+procedure AssociateFileTypes(AssociateOrNot: Boolean);
+function ParseCommandLine(): Boolean;
 
 implementation
 uses uMain, uConsole, uOptions, uEditItem, uEditField, uGenerator, uAccounts, uStrings, uLog;
@@ -991,10 +992,14 @@ function InitGlobal: Boolean;
 //Запуск программы
 begin
 	LogList:= TStringList.Create;
-    xmlCfg:=TSettings.Create(strConfigFile);
+    xmlCfg:=TSettings.Create(ExtractFilePath(Application.ExeName) + strConfigFile);
     lsStoredDocs:= LoadStoredDocs;
 	Log('Инициализация...');
     uCrypt.EnumProviders;
+    if not ParseCommandLine then begin
+        Result:=False;
+        Exit
+    end;
     LoadInitialSettings;
     LoadSettings;
     LoadThemes;
@@ -1231,7 +1236,7 @@ var
     sBackupFolder, sBackupFile, formattedDT, sOldestFile: String;
 begin
 try
-    sBackupFolder:= xmlCfg.GetValue('BackupFolder', constDefaultBackupFolder);
+    sBackupFolder:= xmlCfg.GetValue('BackupFolder', strDefaultBackupFolder);
     if not CheckBackupFolder(sBackupFolder, sBackupFolder, True) then           //Разворачиваем путь и проверяем что папка существует
         raise Exception.Create(rsCantCreateBackupFolder + sBackupFolder);
 
@@ -1372,5 +1377,49 @@ begin
     tmpCfg.Free;
     FreeAndNil(frmOptions);
 end;
-
+procedure AssociateFileTypes(AssociateOrNot: Boolean);
+var
+    reg: TRegistry;
+begin
+    Reg := TRegistry.Create;
+    Reg.RootKey:= HKEY_CURRENT_USER;
+    if AssociateOrNot then
+        with Reg do begin
+            OpenKey('Software\Classes\' + strCryptedExt, true);
+            WriteString('', rsFileTypeName);
+            CloseKey;
+            OpenKey('Software\Classes\' + rsFileTypeName, true);
+            WriteString('', rsFileTypeDescription);
+            CloseKey;
+            OpenKey('Software\Classes\' + rsFileTypeName + '\DefaultIcon', true );
+            WriteString( '', Application.ExeName + ',' + IntToStr(intFileIconIndex));
+            CloseKey;
+            OpenKey('Software\Classes\' + rsFileTypeName + '\Shell\Open\Command', true );
+            WriteString( '', AnsiQuotedStr(Application.ExeName, '"') + ' "%1"');
+        end
+    else
+        with Reg do begin
+            DeleteKey('Software\Classes\' + strCryptedExt);
+            DeleteKey('Software\Classes\' + rsFileTypeName);
+        end;
+    Reg.Free;
+    //SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETNONCLIENTMETRICS, 0);
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nil, nil);                 //Магия блд
+end;
+function ParseCommandLine(): Boolean;
+begin
+    Result:=False;
+    if FindCmdLineSwitch(strAssociateParam, True) then begin
+        AssociateFileTypes(True);
+        Exit;
+    end;
+    if FindCmdLineSwitch(strDeassociateParam, True) then begin
+        AssociateFileTypes(False);
+        Exit;
+    end;
+    if ParamStr(1)<>'' then
+        if FileExists(ParamStr(1)) then
+            AddReloadStoredDocs(ParamStr(1));
+    Result:=True;
+end;
 end.

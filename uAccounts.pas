@@ -132,6 +132,7 @@ begin
     Logic.SetButtonImg(btnRemove, imlAccounts, 6);
     Logic.SetButtonImg(btnNew, imlAccounts, 4);
     Logic.SetButtonImg(btnDelete, imlAccounts, 10);
+    chkShowPass.Checked:=xmlCfg.GetValue('ShowPasswordsInManager', True);
 end;
 
 procedure TfrmAccounts.LoadLvFiles;
@@ -428,6 +429,7 @@ end else begin
   txtNewPass.PasswordChar:= #149;
   if txtPass.Enabled then txtPass.PasswordChar:=#149;
 end;
+xmlCfg.SetValue('ShowPasswordsInManager', chkShowPass.Checked);
 
 end;
 

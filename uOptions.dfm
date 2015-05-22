@@ -113,7 +113,7 @@ object frmOptions: TfrmOptions
     Margins.Top = 7
     Margins.Right = 7
     Margins.Bottom = 55
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Align = alClient
     Images = imlOptions
     TabOrder = 0
@@ -243,6 +243,10 @@ object frmOptions: TfrmOptions
     object TabSheet3: TTabSheet
       Caption = 'Security'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 272
         Top = 61
@@ -309,6 +313,10 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Backups'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblBackupsCount: TLabel
         Left = 16
         Top = 122
@@ -334,8 +342,8 @@ object frmOptions: TfrmOptions
         OnClick = btnSelBackupFolderClick
       end
       object Label2: TLabel
-        Left = 113
-        Top = 147
+        Left = 110
+        Top = 149
         Width = 176
         Height = 26
         Caption = 
@@ -461,7 +469,7 @@ object frmOptions: TfrmOptions
       end
       object btnBackupNow: TButton
         Left = 16
-        Top = 147
+        Top = 149
         Width = 80
         Height = 35
         Caption = 'Backup now!'
@@ -484,6 +492,32 @@ object frmOptions: TfrmOptions
     object TabSheet4: TTabSheet
       Caption = 'System'
       ImageIndex = 3
+      object Label4: TLabel
+        Left = 110
+        Top = 18
+        Width = 194
+        Height = 35
+        AutoSize = False
+        Caption = 
+          'This button repair .opwd files associations with program if its ' +
+          'broken'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clHotLight
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object btnAssociateFiles: TButton
+        Left = 16
+        Top = 18
+        Width = 80
+        Height = 35
+        Caption = 'Associate'
+        TabOrder = 0
+        OnClick = btnAssociateFilesClick
+      end
     end
   end
   object btnOK: TButton
@@ -515,7 +549,7 @@ object frmOptions: TfrmOptions
     Left = 16
     Top = 240
     Bitmap = {
-      494C010106000001BC0016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000001C80016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
