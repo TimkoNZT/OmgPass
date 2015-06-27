@@ -3,7 +3,7 @@
         <ProjectGuid>{5A87BACE-6BAC-4BC6-8021-31BAF64C7B6E}</ProjectGuid>
         <MainSource>OmgPass.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -145,6 +145,7 @@
         </DCCReference>
         <DCCReference Include="uCustomSplitter.pas"/>
         <DCCReference Include="RyMenus.pas"/>
+        <DCCReference Include="uLocalization.pas"/>
         <RcItem Include="Boomy\ICO\Full ico\filelocked.ico">
             <ResourceType>ICON</ResourceType>
             <ResourceId>Icon_2</ResourceId>
@@ -587,9 +588,9 @@
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

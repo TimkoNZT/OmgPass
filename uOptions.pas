@@ -9,7 +9,7 @@ interface
 uses
 Windows, SysUtils, Classes, FileCtrl, Controls, Forms, StdCtrls, Vcl.ComCtrls,
 uSettings, uLog, System.ImageList, Vcl.ImgList, Vcl.Buttons, Vcl.Menus,
-  Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+  Vcl.Imaging.pngimage, Vcl.ExtCtrls,uLocalization;
 
 type
   TfrmOptions = class(TForm)
@@ -52,6 +52,8 @@ type
     bhBackup: TBalloonHint;
     btnAssociateFiles: TButton;
     Label4: TLabel;
+    cmbLanguages: TComboBox;
+    lblLanguages: TLabel;
     procedure FormShow(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -65,6 +67,7 @@ type
     procedure txtBackupFolderChange(Sender: TObject);
     procedure imgBackupClick(Sender: TObject);
     procedure btnAssociateFilesClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     Cfg: TSettings;
@@ -98,6 +101,13 @@ begin
         with (Sender as TEdit) do Cfg.SetValue(Hint, Text);
     if (Sender is TUpDown) then
         with (Sender as TUpDown) do Cfg.SetValue(Hint, Position);
+    if (Sender is TComboBox) then
+        with (Sender as TComboBox) do begin
+            if Hint = 'Language' then                                           //Особый случай, нужен не индекс а имя
+                Cfg.SetValue(Hint, appLoc.Languages[ItemIndex].ShortName)
+            else
+                Cfg.SetValue(Hint, ItemIndex);
+        end;
 end;
 
 procedure TfrmOptions.chkMakeBackupsClick(Sender: TObject);
@@ -121,6 +131,8 @@ end;
 procedure TfrmOptions.ReadConfiguration;
 
 procedure ReadValues(Com: TComponent);
+
+//(RootNode.ChildNodes.FindNode(Section) <> nil)
 begin
     if Com is TCheckBox then with (Com as TCheckBox) do
         if Cfg.HasOption(Hint) then
@@ -204,9 +216,19 @@ begin
     Self.Caption:='';
 end;
 
+procedure TfrmOptions.FormCreate(Sender: TObject);
+var
+    Lng:TLocalization.TLanguage;
+begin
+    for Lng in appLoc.Languages do
+        cmbLanguages.Items.Add(Lng.Name);
+    cmbLanguages.ItemIndex:= appLoc.Languages.IndexOf(appLoc.CurrentLanguage);
+end;
+
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
     WindowsOnTop(bWindowsOnTop, Self);
+    appLoc.TranslateForm(Self);
     SetButtonImg(btnSelBackupFolder, imlOptions, 4);
     chkMakeBackupsClick(nil);                                                   //Для enable-disable зависимых контролов
     txtBackupFolderChange(nil);                                                 //Для заполнения bhBackup

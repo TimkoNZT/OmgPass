@@ -8,7 +8,7 @@ uses Windows, Messages, SysUtils, Variants,TypInfo, Classes, Graphics, Controls,
 	Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc,
 	{MyUnits}
     XMLutils, uDocument, uFieldFrame, uFolderFrame, uFolderFrameInfo,
-    uSmartMethods, uSettings,
+    uSmartMethods, uSettings, uLocalization,
     {Themes}
     Styles, Themes, uCrypt
   	;
@@ -18,6 +18,7 @@ var
     omgDoc: TOmgDocument;           //Основной наш документ
 	  //xmlMain: TXMLDocument;        //Деприкейтед
     xmlCfg: TSettings;
+    appLoc: TLocalization;
 	  //omgDoc.docPages: IXMLNodeList;//Список страниц
     //intCurrentPage: Integer;    	//Текущая страничка
     intThemeIndex: Integer;         //Номер выбранной темы
@@ -310,7 +311,7 @@ begin
     else
        	tabControl.TabIndex:=tabControl.Tabs.Count - 1;
     intExpandFlag:=0;
-    tabControl.Tabs.Add('');
+    //tabControl.Tabs.Add('');
     Log('--------------------ParsePagesToTabs:End');
 end;
 procedure ParsePageToTree(pageIndex: Integer; Tree: TTreeView; SearchStr: String = '');
@@ -535,7 +536,7 @@ begin
     newPageNode.Text:=rsNewPageTitle +'_'+ DateToStr(now);
     newPageNode.SetAttributeNS('type', '', 'page');
     dItem:= newPageNode.AddChild('DefItem');
-    dItem.ChildNodes.Add(CreateNewField(ffTitle, rsNewItemTitle));
+    dItem.ChildNodes.Add(CreateNewField(ffTitle, appLoc.Strings('rsNewItemText', rsNewItemText)));
     dItem.ChildNodes.Add(CreateNewField(ffText));
     dItem.ChildNodes.Add(CreateNewField(ffPass));
     dItem.ChildNodes.Add(CreateNewField(ffWeb));
@@ -802,6 +803,11 @@ procedure LoadSettings;
 //Загрузка настроек которые можно менять по ходу программы
 //Например настройка внешнего отображения или языка
 begin
+    if appLoc.Languages.Count > 0 then
+        if not appLoc.SetLanguage(VarToStr(xmlCfg.GetValue('Language', strLocDefLang))) then
+            if not appLoc.SetLanguage(strLocDefLang) then
+                appLoc.SetLanguage(0);
+
     frmMain.tvMain.RowSelect:= xmlCfg.GetValue('TreeRowSelect', False);
 end;
 procedure LoadDocSettings;
@@ -992,8 +998,12 @@ function InitGlobal: Boolean;
 //Запуск программы
 begin
 	LogList:= TStringList.Create;
-    xmlCfg:=TSettings.Create(ExtractFilePath(Application.ExeName) + strConfigFile);
-    lsStoredDocs:= LoadStoredDocs;
+    xmlCfg:=TSettings.Create(strConfigFile);
+    appLoc:=TLocalization.Create(strLanguagesFolder);
+    Log('Languages found: ', appLoc.Languages.Count);
+    //Log(appLoc.Languages[0].Name);
+    lsStoredDocs:= LoadStoredDocs();
+    SetCurrentDir(ExtractFilePath(Application.ExeName));
 	Log('Инициализация...');
     uCrypt.EnumProviders;
     if not ParseCommandLine then begin
@@ -1008,6 +1018,7 @@ begin
         Exit
     end;
     //Принудительно показываем форму
+    //appLoc.Translate(frmMain);
     frmMain.Show;
     CheckVersion;
     CheckUpdates;
@@ -1195,9 +1206,9 @@ function CheckBackupFolder(sBackupFolder: String; var FullPath: String; CreateFo
 //CreateFolder разрешает создать эту папку для проверки правильности имени
 begin
     if ExtractFileDrive(sBackupFolder) = '' then
-        sBackupFolder:= GetCurrentDir() +'\' + sBackupFolder;
-    sBackupFolder:= ExpandFileName(sBackupFolder);
-    FullPath:=IncludeTrailingBackslash(sBackupFolder);
+        //BackupFolder:= ExtractFilePath(Application.ExeName) + sBackupFolder;
+        sBackupFolder:= ExpandFileName(sBackupFolder);
+    FullPath:=IncludeTrailingPathDelimiter(sBackupFolder);
     if CreateFolder then
         if not DirectoryExists(FullPath) then
             Result:= ForceDirectories(FullPath)
@@ -1221,7 +1232,7 @@ var
     fs: TSearchRec;
 begin
     Result:=0;
-    if FindFirst(Dir + '\Backup_*.*', faAnyFile - faDirectory - faVolumeID, fs) = 0 then begin
+    if FindFirst(Dir + '\Backup_*.*', faAnyFile - faDirectory, fs) = 0 then begin
         OldestFile := Dir + fs.Name;
         repeat
             inc(Result);
@@ -1373,6 +1384,7 @@ begin
 //    end else
 //        tmpCfg.Free;
         LoadSettings();
+        appLoc.TranslateForm(frmMain);
     end;
     tmpCfg.Free;
     FreeAndNil(frmOptions);

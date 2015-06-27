@@ -17,7 +17,7 @@ TfrmMain = class(TForm)
     mnuDocument: TMenuItem;
     mnuAccounts: TMenuItem;
     mnuPassword: TMenuItem;
-    N4: TMenuItem;
+    mnuItem: TMenuItem;
     mnuInsertItem: TMenuItem;
     mnuDelete: TMenuItem;
     mnuInsertFolder: TMenuItem;
@@ -714,7 +714,7 @@ begin
             ParsePageToTree(omgDoc.CurrentPage, tvMain);
             tvMain.Items[iSelected].Selected:=True;
         end;
-        Text:=rsSearchText;
+        Text:= appLoc.Strings('rsSearchText', rsSearchText);
         tvMain.SetFocus;
         bSearchMode:=False;
     end;
@@ -733,6 +733,7 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
 WindowsOnTop(bWindowsOnTop, Self);
+appLoc.TranslateForm(Self);
 end;
 
 procedure TfrmMain.fpMainMouseWheel(Sender: TObject; Shift: TShiftState;

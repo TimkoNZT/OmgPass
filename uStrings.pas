@@ -2,6 +2,7 @@ unit uStrings;
 interface
 const
     intFileIconIndex = 1;
+    strLocDefLang = 'En';
     CrLf = sLineBreak;
     strDefaultExt = '.xml';
     strCryptedExt = '.opwd';
@@ -12,6 +13,7 @@ const
     strItemNode = 'Item';
     strDefItemNode = 'DefItem';
     strConfigFile = 'config.xml';
+    strLanguagesFolder = '..\..\Languages';
     strLink = 'https://github.com/Mrgnstrn/OmgPass/releases/';
     strSaveDialogDefFileName = 'NewCryptedBase';
     strBackupFilePrefix = 'Backup_';
@@ -19,6 +21,7 @@ const
     strDefaultBackupFolder = '.\Backups';
     strAssociateParam = 'fa';
     strDeassociateParam = 'dfa';
+    strDefaultLanguageName = 'Default (English)';
 
 const arrFieldFormats: array[0..8] of String = ('title',
                                                 'text',
@@ -55,21 +58,22 @@ resourcestring
     rsFileTypeDescription = 'OmgPass crypted container';                              //Описание для файловой ассоциации
     rsFileTypeName = 'OmgPass.Crypted';
     rsTypes ='Title|Text|Pass|Link|Memo|Date|Mail|File';
-    rsDefFieldNames = 'Title|Login|Password|Website|Comment|Date|Mail|File|Text or Login';
-    rsTitleDefName = 'Title';
-    rsTextDefName = 'Login';
-    rsPassDefName = 'Password';
-    rsCommentDefName = 'Comment';
-    rsLinkDefName = 'Website';
-    rsDateDefName = 'Date';
-    rsMailDefName = 'Mail';
-    rsFileDefName = 'File';
+    //rsDefFieldNames = 'Title|Login|Password|Website|Comment|Date|Mail|File|Text or Login';
+    //rsTitleDefName = 'Title';
+//    rsTextDefName = 'Login';
+//    rsPassDefName = 'Password';
+//    rsCommentDefName = 'Comment';
+//    rsLinkDefName = 'Website';
+//    rsDateDefName = 'Date';
+//    rsMailDefName = 'Mail';
+//    rsFileDefName = 'File';
     //Название новой записи, папки, страницы
-    rsNewItemTitle = 'New record';
+    rsNewItemText = 'New record';
     rsNewFolderTitle = 'New folder';
     rsNewPageTitle = 'Page';
     //Серый текст в поле поиска
     rsSearchText = 'Search';
+
     //Инфо блок для папок
     rsInfoTitle =           'Title: ';
     rsInfoSubfolders =      'Subfolders:       ';
@@ -102,7 +106,7 @@ resourcestring
     //Window captions
     //Заголовки окошек
     rsFrmAccountsCaption = ' welcomes you!';
-    rsFrmAccountsCaptionOpen = 'Open base';
+    //rsFrmAccountsCaptionOpen = 'Open base';
     rsFrmAccountsCaptionChange = ' - Document manager';
     rsFrmEditItemCaption = 'Edit record';
     rsFrmEditItemCaptionDef = 'Edit default record';
@@ -121,13 +125,13 @@ resourcestring
 
     //Smart-buttons hints
     //Подсказки для кнопулек
-    rsHintOpenLink = 'Open link';
-    rsHintCopyToClipboard = 'Copy to clipboard';
-    rsHintCopyFromClipboard = 'Copy from clipboard';
-    rsHintGenerate = 'Generate password';
-    rsHintEditField = 'Edit field properties';
-    rsHintSaveFile = 'Save file(s)';
-    rsHintAddFile = 'Add file(s)';
+//    rsHintOpenLink = 'Open link';
+//    rsHintCopyToClipboard = 'Copy to clipboard';
+//    rsHintCopyFromClipboard = 'Copy from clipboard';
+//    rsHintGenerate = 'Generate password';
+//    rsHintEditField = 'Edit field properties';
+//    rsHintSaveFile = 'Save file(s)';
+//    rsHintAddFile = 'Add file(s)';
 
     //frmAccounts
     rsSaveDialogFilter = 'Omg!Pass Crypted files (*.opwd)|*.opwd|Omg!Pass XML files (*.xml)|*.xml';

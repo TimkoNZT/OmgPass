@@ -40,7 +40,8 @@ uses
   uLog in 'uLog.pas',
   uPassword in 'uPassword.pas' {frmPassword},
   uCustomSplitter in 'uCustomSplitter.pas',
-  RyMenus in 'RyMenus.pas';
+  RyMenus in 'RyMenus.pas',
+  uLocalization in 'uLocalization.pas';
 
 {$R *.res}
 

@@ -23,10 +23,10 @@ type
     tsOpen: TTabSheet;
     imlAccounts: TImageList;
     lvFiles: TListView;
-    Label1: TLabel;
-    Label6: TLabel;
+    lblPassword: TLabel;
+    lblStoredDocuments: TLabel;
     btnGeneratePass: TSpeedButton;
-    btnNewBase: TSpeedButton;
+    btnNewBasePath: TSpeedButton;
     Image1: TImage;
     txtPass: TEdit;
     btnClose: TButton;
@@ -44,7 +44,7 @@ type
     tmrEnter: TTimer;
     constructor Create(AOwner: TComponent; isChange: Boolean = False); reintroduce;
     procedure chkShowPassClick(Sender: TObject);
-    procedure btnNewBaseClick(Sender: TObject);
+    procedure btnNewBasePathClick(Sender: TObject);
     procedure btnGeneratePassClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -92,13 +92,13 @@ begin
 fIsChange :=IsChange;
 inherited Create (AOwner);
 if isChange then begin
-    Self.Caption:= Application.Title + rsFrmAccountsCaptionChange;
-    btnClose.Caption:=rsCancel;
-    btnOK.Caption:=rsOK;
+    Self.Caption:= Application.Title + appLoc.Strings('rsFrmAccountsCaptionChange', rsFrmAccountsCaptionChange);
+    btnClose.Caption:= appLoc.Strings('rsCancel', rsCancel) ;
+    btnOK.Caption:= appLoc.Strings('rsOK', rsOK) ;
 end else begin
-    Self.Caption:=Application.Title + rsFrmAccountsCaption;
-    btnClose.Caption:=rsExit;
-    btnOK.Caption:=rsOpen;
+    Self.Caption:=Application.Title + appLoc.Strings('rsFrmAccountsCaption', rsFrmAccountsCaption);;
+    btnClose.Caption:= appLoc.Strings('rsExit', rsExit);
+    btnOK.Caption:= appLoc.Strings('rsOpen', rsOpen);
 end;
 end;
 
@@ -122,11 +122,12 @@ end;
 
 procedure TfrmAccounts.FormCreate(Sender: TObject);
 begin
+    appLoc.TranslateForm(Self);
     LoadLvFiles;
     if lvFiles.Items.Count > 5 then
         lvFiles.Column[0].Width:=(lvFiles.ClientRect.Width - 17);
 
-    Logic.SetButtonImg(btnNewBase, imlAccounts, 3);
+    Logic.SetButtonImg(btnNewBasePath, imlAccounts, 3);
     Logic.SetButtonImg(btnGeneratePass, imlAccounts, 1);
     Logic.SetButtonImg(btnAdd, imlAccounts, 5);
     Logic.SetButtonImg(btnRemove, imlAccounts, 6);
@@ -163,20 +164,20 @@ begin
     txtPass.Font.Style:= [fsItalic];
     imgNotShallPass.Visible:=True;
     if lvFiles.Selected = nil then begin
-        txtPass.Text:=rsTxtPassFileNotSelected;
+        txtPass.Text:= appLoc.Strings('rsTxtPassFileNotSelected', rsTxtPassFileNotSelected);
         Exit;
     end;
 
     FFileName:=lvFiles.Selected.Caption;
     if not FileExists(FFileName) then begin      //Where is the file?
-        txtPass.Text:=rsTxtPassFileNotFound;
+        txtPass.Text:= appLoc.Strings('rsTxtPassFileNotFound', rsTxtPassFileNotFound);
         lvFiles.Selected.ImageIndex:=8;
         Exit;
     end;
 
     if omgDoc<> nil then
         if FFilename = omgDoc.docFilePath then begin
-            txtPass.Text := rsTxtPassAlrOpened;
+            txtPass.Text := appLoc.Strings('rsTxtPassAlrOpened', rsTxtPassAlrOpened);
             imgNotShallPass.Visible:=False;
             Result:=False;
             if AlertMsg then Self.Close;
@@ -184,18 +185,18 @@ begin
         end;
     if ExtractFileExt(FFileName) = strDefaultExt {*.xml?} then
         if DocumentPreOpenXML(FFileName, AlertMsg) then begin
-            txtPass.Text:= rsTxtPassPassNotReq;
+            txtPass.Text:= appLoc.Strings('rsTxtPassPassNotReq', rsTxtPassPassNotReq);
             imgNotShallPass.Visible:=False;
             Result:=True;
         end else begin
-            txtPass.Text:= rsTxtPassFileIsBad;
+            txtPass.Text:= appLoc.Strings('rsTxtPassFileIsBad', rsTxtPassFileIsBad);
             lvFiles.Selected.ImageIndex:=8;
         end
     else
         case DocumentPreOpenCrypted(FFileName, fPassword, AlertMsg) of
         idOk: begin
             if txtPass.Text = '' then begin
-                txtPass.Text:=rsTxtPassPassEmpty
+                txtPass.Text:= appLoc.Strings('rsTxtPassPassEmpty', rsTxtPassPassEmpty);
             end else begin
                 txtPass.Enabled:=True;
                 if not chkShowMainPass.Checked then txtPass.PasswordChar:=#149;
@@ -212,7 +213,7 @@ begin
             if Self.Visible = True then txtPass.SetFocus;
             end;
         idCancel: begin
-            txtPass.Text:= rsTxtPassFileIsBad;
+            txtPass.Text:= appLoc.Strings('rsTxtPassFileIsBad', rsTxtPassFileIsBad);
             lvFiles.Selected.ImageIndex:=8;
         end;
     end;
@@ -315,7 +316,7 @@ begin
             PWideChar(rsCreateNewNeedFile),
             PWideChar(rsCreateNewNeedFileTitle),
             MB_OK + MB_ICONWARNING);
-        btnNewBase.Click;
+        btnNewBasePath.Click;
         Exit;
     end;
     if not chkShowPass.Checked and (txtNewPass.Text <> txtNewPassConfirm.Text) then begin
@@ -380,7 +381,7 @@ end;
 FreeAndNil(frmGenerator);
 end;
 
-procedure TfrmAccounts.btnNewBaseClick(Sender: TObject);
+procedure TfrmAccounts.btnNewBasePathClick(Sender: TObject);
 var Accept: Boolean;
 begin
 With SaveDialog do begin

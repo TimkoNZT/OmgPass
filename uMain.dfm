@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 397
   Top = 326
   Caption = 'Omg!Pass'
-  ClientHeight = 342
+  ClientHeight = 343
   ClientWidth = 472
   Color = clBtnFace
   Constraints.MinHeight = 330
@@ -41,12 +41,12 @@ object frmMain: TfrmMain
     AutoSize = True
     ButtonHeight = 54
     ButtonWidth = 55
+    GradientEndColor = 14079702
     Images = imlToolBar
     Indent = 2
     TabOrder = 0
     Transparent = True
     Wrapable = False
-    ExplicitWidth = 533
     object tbtnAccounts: TToolButton
       Left = 2
       Top = 0
@@ -144,7 +144,7 @@ object frmMain: TfrmMain
     Left = 1
     Top = 55
     Width = 470
-    Height = 267
+    Height = 268
     Margins.Left = 1
     Margins.Top = 1
     Margins.Right = 1
@@ -156,11 +156,9 @@ object frmMain: TfrmMain
     OnChange = tabMainChange
     OnMouseDown = tabMainMouseDown
     OnMouseLeave = tabMainMouseLeave
-    ExplicitWidth = 531
-    ExplicitHeight = 327
     DesignSize = (
       470
-      267)
+      268)
     object btnAddPage: TSpeedButton
       Left = 442
       Top = 0
@@ -201,7 +199,7 @@ object frmMain: TfrmMain
       Left = 201
       Top = 6
       Width = 7
-      Height = 257
+      Height = 258
       Hint = 'DblClick for restore position'
       Margins.Left = 2
       Margins.Top = 2
@@ -218,7 +216,7 @@ object frmMain: TfrmMain
       Left = 208
       Top = 6
       Width = 256
-      Height = 256
+      Height = 257
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 2
@@ -234,26 +232,23 @@ object frmMain: TfrmMain
       Padding.Bottom = 10
       TabOrder = 0
       OnMouseWheel = fpMainMouseWheel
-      ExplicitWidth = 317
-      ExplicitHeight = 316
     end
     object pnlTree: TPanel
       Left = 4
       Top = 6
       Width = 197
-      Height = 257
+      Height = 258
       Align = alLeft
       BevelOuter = bvNone
       Constraints.MinWidth = 150
       ParentBackground = False
       ParentColor = True
       TabOrder = 1
-      ExplicitHeight = 317
       object tvMain: TTreeView
         Left = 0
         Top = 34
         Width = 197
-        Height = 223
+        Height = 224
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -279,7 +274,6 @@ object frmMain: TfrmMain
         OnEditing = tvMainEditing
         OnExpanded = tvMainExpanded
         OnStartDrag = tvMainStartDrag
-        ExplicitHeight = 283
       end
       object txtSearch: TButtonedEdit
         AlignWithMargins = True
@@ -321,7 +315,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 323
+    Top = 324
     Width = 472
     Height = 19
     Margins.Left = 2
@@ -333,8 +327,6 @@ object frmMain: TfrmMain
         Width = 50
       end>
     Visible = False
-    ExplicitTop = 383
-    ExplicitWidth = 533
   end
   object menuMain: TMainMenu
     AutoHotkeys = maManual
@@ -369,7 +361,7 @@ object frmMain: TfrmMain
         OnClick = mnuBasePropertiesClick
       end
     end
-    object N4: TMenuItem
+    object mnuItem: TMenuItem
       Caption = 'Record'
       SubMenuImages = imlTab
       object mnuInsertItem: TMenuItem
@@ -524,7 +516,7 @@ object frmMain: TfrmMain
     Left = 307
     Top = 192
     Bitmap = {
-      494C010109001800280330003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109003803380330003000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000C000000090000000010020000000000000B0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4104,7 +4096,7 @@ object frmMain: TfrmMain
     Left = 227
     Top = 152
     Bitmap = {
-      494C01010D002401280417001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010D003804380417001700FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005C0000005C00000001002000000000004084
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5213,7 +5205,7 @@ object frmMain: TfrmMain
     Left = 227
     Top = 104
     Bitmap = {
-      494C0101030034005C0216001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
+      494C010103006C026C0216001600FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5468,7 +5460,7 @@ object frmMain: TfrmMain
     Left = 347
     Top = 192
     Bitmap = {
-      494C01015C005803600416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01015C007004700416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000005800000010020000010020000000000000D6
       0200000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -11531,7 +11523,7 @@ object frmMain: TfrmMain
     Left = 411
     Top = 304
     Bitmap = {
-      494C01010500F001400416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010105005004500416001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000010000000800000001000000000000
@@ -12058,7 +12050,7 @@ object frmMain: TfrmMain
     Left = 227
     Top = 62
     Bitmap = {
-      494C010103000800B80110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010300C801C80110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000E00121B78002B

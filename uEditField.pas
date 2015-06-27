@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   {XML}
   Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.ImgList,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, System.ImageList;
 
 type
   TfrmEditField = class(TForm)
